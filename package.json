@@ -1,0 +1,27 @@
+{
+  "name": "gatsby-source-tractstack",
+  "version": "0.1.0",
+  "description": "Source data from tractstack API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src --out-dir ./ --source-maps",
+    "watch": "babel src --out-dir ./ --source-maps --watch",
+    "lint": "eslint --ext js ./ --cache",
+    "format": "prettier --write 'src/*.js'"
+  },
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin"
+  ],
+  "author": "Adon Irani <a@atriskmedia.com>",
+  "license": "LGPL",
+  "devDependencies": {
+    "@babel/cli": "^7.17.3",
+    "@babel/core": "^7.17.5",
+    "eslint": "^8.9.0"
+  },
+  "dependencies": {
+    "prettier": "^2.5.1"
+  }
+}
