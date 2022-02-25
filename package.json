@@ -1,5 +1,5 @@
 {
-  "name": "gatsby-source-tractstack",
+  "name": "gatsby-plugin-tractstack",
   "version": "0.1.0",
   "description": "Source data from tractstack API",
   "main": "index.js",
