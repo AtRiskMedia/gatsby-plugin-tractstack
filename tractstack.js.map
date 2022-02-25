@@ -1,0 +1,1 @@
+{"version":3,"sources":["src/tractstack.js"],"names":["Hello1","console","log"],"mappings":"AACA,OAAO,SAASA,MAAT,GAAkB;AACvBC,EAAAA,OAAO,CAACC,GAAR,CAAa,iCAAb;AACA,SAAO,EAAP;AACD","sourcesContent":["\nexport function Hello1() {\n  console.log( \"Loaded gatsby-plugin-tractstack\" );\n  return \"\";\n}\n"],"file":"tractstack.js"}
