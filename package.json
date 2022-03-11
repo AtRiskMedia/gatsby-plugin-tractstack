@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.17.3",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "prop-types": "^15.8.1"
   }
 }

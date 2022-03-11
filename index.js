@@ -1,3 +1,3 @@
-import { Hello1 } from './tractstack';
-export { Hello1 };
+import { ResolveComponent } from './component-resolver';
+export default ResolveComponent;
 //# sourceMappingURL=index.js.map

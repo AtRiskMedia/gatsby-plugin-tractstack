@@ -1,3 +1,3 @@
-import {Hello1} from './tractstack';
+import {ResolveComponent} from './component-resolver'
 
-export {Hello1};
+export default ResolveComponent;
