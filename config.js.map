@@ -1,1 +1,0 @@
-{"version":3,"sources":["src/config.js"],"names":["defaultQueries"],"mappings":"AAAA,OAAO,MAAMA,cAAc,GAAG;AAC5B,OAAK,oBADuB;AAE5B,QAAM,4CAFsB;AAG5B,QAAM;AAHsB,CAAvB","sourcesContent":["export const defaultQueries = {\n  360: '(max-width: 600px)',\n  1080: '(min-width: 601px) and (max-width: 1200px)',\n  1920: '(min-width: 1201px)',\n};\n"],"file":"config.js"}

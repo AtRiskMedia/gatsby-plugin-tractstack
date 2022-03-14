@@ -1,3 +1,2 @@
-import { ResolveComponent } from './component-resolver';
-export default ResolveComponent;
+// noop
 //# sourceMappingURL=index.js.map

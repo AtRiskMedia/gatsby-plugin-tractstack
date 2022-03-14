@@ -5,6 +5,6 @@ module.exports = {
     title: `Gatsby TractStack Plugin`,
     description: `Core functionality`,
     author: `@atriskmedia`,
-    siteUrl: `https://tractstack.com/`
-  }
+    siteUrl: `https://tractstack.com/`,
+  },
 };

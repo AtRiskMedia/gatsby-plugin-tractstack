@@ -1,1 +1,0 @@
-{"version":3,"sources":["src/gatsby-node.js"],"names":[],"mappings":"AAAA;AACA;AACA;AACA;AACA","sourcesContent":["/**\n * Implement Gatsby's Node APIs in this file.\n *\n * See: https://www.gatsbyjs.com/docs/node-apis/\n */\n"],"file":"gatsby-node.js"}

@@ -1,1 +1,1 @@
-{"version":3,"sources":["src/index.js"],"names":["ResolveComponent"],"mappings":"AAAA,SAAQA,gBAAR,QAA+B,sBAA/B;AAEA,eAAeA,gBAAf","sourcesContent":["import {ResolveComponent} from './component-resolver'\n\nexport default ResolveComponent;\n"],"file":"index.js"}
+{"version":3,"sources":["src/index.js"],"names":[],"mappings":"AAAA","sourcesContent":["// noop\n"],"file":"index.js"}
