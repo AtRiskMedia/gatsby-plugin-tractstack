@@ -1,1 +1,1 @@
-{"version":3,"sources":["src/index.js"],"names":[],"mappings":"AAAA","sourcesContent":["// noop\n"],"file":"index.js"}
+{"version":3,"sources":["src/index.js"],"names":["ComposePanes"],"mappings":"AAAA,SAASA,YAAT,QAA6B,iBAA7B;AAEA,SAASA,YAAT","sourcesContent":["import { ComposePanes } from \"./compose-panes\";\n\nexport { ComposePanes };\n"],"file":"index.js"}
