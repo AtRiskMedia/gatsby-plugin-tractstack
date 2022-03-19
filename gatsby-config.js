@@ -6,6 +6,7 @@ module.exports = {
     description: `Core functionality`,
     author: `@atriskmedia`,
     siteUrl: `https://tractstack.com/`
-  }
+  },
+  plugins: [`gatsby-plugin-image`]
 };
 //# sourceMappingURL=gatsby-config.js.map
