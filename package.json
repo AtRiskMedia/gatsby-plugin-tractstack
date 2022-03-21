@@ -24,10 +24,14 @@
   },
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.17.3",
+    "babel-plugin-styled-components": "^2.0.6",
     "gatsby-plugin-image": "^2.10.0",
+    "gatsby-plugin-styled-components": "^5.10.0",
     "hast-to-hyperscript": "^10.0.1",
+    "hast-util-sanitize": "^4.0.0",
     "hyperscript": "^2.0.2",
     "prettier": "^2.5.1",
-    "prop-types": "^15.8.1"
+    "prop-types": "^15.8.1",
+    "styled-components": "^5.3.3"
   }
 }

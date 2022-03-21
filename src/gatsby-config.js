@@ -7,5 +7,10 @@ module.exports = {
     author: `@atriskmedia`,
     siteUrl: `https://tractstack.com/`,
   },
-  plugins: [`gatsby-plugin-image`],
+  plugins: [
+    `gatsby-plugin-image`,
+    {
+      resolve: `gatsby-plugin-styled-components`,
+    },
+  ],
 };
