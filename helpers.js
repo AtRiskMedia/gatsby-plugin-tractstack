@@ -9,10 +9,8 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 
 const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
-  console.log(imageData);
   const image = getImage(imageData);
   const bgImage = convertToBgImage(image);
-  console.log("image", image, bgImage);
   return /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
   }, bgImage, {

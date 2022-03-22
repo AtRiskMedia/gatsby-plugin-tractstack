@@ -7,10 +7,8 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 
 const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
-  console.log(imageData);
   const image = getImage(imageData);
   const bgImage = convertToBgImage(image);
-  console.log("image", image, bgImage);
   return (
     <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
       <div style={{ minHeight: 1000, minWidth: 1000 }}>
