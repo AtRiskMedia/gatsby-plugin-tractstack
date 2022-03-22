@@ -1,7 +1,24 @@
 import React from "react";
 import { toH } from "hast-to-hyperscript";
 import h from "hyperscript";
-import { GatsbyImage } from "gatsby-plugin-image";
+import { graphql, useStaticQuery } from "gatsby";
+import { getImage, GatsbyImage } from "gatsby-plugin-image";
+import { convertToBgImage } from "gbimage-bridge";
+import BackgroundImage from "gatsby-background-image";
+
+const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
+  console.log(imageData);
+  const image = getImage(imageData);
+  const bgImage = convertToBgImage(image);
+  console.log("image", image, bgImage);
+  return (
+    <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
+      <div style={{ minHeight: 1000, minWidth: 1000 }}>
+        <GatsbyImage image={image} alt={alt_text} />
+      </div>
+    </BackgroundImage>
+  );
+};
 
 const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   const html = htmlAst.children
@@ -23,14 +40,23 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
               );
             }
           });
-          // only supports one image with own dedicated paragraph
+          // only supports one image each with its own dedicated paragraph
           return gatsbyImageData[0];
         }
       }
       // otherwise
       return toH(h, child).outerHTML;
     });
-  return html;
+
+  // render with styled-components and css
+  return html.map((tag, index) => {
+    // is either html as string OR is already a react element
+    if (typeof tag === "object") {
+      return tag;
+    } else if (typeof tag === "string") {
+      return <div key={index} dangerouslySetInnerHTML={{ __html: tag }} />;
+    }
+  });
 };
 
-export { MarkdownInjectGatsbyImage };
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage };

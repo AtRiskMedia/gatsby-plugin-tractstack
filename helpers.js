@@ -1,7 +1,32 @@
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 import React from "react";
 import { toH } from "hast-to-hyperscript";
 import h from "hyperscript";
-import { GatsbyImage } from "gatsby-plugin-image";
+import { graphql, useStaticQuery } from "gatsby";
+import { getImage, GatsbyImage } from "gatsby-plugin-image";
+import { convertToBgImage } from "gbimage-bridge";
+import BackgroundImage from "gatsby-background-image";
+
+const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
+  console.log(imageData);
+  const image = getImage(imageData);
+  const bgImage = convertToBgImage(image);
+  console.log("image", image, bgImage);
+  return /*#__PURE__*/React.createElement(BackgroundImage, _extends({
+    Tag: "section"
+  }, bgImage, {
+    preserveStackingContext: true
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      minHeight: 1000,
+      minWidth: 1000
+    }
+  }, /*#__PURE__*/React.createElement(GatsbyImage, {
+    image: image,
+    alt: alt_text
+  })));
+};
 
 const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   const html = htmlAst.children.filter(child => child?.type && child.type === "element").map(child => {
@@ -17,7 +42,7 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
               image: thisImageData[0][2]
             });
           }
-        }); // only supports one image with own dedicated paragraph
+        }); // only supports one image each with its own dedicated paragraph
 
         return gatsbyImageData[0];
       }
@@ -25,9 +50,22 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
 
 
     return toH(h, child).outerHTML;
+  }); // render with styled-components and css
+
+  return html.map((tag, index) => {
+    // is either html as string OR is already a react element
+    if (typeof tag === "object") {
+      return tag;
+    } else if (typeof tag === "string") {
+      return /*#__PURE__*/React.createElement("div", {
+        key: index,
+        dangerouslySetInnerHTML: {
+          __html: tag
+        }
+      });
+    }
   });
-  return html;
 };
 
-export { MarkdownInjectGatsbyImage };
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage };
 //# sourceMappingURL=helpers.js.map

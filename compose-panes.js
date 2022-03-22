@@ -1,9 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { toH } from "hast-to-hyperscript";
 import { sanitize } from "hast-util-sanitize";
-import h from "hyperscript";
-import { MarkdownInjectGatsbyImage } from "./helpers";
+import { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage } from "./helpers";
 const StyledWrapper = styled.div`
   ${props => props.css};
 `;
@@ -25,31 +23,46 @@ const ComposePanes = data => {
   return data.data.relationships.field_panes.map((pane, index) => {
     // each pane needs its field_css_styles_parent
     return pane.relationships.field_pane_fragments.map((pane_fragment, index) => {
+      let react_fragment;
       let imageData = pane_fragment.relationships.field_image.map(image => {
         return [image.id, image.filename, image.localFile.childImageSharp.gatsbyImageData];
-      });
-      let htmlAst = sanitize(pane_fragment.childPaneFragment.childMarkdownRemark.htmlAst); // replace images with Gatsby Images
+      }); // switch on internal.type
 
-      let html = MarkdownInjectGatsbyImage(htmlAst, imageData); // render with styled-components and css
+      switch (pane_fragment.internal.type) {
+        case "paragraph__markdown":
+          // replace images with Gatsby Images and prepare html
+          let htmlAst = sanitize(pane_fragment.childPaneFragment.childMarkdownRemark.htmlAst);
+          react_fragment = MarkdownInjectGatsbyImage(htmlAst, imageData);
+          break;
 
-      let children = html.map((tag, index) => {
-        // is either html as string OR is already a react element
-        if (typeof tag === "object") {
-          return tag;
-        } else if (typeof tag === "string") {
-          return /*#__PURE__*/React.createElement("div", {
-            key: index,
-            dangerouslySetInnerHTML: {
-              __html: tag
-            }
-          });
-        }
-      });
+        case "paragraph__background_image":
+          // create Gatsby Background Image ... imageData[2] has the image
+          let alt_text = pane_fragment.field_alt_text;
+          react_fragment = InjectGatsbyBackgroundImage(imageData[0][2], alt_text);
+          break;
+
+        case "paragraph__svg":
+          //
+          break;
+
+        case "paragraph__video":
+          //
+          break;
+
+        case "paragraph__d3":
+          //
+          break;
+
+        case "paragraph__h5p":
+          //
+          break;
+      }
+
       return /*#__PURE__*/React.createElement(StyleWrapper, {
         key: index,
         css: pane_fragment.field_css_styles,
         parent_css: pane_fragment.field_css_styles_parent
-      }, children);
+      }, react_fragment);
     });
   });
 };
