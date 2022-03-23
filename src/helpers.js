@@ -11,10 +11,18 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
   const bgImage = convertToBgImage(image);
   return (
     <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
-      <div style={{ minHeight: 1000, minWidth: 1000 }}>
+      <div>
         <GatsbyImage image={image} alt={alt_text} />
       </div>
     </BackgroundImage>
+  );
+};
+
+const InjectSvg = (publicURL, alt_text) => {
+  return (
+    <>
+      <img src={publicURL} alt={alt_text} />
+    </>
   );
 };
 
@@ -57,4 +65,4 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage };
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectSvg };

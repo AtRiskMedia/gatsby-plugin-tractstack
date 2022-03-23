@@ -15,15 +15,17 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
     Tag: "section"
   }, bgImage, {
     preserveStackingContext: true
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      minHeight: 1000,
-      minWidth: 1000
-    }
-  }, /*#__PURE__*/React.createElement(GatsbyImage, {
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
     image: image,
     alt: alt_text
   })));
+};
+
+const InjectSvg = (publicURL, alt_text) => {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+    src: publicURL,
+    alt: alt_text
+  }));
 };
 
 const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
@@ -65,5 +67,5 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage };
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectSvg };
 //# sourceMappingURL=helpers.js.map
