@@ -12,6 +12,7 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
   const image = getImage(imageData);
   const bgImage = convertToBgImage(image);
   return /*#__PURE__*/React.createElement(BackgroundImage, _extends({
+    className: "paneFragmentImage",
     Tag: "section"
   }, bgImage, {
     preserveStackingContext: true
@@ -21,10 +22,26 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
   })));
 };
 
+const InjectGatsbyBackgroundVideo = (id, url, alt_text) => {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "paneFragmentVideo"
+  }, /*#__PURE__*/React.createElement("video", {
+    autoPlay: true,
+    muted: true,
+    loop: true,
+    id: id,
+    title: alt_text
+  }, /*#__PURE__*/React.createElement("source", {
+    src: url,
+    type: "video/mp4"
+  })));
+};
+
 const InjectSvg = (publicURL, alt_text) => {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     src: publicURL,
-    alt: alt_text
+    alt: alt_text,
+    className: "paneFragmentCSS"
   }));
 };
 
@@ -67,5 +84,5 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectSvg };
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg };
 //# sourceMappingURL=helpers.js.map

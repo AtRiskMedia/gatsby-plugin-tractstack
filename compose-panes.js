@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { sanitize } from "hast-util-sanitize";
-import { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectSvg } from "./helpers";
+import { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg } from "./helpers";
 const StyledWrapper = styled.div`
   ${props => props.css};
 `;
@@ -14,7 +14,7 @@ const StyleWrapper = ({
   return /*#__PURE__*/React.createElement(StyledWrapper, {
     css: parent_css
   }, /*#__PURE__*/React.createElement("div", {
-    className: "panefragment"
+    className: "paneFragment"
   }, /*#__PURE__*/React.createElement(StyledWrapper, {
     css: css
   }, children)));
@@ -38,10 +38,13 @@ const ComposePanes = data => {
           react_fragment = MarkdownInjectGatsbyImage(htmlAst, imageData);
           break;
 
+        case "paragraph__background_video":
+          react_fragment = InjectGatsbyBackgroundVideo(pane_fragment?.id, pane_fragment?.field_cdn_url, pane_fragment?.field_alt_text);
+          break;
+
         case "paragraph__background_image":
           // create Gatsby Background Image ... imageData[2] has the image
-          alt_text = pane_fragment?.field_alt_text;
-          react_fragment = InjectGatsbyBackgroundImage(imageData[0][2], alt_text);
+          react_fragment = InjectGatsbyBackgroundImage(imageData[0][2], pane_fragment?.field_alt_text);
           break;
 
         case "paragraph__svg":
@@ -65,8 +68,8 @@ const ComposePanes = data => {
 
       return /*#__PURE__*/React.createElement(StyleWrapper, {
         key: index,
-        css: pane_fragment.field_css_styles,
-        parent_css: pane_fragment.field_css_styles_parent
+        css: pane_fragment?.field_css_styles,
+        parent_css: pane_fragment?.field_css_styles_parent
       }, react_fragment);
     });
   });

@@ -10,7 +10,12 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
   const image = getImage(imageData);
   const bgImage = convertToBgImage(image);
   return (
-    <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
+    <BackgroundImage
+      className="paneFragmentImage"
+      Tag="section"
+      {...bgImage}
+      preserveStackingContext
+    >
       <div>
         <GatsbyImage image={image} alt={alt_text} />
       </div>
@@ -18,10 +23,20 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
   );
 };
 
+const InjectGatsbyBackgroundVideo = (id, url, alt_text) => {
+  return (
+    <div className="paneFragmentVideo">
+      <video autoPlay={true} muted loop id={id} title={alt_text}>
+        <source src={url} type="video/mp4" />
+      </video>
+    </div>
+  );
+};
+
 const InjectSvg = (publicURL, alt_text) => {
   return (
     <>
-      <img src={publicURL} alt={alt_text} />
+      <img src={publicURL} alt={alt_text} className="paneFragmentCSS" />
     </>
   );
 };
@@ -65,4 +80,9 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectSvg };
+export {
+  MarkdownInjectGatsbyImage,
+  InjectGatsbyBackgroundImage,
+  InjectGatsbyBackgroundVideo,
+  InjectSvg,
+};

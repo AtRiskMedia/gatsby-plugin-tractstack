@@ -4,6 +4,7 @@ import { sanitize } from "hast-util-sanitize";
 import {
   MarkdownInjectGatsbyImage,
   InjectGatsbyBackgroundImage,
+  InjectGatsbyBackgroundVideo,
   InjectSvg,
 } from "./helpers";
 
@@ -13,7 +14,7 @@ const StyledWrapper = styled.div`
 const StyleWrapper = ({ children, css, parent_css }) => {
   return (
     <StyledWrapper css={parent_css}>
-      <div className="panefragment">
+      <div className="paneFragment">
         <StyledWrapper css={css}>{children}</StyledWrapper>
       </div>
     </StyledWrapper>
@@ -48,12 +49,19 @@ const ComposePanes = (data) => {
             react_fragment = MarkdownInjectGatsbyImage(htmlAst, imageData);
             break;
 
+          case "paragraph__background_video":
+            react_fragment = InjectGatsbyBackgroundVideo(
+              pane_fragment?.id,
+              pane_fragment?.field_cdn_url,
+              pane_fragment?.field_alt_text
+            );
+            break;
+
           case "paragraph__background_image":
             // create Gatsby Background Image ... imageData[2] has the image
-            alt_text = pane_fragment?.field_alt_text;
             react_fragment = InjectGatsbyBackgroundImage(
               imageData[0][2],
-              alt_text
+              pane_fragment?.field_alt_text
             );
             break;
 
@@ -81,8 +89,8 @@ const ComposePanes = (data) => {
         return (
           <StyleWrapper
             key={index}
-            css={pane_fragment.field_css_styles}
-            parent_css={pane_fragment.field_css_styles_parent}
+            css={pane_fragment?.field_css_styles}
+            parent_css={pane_fragment?.field_css_styles_parent}
           >
             {react_fragment}
           </StyleWrapper>
