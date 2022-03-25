@@ -6,7 +6,7 @@ const StyledWrapper = styled.div`
   ${props => props.css};
 `;
 
-const StyleWrapper = ({
+const StyledInner = ({
   children,
   css,
   parent_css
@@ -20,10 +20,21 @@ const StyleWrapper = ({
   }, children)));
 };
 
+const StyledOuter = ({
+  children,
+  css
+}) => {
+  return /*#__PURE__*/React.createElement(StyledWrapper, {
+    css: css
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "storyFragment"
+  }, children));
+};
+
 const ComposePanes = data => {
-  // loop through the panes and render from markdown > htmlAst + css using styled-components
-  return data?.data?.relationships?.field_panes.map((pane, index) => {
-    // each pane needs its field_css_styles_parent
+  // loop through the panes and render each pane fragment
+  const composedPanes = data?.data?.relationships?.field_panes.map((pane, index) => {
+    // compose each pane fragment
     return pane?.relationships?.field_pane_fragments.map((pane_fragment, index) => {
       let react_fragment;
       let alt_text;
@@ -33,7 +44,7 @@ const ComposePanes = data => {
 
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
-          // replace images with Gatsby Images and prepare html
+          // replaces images with Gatsby Images and prepares html
           let htmlAst = sanitize(pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst);
           react_fragment = MarkdownInjectGatsbyImage(htmlAst, imageData);
           break;
@@ -53,10 +64,6 @@ const ComposePanes = data => {
           react_fragment = InjectSvg(publicURL, alt_text);
           break;
 
-        case "paragraph__video":
-          //
-          break;
-
         case "paragraph__d3":
           //
           break;
@@ -66,13 +73,16 @@ const ComposePanes = data => {
           break;
       }
 
-      return /*#__PURE__*/React.createElement(StyleWrapper, {
+      return /*#__PURE__*/React.createElement(StyledInner, {
         key: index,
         css: pane_fragment?.field_css_styles,
         parent_css: pane_fragment?.field_css_styles_parent
       }, react_fragment);
     });
   });
+  return /*#__PURE__*/React.createElement(StyledOuter, {
+    css: data?.parent_css
+  }, composedPanes);
 };
 
 export { ComposePanes };

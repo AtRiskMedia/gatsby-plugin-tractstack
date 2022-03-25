@@ -18,21 +18,21 @@
   "license": "LGPL",
   "devDependencies": {
     "@babel/cli": "^7.17.6",
-    "@babel/core": "^7.17.5",
+    "@babel/core": "^7.17.8",
     "@babel/preset-react": "^7.16.7",
-    "eslint": "^8.10.0"
+    "eslint": "^8.11.0"
   },
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.17.3",
     "babel-plugin-styled-components": "^2.0.6",
-    "gatsby-plugin-image": "^2.10.0",
+    "gatsby-plugin-image": "^2.10.1",
     "gatsby-plugin-styled-components": "^5.10.0",
     "gbimage-bridge": "^0.2.1",
     "hast-to-hyperscript": "^10.0.1",
     "hast-util-sanitize": "^4.0.0",
     "hyperscript": "^2.0.2",
-    "prettier": "^2.5.1",
+    "prettier": "^2.6.0",
     "prop-types": "^15.8.1",
-    "styled-components": "^5.3.3"
+    "styled-components": "^5.3.5"
   }
 }
