@@ -29,27 +29,30 @@ const StyledOuter = ({ children, css }) => {
 };
 
 const ComposePanes = (data) => {
+  // if viewport is not yet defined, return empty fragment
+  if (typeof data?.viewport?.key === "undefined") return <></>;
   // loop through the panes and render each pane fragment
   const composedPanes = data?.data?.relationships?.field_panes.map(
     (pane, index) => {
       // compose each pane fragment
       return pane?.relationships?.field_pane_fragments.map(
         (pane_fragment, index) => {
-          let react_fragment;
-          let alt_text;
-          let imageData = pane_fragment?.relationships?.field_image?.map(
-            (image) => {
-              return [
-                image.id,
-                image.filename,
-                image.localFile?.childImageSharp?.gatsbyImageData,
-              ];
-            }
-          );
+          let react_fragment, alt_text, imageData;
 
           // switch on internal.type
           switch (pane_fragment?.internal?.type) {
             case "paragraph__markdown":
+              // get image data (if available)
+              imageData = pane_fragment?.relationships?.field_image?.map(
+                (image) => {
+                  return [
+                    image.id,
+                    image.filename,
+                    image.localFile?.childImageSharp?.gatsbyImageData,
+                  ];
+                }
+              );
+
               // replaces images with Gatsby Images and prepares html
               let htmlAst = sanitize(
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst
@@ -67,8 +70,17 @@ const ComposePanes = (data) => {
 
             case "paragraph__background_image":
               // create Gatsby Background Image ... imageData[2] has the image
+              imageData = pane_fragment?.relationships?.field_image?.map(
+                (image) => {
+                  let key = data?.viewport?.key;
+                  let this_image_data = image[key];
+                  if (typeof this_image_data !== "undefined") {
+                    return this_image_data.childImageSharp?.gatsbyImageData;
+                  }
+                }
+              );
               react_fragment = InjectGatsbyBackgroundImage(
-                imageData[0][2],
+                imageData[0],
                 pane_fragment?.field_alt_text
               );
               break;
