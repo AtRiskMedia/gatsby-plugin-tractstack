@@ -80,9 +80,47 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
+const getStorySteps = (data) => {
+  let storyFragments = data?.relationships?.field_story_fragments.map(
+    (storyfragment) => {
+      let panes = storyfragment.relationships.field_panes.map((pane) => {
+        return {
+          pane: pane.id,
+          recall: pane.field_recall,
+        };
+      });
+      return {
+        storyFragment: storyfragment.id,
+        recall: storyfragment.field_recall,
+        paneFragments: panes,
+      };
+    }
+  );
+  return {
+    tractStact: data.id,
+    storyFragments: storyFragments,
+  };
+  /*
+  return data?.map((pane) => {
+    let paneFragments = pane?.relationships?.field_pane_fragments.map(
+      (pane_fragment) => {
+        return pane_fragment.id;
+      }
+    );
+    return {
+      recall: pane.field_recall,
+      pane: pane.id,
+      paneFragments: paneFragments,
+    };
+  });
+  return data;
+  */
+};
+
 export {
   MarkdownInjectGatsbyImage,
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
+  getStorySteps,
 };
