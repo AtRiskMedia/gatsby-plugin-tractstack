@@ -1,4 +1,4 @@
 import { ComposePanes } from "./compose-panes";
-import { getStorySteps } from "./helpers";
-export { ComposePanes, getStorySteps };
+import { getStorySteps, getStoryStepRecall } from "./helpers";
+export { ComposePanes, getStorySteps, getStoryStepRecall };
 //# sourceMappingURL=index.js.map

@@ -84,6 +84,18 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
+const getStoryStepRecall = (storyFragment, storySteps) => {
+  let tractStackRecall, storyFragmentRecall;
+
+  for (const [i, step] of Object.entries(storySteps?.storyFragments)) {
+    if (step.storyFragment === storyFragment) {
+      return [parseInt(i), 0];
+    }
+  }
+
+  return [0, 0];
+};
+
 const getStorySteps = data => {
   let storyFragments = data?.relationships?.field_story_fragments.map(storyfragment => {
     let panes = storyfragment.relationships.field_panes.map(pane => {
@@ -102,22 +114,7 @@ const getStorySteps = data => {
     tractStact: data.id,
     storyFragments: storyFragments
   };
-  /*
-  return data?.map((pane) => {
-    let paneFragments = pane?.relationships?.field_pane_fragments.map(
-      (pane_fragment) => {
-        return pane_fragment.id;
-      }
-    );
-    return {
-      recall: pane.field_recall,
-      pane: pane.id,
-      paneFragments: paneFragments,
-    };
-  });
-  return data;
-  */
 };
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStorySteps };
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStorySteps, getStoryStepRecall };
 //# sourceMappingURL=helpers.js.map
