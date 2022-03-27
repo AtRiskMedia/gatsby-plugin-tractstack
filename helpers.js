@@ -85,8 +85,6 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
 };
 
 const getStoryStepRecall = (storyFragment, storySteps) => {
-  let tractStackRecall, storyFragmentRecall;
-
   for (const [i, step] of Object.entries(storySteps?.storyFragments)) {
     if (step.storyFragment === storyFragment) {
       return [parseInt(i), 0];
