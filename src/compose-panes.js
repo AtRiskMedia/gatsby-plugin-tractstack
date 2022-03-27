@@ -11,19 +11,21 @@ import {
 const StyledWrapper = styled.div`
   ${(props) => props.css};
 `;
-const StyledInner = ({ children, css, parent_css }) => {
+const StyledInner = ({ children, css, parent_css, viewport }) => {
   return (
     <StyledWrapper css={parent_css}>
-      <div className="paneFragment">
+      <div className={"paneFragment paneFragment__view--" + viewport}>
         <StyledWrapper css={css}>{children}</StyledWrapper>
       </div>
     </StyledWrapper>
   );
 };
-const StyledOuter = ({ children, css }) => {
+const StyledOuter = ({ children, css, viewport }) => {
   return (
     <StyledWrapper css={css}>
-      <div className="storyFragment">{children}</div>
+      <div className={"storyFragment storyFragment__view--" + viewport}>
+        {children}
+      </div>
     </StyledWrapper>
   );
 };
@@ -107,6 +109,7 @@ const ComposePanes = (data) => {
               key={index}
               css={pane_fragment?.field_css_styles}
               parent_css={pane_fragment?.field_css_styles_parent}
+              viewport={data?.viewport?.key}
             >
               {react_fragment}
             </StyledInner>
@@ -115,7 +118,11 @@ const ComposePanes = (data) => {
       );
     }
   );
-  return <StyledOuter css={data?.parent_css}>{composedPanes}</StyledOuter>;
+  return (
+    <StyledOuter css={data?.parent_css} viewport={data?.viewport?.key}>
+      {composedPanes}
+    </StyledOuter>
+  );
 };
 
 export { ComposePanes };

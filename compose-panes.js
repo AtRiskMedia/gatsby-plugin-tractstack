@@ -9,12 +9,13 @@ const StyledWrapper = styled.div`
 const StyledInner = ({
   children,
   css,
-  parent_css
+  parent_css,
+  viewport
 }) => {
   return /*#__PURE__*/React.createElement(StyledWrapper, {
     css: parent_css
   }, /*#__PURE__*/React.createElement("div", {
-    className: "paneFragment"
+    className: "paneFragment paneFragment__view--" + viewport
   }, /*#__PURE__*/React.createElement(StyledWrapper, {
     css: css
   }, children)));
@@ -22,12 +23,13 @@ const StyledInner = ({
 
 const StyledOuter = ({
   children,
-  css
+  css,
+  viewport
 }) => {
   return /*#__PURE__*/React.createElement(StyledWrapper, {
     css: css
   }, /*#__PURE__*/React.createElement("div", {
-    className: "storyFragment"
+    className: "storyFragment storyFragment__view--" + viewport
   }, children));
 };
 
@@ -86,12 +88,14 @@ const ComposePanes = data => {
       return /*#__PURE__*/React.createElement(StyledInner, {
         key: index,
         css: pane_fragment?.field_css_styles,
-        parent_css: pane_fragment?.field_css_styles_parent
+        parent_css: pane_fragment?.field_css_styles_parent,
+        viewport: data?.viewport?.key
       }, react_fragment);
     });
   });
   return /*#__PURE__*/React.createElement(StyledOuter, {
-    css: data?.parent_css
+    css: data?.parent_css,
+    viewport: data?.viewport?.key
   }, composedPanes);
 };
 
