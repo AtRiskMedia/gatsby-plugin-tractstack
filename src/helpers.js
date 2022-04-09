@@ -89,6 +89,10 @@ const getStoryStepRecall = (storyFragment, storySteps) => {
   return [0, 0];
 };
 
+const getStoryStepGraph = (graph, targetId) => {
+  return graph.edges.filter((e) => e?.node?.id === targetId)[0];
+};
+
 const getStorySteps = (data) => {
   let storyFragments = data?.relationships?.field_story_fragments.map(
     (storyfragment) => {
@@ -118,4 +122,5 @@ export {
   InjectSvg,
   getStorySteps,
   getStoryStepRecall,
+  getStoryStepGraph,
 };

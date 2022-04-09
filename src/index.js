@@ -1,4 +1,8 @@
 import { ComposePanes } from "./compose-panes";
-import { getStorySteps, getStoryStepRecall } from "./helpers";
+import {
+  getStorySteps,
+  getStoryStepRecall,
+  getStoryStepGraph,
+} from "./helpers";
 
-export { ComposePanes, getStorySteps, getStoryStepRecall };
+export { ComposePanes, getStorySteps, getStoryStepRecall, getStoryStepGraph };

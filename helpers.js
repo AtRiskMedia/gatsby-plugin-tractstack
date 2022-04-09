@@ -94,6 +94,10 @@ const getStoryStepRecall = (storyFragment, storySteps) => {
   return [0, 0];
 };
 
+const getStoryStepGraph = (graph, targetId) => {
+  return graph.edges.filter(e => e?.node?.id === targetId)[0];
+};
+
 const getStorySteps = data => {
   let storyFragments = data?.relationships?.field_story_fragments.map(storyfragment => {
     let panes = storyfragment.relationships.field_panes.map(pane => {
@@ -114,5 +118,5 @@ const getStorySteps = data => {
   };
 };
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStorySteps, getStoryStepRecall };
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStorySteps, getStoryStepRecall, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map
