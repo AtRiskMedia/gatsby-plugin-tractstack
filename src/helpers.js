@@ -80,19 +80,11 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
-const getStoryStepRecall = (storyFragment, storySteps) => {
-  for (const [i, step] of Object.entries(storySteps?.storyFragments)) {
-    if (step.storyFragment === storyFragment) {
-      return [parseInt(i), 0];
-    }
-  }
-  return [0, 0];
-};
-
 const getStoryStepGraph = (graph, targetId) => {
   return graph.edges.filter((e) => e?.node?.id === targetId)[0];
 };
 
+/*
 const getStorySteps = (data) => {
   let storyFragments = data?.relationships?.field_story_fragments.map(
     (storyfragment) => {
@@ -114,13 +106,12 @@ const getStorySteps = (data) => {
     storyFragments: storyFragments,
   };
 };
+*/
 
 export {
   MarkdownInjectGatsbyImage,
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
-  getStorySteps,
-  getStoryStepRecall,
   getStoryStepGraph,
 };

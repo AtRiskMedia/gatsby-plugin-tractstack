@@ -84,39 +84,33 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
   });
 };
 
-const getStoryStepRecall = (storyFragment, storySteps) => {
-  for (const [i, step] of Object.entries(storySteps?.storyFragments)) {
-    if (step.storyFragment === storyFragment) {
-      return [parseInt(i), 0];
-    }
-  }
-
-  return [0, 0];
-};
-
 const getStoryStepGraph = (graph, targetId) => {
   return graph.edges.filter(e => e?.node?.id === targetId)[0];
 };
-
-const getStorySteps = data => {
-  let storyFragments = data?.relationships?.field_story_fragments.map(storyfragment => {
-    let panes = storyfragment.relationships.field_panes.map(pane => {
+/*
+const getStorySteps = (data) => {
+  let storyFragments = data?.relationships?.field_story_fragments.map(
+    (storyfragment) => {
+      let panes = storyfragment.relationships.field_panes.map((pane) => {
+        return {
+          pane: pane.id,
+          recall: pane.field_recall,
+        };
+      });
       return {
-        pane: pane.id,
-        recall: pane.field_recall
+        storyFragment: storyfragment.id,
+        recall: storyfragment.field_recall,
+        paneFragments: panes,
       };
-    });
-    return {
-      storyFragment: storyfragment.id,
-      recall: storyfragment.field_recall,
-      paneFragments: panes
-    };
-  });
+    }
+  );
   return {
     tractStact: data.id,
-    storyFragments: storyFragments
+    storyFragments: storyFragments,
   };
 };
+*/
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStorySteps, getStoryStepRecall, getStoryStepGraph };
+
+export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map

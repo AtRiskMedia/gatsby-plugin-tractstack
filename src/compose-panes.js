@@ -33,10 +33,14 @@ const StyledOuter = ({ children, css, viewport }) => {
 const ComposePanes = (data) => {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return <></>;
-  // loop through the panes and render each pane fragment
-  const composedPanes = data?.data?.relationships?.field_panes.map(
-    (pane, index) => {
-      // compose each pane fragment
+  let recall = data?.recall;
+  let lookahead =
+    data?.data?.relationships?.field_panes[recall - 1].field_lookahead;
+  // loop through the panes in view and render each pane fragment
+  const composedPanes = data?.data?.relationships?.field_panes
+    // compose current pane plus lookahead
+    .slice(recall - 1, recall + lookahead)
+    .map((pane) => {
       return pane?.relationships?.field_pane_fragments.map(
         (pane_fragment, index) => {
           let react_fragment, alt_text, imageData;
@@ -52,7 +56,8 @@ const ComposePanes = (data) => {
                     image.filename,
                     image.localFile?.childImageSharp?.gatsbyImageData,
                   ];
-                }
+                },
+                recall
               );
 
               // replaces images with Gatsby Images and prepares html
@@ -71,7 +76,6 @@ const ComposePanes = (data) => {
               break;
 
             case "paragraph__background_image":
-              // create Gatsby Background Image ... imageData[2] has the image
               imageData = pane_fragment?.relationships?.field_image?.map(
                 (image) => {
                   let key = data?.viewport?.key;
@@ -116,8 +120,7 @@ const ComposePanes = (data) => {
           );
         }
       );
-    }
-  );
+    });
   return (
     <StyledOuter css={data?.parent_css} viewport={data?.viewport?.key}>
       {composedPanes}
