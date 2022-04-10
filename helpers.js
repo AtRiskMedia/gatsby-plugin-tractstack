@@ -87,30 +87,6 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
 const getStoryStepGraph = (graph, targetId) => {
   return graph.edges.filter(e => e?.node?.id === targetId)[0];
 };
-/*
-const getStorySteps = (data) => {
-  let storyFragments = data?.relationships?.field_story_fragments.map(
-    (storyfragment) => {
-      let panes = storyfragment.relationships.field_panes.map((pane) => {
-        return {
-          pane: pane.id,
-          recall: pane.field_recall,
-        };
-      });
-      return {
-        storyFragment: storyfragment.id,
-        recall: storyfragment.field_recall,
-        paneFragments: panes,
-      };
-    }
-  );
-  return {
-    tractStact: data.id,
-    storyFragments: storyFragments,
-  };
-};
-*/
-
 
 export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map

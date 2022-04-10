@@ -33,6 +33,7 @@
     "hyperscript": "^2.0.2",
     "prettier": "^2.6.0",
     "prop-types": "^15.8.1",
+    "scroll-trigger": "^1.0.0",
     "styled-components": "^5.3.5"
   }
 }

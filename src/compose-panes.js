@@ -14,7 +14,7 @@ const StyledWrapper = styled.div`
 const StyledInner = ({ children, css, parent_css, viewport }) => {
   return (
     <StyledWrapper css={parent_css}>
-      <div className={"paneFragment paneFragment__view--" + viewport}>
+      <div className={"pane pane__view--" + viewport}>
         <StyledWrapper css={css}>{children}</StyledWrapper>
       </div>
     </StyledWrapper>

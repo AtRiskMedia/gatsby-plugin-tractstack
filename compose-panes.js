@@ -15,7 +15,7 @@ const StyledInner = ({
   return /*#__PURE__*/React.createElement(StyledWrapper, {
     css: parent_css
   }, /*#__PURE__*/React.createElement("div", {
-    className: "paneFragment paneFragment__view--" + viewport
+    className: "pane pane__view--" + viewport
   }, /*#__PURE__*/React.createElement(StyledWrapper, {
     css: css
   }, children)));
