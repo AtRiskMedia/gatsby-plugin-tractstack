@@ -75,7 +75,13 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
     if (typeof tag === "object") {
       return tag;
     } else if (typeof tag === "string") {
-      return <div key={index} dangerouslySetInnerHTML={{ __html: tag }} />;
+      return (
+        <div
+          className="paneFragment"
+          key={index}
+          dangerouslySetInnerHTML={{ __html: tag }}
+        />
+      );
     }
   });
 };

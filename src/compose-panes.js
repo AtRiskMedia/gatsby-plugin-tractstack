@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { sanitize } from "hast-util-sanitize";
 import {
@@ -7,20 +7,12 @@ import {
   InjectGatsbyBackgroundVideo,
   InjectSvg,
 } from "./helpers";
+import { gsap } from "gsap";
 
 const StyledWrapper = styled.div`
   ${(props) => props.css};
 `;
-const StyledInner = ({ children, css, parent_css, viewport }) => {
-  return (
-    <StyledWrapper css={parent_css}>
-      <div className={"pane pane__view--" + viewport}>
-        <StyledWrapper css={css}>{children}</StyledWrapper>
-      </div>
-    </StyledWrapper>
-  );
-};
-const StyledOuter = ({ children, css, viewport }) => {
+const StyledOuter = ({ children, viewport, css = "" }) => {
   return (
     <StyledWrapper css={css}>
       <div className={"storyFragment storyFragment__view--" + viewport}>
@@ -29,8 +21,18 @@ const StyledOuter = ({ children, css, viewport }) => {
     </StyledWrapper>
   );
 };
+const StyledInner = ({ children, css = "", parent_css = "", zIndex = 100 }) => {
+  return (
+    // inject zIndex
+    <StyledWrapper
+      css={parent_css + ".paneFragment{ z-index:" + parseInt(zIndex) + "}"}
+    >
+      <StyledWrapper css={css}>{children}</StyledWrapper>
+    </StyledWrapper>
+  );
+};
 
-const ComposePanes = (data) => {
+function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return <></>;
   // loop through the panes in view and render each pane fragment
@@ -101,26 +103,43 @@ const ComposePanes = (data) => {
               //
               break;
           }
-
           return (
-            <StyledInner
-              key={index}
-              css={pane_fragment?.field_css_styles}
-              parent_css={pane_fragment?.field_css_styles_parent}
-              viewport={data?.viewport?.key}
+            <div
+              className={
+                "paneFragment paneFragment__view--" + data?.viewport?.key
+              }
             >
-              {react_fragment}
-            </StyledInner>
+              <StyledInner
+                key={index}
+                zIndex={pane_fragment?.field_zindex}
+                css={pane_fragment?.field_css_styles}
+                parent_css={pane_fragment?.field_css_styles_parent}
+              >
+                {react_fragment}
+              </StyledInner>
+            </div>
           );
         }
       );
-      return composedPane;
+      let paneRef = useRef();
+      useEffect(() => {
+        gsap.from(paneRef.current, 1, { opacity: 0, delay: 0 });
+      });
+      return (
+        <div
+          key={i}
+          className={"pane pane__view--" + data?.viewport?.key}
+          ref={paneRef}
+        >
+          {composedPane}
+        </div>
+      );
     });
   return (
     <StyledOuter css={data?.parent_css} viewport={data?.viewport?.key}>
       {composedPanes}
     </StyledOuter>
   );
-};
+}
 
 export { ComposePanes };

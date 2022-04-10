@@ -75,6 +75,7 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
       return tag;
     } else if (typeof tag === "string") {
       return /*#__PURE__*/React.createElement("div", {
+        className: "paneFragment",
         key: index,
         dangerouslySetInnerHTML: {
           __html: tag

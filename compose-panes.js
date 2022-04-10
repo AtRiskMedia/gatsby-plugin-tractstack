@@ -1,30 +1,16 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { sanitize } from "hast-util-sanitize";
 import { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg } from "./helpers";
+import { gsap } from "gsap";
 const StyledWrapper = styled.div`
   ${props => props.css};
 `;
 
-const StyledInner = ({
-  children,
-  css,
-  parent_css,
-  viewport
-}) => {
-  return /*#__PURE__*/React.createElement(StyledWrapper, {
-    css: parent_css
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pane pane__view--" + viewport
-  }, /*#__PURE__*/React.createElement(StyledWrapper, {
-    css: css
-  }, children)));
-};
-
 const StyledOuter = ({
   children,
-  css,
-  viewport
+  viewport,
+  css = ""
 }) => {
   return /*#__PURE__*/React.createElement(StyledWrapper, {
     css: css
@@ -33,7 +19,24 @@ const StyledOuter = ({
   }, children));
 };
 
-const ComposePanes = data => {
+const StyledInner = ({
+  children,
+  css = "",
+  parent_css = "",
+  zIndex = 100
+}) => {
+  return (
+    /*#__PURE__*/
+    // inject zIndex
+    React.createElement(StyledWrapper, {
+      css: parent_css + ".paneFragment{ z-index:" + parseInt(zIndex) + "}"
+    }, /*#__PURE__*/React.createElement(StyledWrapper, {
+      css: css
+    }, children))
+  );
+};
+
+function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
@@ -84,20 +87,33 @@ const ComposePanes = data => {
           break;
       }
 
-      return /*#__PURE__*/React.createElement(StyledInner, {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "paneFragment paneFragment__view--" + data?.viewport?.key
+      }, /*#__PURE__*/React.createElement(StyledInner, {
         key: index,
+        zIndex: pane_fragment?.field_zindex,
         css: pane_fragment?.field_css_styles,
-        parent_css: pane_fragment?.field_css_styles_parent,
-        viewport: data?.viewport?.key
-      }, react_fragment);
+        parent_css: pane_fragment?.field_css_styles_parent
+      }, react_fragment));
     });
-    return composedPane;
+    let paneRef = useRef();
+    useEffect(() => {
+      gsap.from(paneRef.current, 1, {
+        opacity: 0,
+        delay: 0
+      });
+    });
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "pane pane__view--" + data?.viewport?.key,
+      ref: paneRef
+    }, composedPane);
   });
   return /*#__PURE__*/React.createElement(StyledOuter, {
     css: data?.parent_css,
     viewport: data?.viewport?.key
   }, composedPanes);
-};
+}
 
 export { ComposePanes };
 //# sourceMappingURL=compose-panes.js.map
