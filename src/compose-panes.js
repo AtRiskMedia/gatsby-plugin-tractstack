@@ -56,8 +56,7 @@ const ComposePanes = (data) => {
                     image.filename,
                     image.localFile?.childImageSharp?.gatsbyImageData,
                   ];
-                },
-                recall
+                }
               );
 
               // replaces images with Gatsby Images and prepares html

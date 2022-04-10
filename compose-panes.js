@@ -49,7 +49,7 @@ const ComposePanes = data => {
           // get image data (if available)
           imageData = pane_fragment?.relationships?.field_image?.map(image => {
             return [image.id, image.filename, image.localFile?.childImageSharp?.gatsbyImageData];
-          }, recall); // replaces images with Gatsby Images and prepares html
+          }); // replaces images with Gatsby Images and prepares html
 
           let htmlAst = sanitize(pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst);
           react_fragment = MarkdownInjectGatsbyImage(htmlAst, imageData);
