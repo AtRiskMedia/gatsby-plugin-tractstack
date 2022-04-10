@@ -33,18 +33,13 @@ const StyledOuter = ({ children, css, viewport }) => {
 const ComposePanes = (data) => {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return <></>;
-  let recall = data?.recall;
-  let lookahead =
-    data?.data?.relationships?.field_panes[recall - 1].field_lookahead;
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.data?.relationships?.field_panes
     // compose current pane plus lookahead
-    .slice(recall - 1, recall + lookahead)
-    .map((pane) => {
-      return pane?.relationships?.field_pane_fragments.map(
+    .map((pane, i) => {
+      const composedPane = pane?.relationships?.field_pane_fragments.map(
         (pane_fragment, index) => {
           let react_fragment, alt_text, imageData;
-
           // switch on internal.type
           switch (pane_fragment?.internal?.type) {
             case "paragraph__markdown":
@@ -119,6 +114,7 @@ const ComposePanes = (data) => {
           );
         }
       );
+      return composedPane;
     });
   return (
     <StyledOuter css={data?.parent_css} viewport={data?.viewport?.key}>
