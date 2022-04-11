@@ -1,36 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import styled from "styled-components";
 import { sanitize } from "hast-util-sanitize";
 import {
-  MarkdownInjectGatsbyImage,
+  MarkdownParagraph,
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
 } from "./helpers";
 import { gsap } from "gsap";
-
-const StyledWrapper = styled.div`
-  ${(props) => props.css};
-`;
-const StyledOuter = ({ children, viewport, css = "" }) => {
-  return (
-    <StyledWrapper css={css}>
-      <div className={"storyFragment storyFragment__view--" + viewport}>
-        {children}
-      </div>
-    </StyledWrapper>
-  );
-};
-const StyledInner = ({ children, css = "", parent_css = "", zIndex = 100 }) => {
-  return (
-    // inject zIndex
-    <StyledWrapper
-      css={parent_css + ".paneFragment{ z-index:" + parseInt(zIndex) + "}"}
-    >
-      <StyledWrapper css={css}>{children}</StyledWrapper>
-    </StyledWrapper>
-  );
-};
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
@@ -38,7 +14,7 @@ function ComposePanes(data) {
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.data?.relationships?.field_panes
     // compose current pane plus lookahead
-    .map((pane, i) => {
+    .map((pane) => {
       const composedPane = pane?.relationships?.field_pane_fragments.map(
         (pane_fragment, index) => {
           let react_fragment, alt_text, imageData;
@@ -60,14 +36,22 @@ function ComposePanes(data) {
               let htmlAst = sanitize(
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst
               );
-              react_fragment = MarkdownInjectGatsbyImage(htmlAst, imageData);
+              react_fragment = MarkdownParagraph(
+                htmlAst,
+                imageData,
+                index,
+                pane_fragment?.field_css_styles_parent,
+                pane_fragment?.field_css_styles,
+                pane_fragment?.field_zindex
+              );
               break;
 
             case "paragraph__background_video":
               react_fragment = InjectGatsbyBackgroundVideo(
                 pane_fragment?.id,
                 pane_fragment?.field_cdn_url,
-                pane_fragment?.field_alt_text
+                pane_fragment?.field_alt_text,
+                index
               );
               break;
 
@@ -83,7 +67,8 @@ function ComposePanes(data) {
               );
               react_fragment = InjectGatsbyBackgroundImage(
                 imageData[0],
-                pane_fragment?.field_alt_text
+                pane_fragment?.field_alt_text,
+                index
               );
               break;
 
@@ -92,7 +77,7 @@ function ComposePanes(data) {
               let publicURL =
                 pane_fragment?.relationships?.field_svg_file?.localFile
                   ?.publicURL;
-              react_fragment = InjectSvg(publicURL, alt_text);
+              react_fragment = InjectSvg(publicURL, alt_text, index);
               break;
 
             case "paragraph__d3":
@@ -103,22 +88,7 @@ function ComposePanes(data) {
               //
               break;
           }
-          return (
-            <div
-              className={
-                "paneFragment paneFragment__view--" + data?.viewport?.key
-              }
-            >
-              <StyledInner
-                key={index}
-                zIndex={pane_fragment?.field_zindex}
-                css={pane_fragment?.field_css_styles}
-                parent_css={pane_fragment?.field_css_styles_parent}
-              >
-                {react_fragment}
-              </StyledInner>
-            </div>
-          );
+          return react_fragment;
         }
       );
       let paneRef = useRef();
@@ -127,7 +97,7 @@ function ComposePanes(data) {
       });
       return (
         <div
-          key={i}
+          key={pane?.id}
           className={"pane pane__view--" + data?.viewport?.key}
           ref={paneRef}
         >
@@ -135,11 +105,7 @@ function ComposePanes(data) {
         </div>
       );
     });
-  return (
-    <StyledOuter css={data?.parent_css} viewport={data?.viewport?.key}>
-      {composedPanes}
-    </StyledOuter>
-  );
+  return composedPanes;
 }
 
 export { ComposePanes };

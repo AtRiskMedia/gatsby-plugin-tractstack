@@ -3,28 +3,38 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 import React from "react";
 import { toH } from "hast-to-hyperscript";
 import h from "hyperscript";
+import styled from "styled-components";
 import { graphql, useStaticQuery } from "gatsby";
 import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
+const StyledWrapper = styled.div`
+  ${props => props.css};
+`;
 
-const InjectGatsbyBackgroundImage = (imageData, alt_text) => {
+const InjectGatsbyBackgroundImage = (imageData, alt_text, index, parent_css, css, zIndex) => {
   const image = getImage(imageData);
   const bgImage = convertToBgImage(image);
-  return /*#__PURE__*/React.createElement(BackgroundImage, _extends({
-    className: "paneFragmentImage",
+  return /*#__PURE__*/React.createElement("div", {
+    className: "paneFragment",
+    key: index
+  }, /*#__PURE__*/React.createElement(StyledWrapper, {
+    css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
+  }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
   }, bgImage, {
     preserveStackingContext: true
   }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
     image: image,
     alt: alt_text
-  })));
+  })))));
 };
 
-const InjectGatsbyBackgroundVideo = (id, url, alt_text) => {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "paneFragmentVideo"
+const InjectGatsbyBackgroundVideo = (id, url, alt_text, index, parent_css, css, zIndex) => {
+  return /*#__PURE__*/React.createElement(StyledWrapper, {
+    className: "paneFragment",
+    key: index,
+    css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
   }, /*#__PURE__*/React.createElement("video", {
     autoPlay: true,
     muted: true,
@@ -37,16 +47,20 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text) => {
   })));
 };
 
-const InjectSvg = (publicURL, alt_text) => {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+const InjectSvg = (publicURL, alt_text, index, parent_css, css, zIndex) => {
+  return /*#__PURE__*/React.createElement(StyledWrapper, {
+    className: "paneFragment",
+    key: index,
+    css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
+  }, /*#__PURE__*/React.createElement("img", {
     src: publicURL,
     alt: alt_text,
     className: "paneFragmentCSS"
   }));
 };
 
-const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
-  const html = htmlAst.children.filter(child => child?.type && child.type === "element").map(child => {
+const MarkdownParagraph = (htmlAst, imageData = [], index, parent_css, css, zIndex) => {
+  const html = htmlAst.children.filter(child => child?.type && child.type === "element").map((child, index) => {
     for (const [i, tag] of Object.entries(child.children)) {
       if (tag?.tagName && tag.tagName === "img") {
         const gatsbyImageData = child.children.map(image => {
@@ -63,31 +77,26 @@ const MarkdownInjectGatsbyImage = (htmlAst, imageData = []) => {
 
         return gatsbyImageData[0];
       }
-    } // otherwise
+    } // otherwise this tag is not an image
 
 
-    return toH(h, child).outerHTML;
-  }); // render with styled-components and css
-
-  return html.map((tag, index) => {
-    // is either html as string OR is already a react element
-    if (typeof tag === "object") {
-      return tag;
-    } else if (typeof tag === "string") {
-      return /*#__PURE__*/React.createElement("div", {
-        className: "paneFragment",
-        key: index,
-        dangerouslySetInnerHTML: {
-          __html: tag
-        }
-      });
-    }
+    return /*#__PURE__*/React.createElement("div", {
+      key: index,
+      dangerouslySetInnerHTML: {
+        __html: toH(h, child).outerHTML
+      }
+    });
   });
+  return /*#__PURE__*/React.createElement(StyledWrapper, {
+    key: index,
+    className: "paneFragment",
+    css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
+  }, html);
 };
 
 const getStoryStepGraph = (graph, targetId) => {
   return graph.edges.filter(e => e?.node?.id === targetId)[0];
 };
 
-export { MarkdownInjectGatsbyImage, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStoryStepGraph };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map
