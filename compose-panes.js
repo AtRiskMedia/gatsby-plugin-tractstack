@@ -1,16 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { sanitize } from "hast-util-sanitize";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg } from "./helpers";
-import { gsap } from "gsap";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
-  const composedPanes = data?.data?.relationships?.field_panes // compose current pane plus lookahead
-  .map(pane => {
+  const composedPanes = data?.data?.relationships?.field_panes.map(pane => {
     const composedPane = pane?.relationships?.field_pane_fragments.map((pane_fragment, index) => {
-      let react_fragment, alt_text, imageData; // switch on internal.type
+      let react_fragment, alt_text, imageData;
 
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
@@ -56,17 +54,9 @@ function ComposePanes(data) {
 
       return react_fragment;
     });
-    let paneRef = useRef();
-    useEffect(() => {
-      gsap.from(paneRef.current, 1, {
-        opacity: 0,
-        delay: 0
-      });
-    });
     return /*#__PURE__*/React.createElement("div", {
       key: pane?.id,
-      className: "pane pane__view--" + data?.viewport?.key,
-      ref: paneRef
+      className: "pane pane__view--" + data?.viewport?.key
     }, composedPane);
   });
   return composedPanes;
