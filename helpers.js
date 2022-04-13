@@ -59,7 +59,7 @@ const InjectSvg = (publicURL, alt_text, index, parent_css, css, zIndex) => {
   }));
 };
 
-const MarkdownParagraph = (htmlAst, imageData = [], index, parent_css, css, zIndex) => {
+const MarkdownParagraph = (htmlAst, imageData = [], index, parent_css = "", css = "", zIndex) => {
   const html = htmlAst.children.filter(child => child?.type && child.type === "element").map((child, index) => {
     for (const [i, tag] of Object.entries(child.children)) {
       if (tag?.tagName && tag.tagName === "img") {

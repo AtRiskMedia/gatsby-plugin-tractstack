@@ -74,8 +74,8 @@ const MarkdownParagraph = (
   htmlAst,
   imageData = [],
   index,
-  parent_css,
-  css,
+  parent_css = "",
+  css = "",
   zIndex
 ) => {
   const html = htmlAst.children
