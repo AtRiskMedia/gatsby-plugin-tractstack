@@ -27,7 +27,6 @@ function ComposePanes(data) {
                 ];
               }
             );
-
             // replaces images with Gatsby Images and prepares html
             let htmlAst = sanitize(
               pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst
