@@ -14,6 +14,15 @@ function ComposePanes(data) {
   const composedPanes = data?.data?.relationships?.field_panes.map((pane) => {
     const composedPane = pane?.relationships?.field_pane_fragments.map(
       (pane_fragment, index) => {
+        // skip if current viewport is listed in field_hidden_viewports
+        if (
+          pane_fragment?.field_hidden_viewports
+            .replace(/\s+/g, "")
+            .split(",")
+            .indexOf(data?.viewport?.key) > -1
+        ) {
+          return;
+        }
         let react_fragment, alt_text, imageData;
         switch (pane_fragment?.internal?.type) {
           case "paragraph__markdown":
