@@ -5,6 +5,7 @@ import {
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
+  StyledWrapper,
 } from "./helpers";
 
 function ComposePanes(data) {
@@ -113,6 +114,28 @@ function ComposePanes(data) {
         return react_fragment;
       }
     );
+    let pane_height;
+    switch (data?.viewport?.key) {
+      case "mobile":
+        pane_height = pane?.field_pixel_height_mobile;
+        break;
+      case "tablet":
+        pane_height = pane?.field_pixel_height_tablet;
+        break;
+      case "desktop":
+        pane_height = pane?.field_pixel_height_desktop;
+        break;
+    }
+    return (
+      <StyledWrapper
+        key={pane?.id}
+        className={"pane pane__view--" + data?.viewport?.key}
+        css={"height:" + parseInt(pane_height) + "px;"}
+      >
+        {composedPane}
+      </StyledWrapper>
+    );
+
     return (
       <div key={pane?.id} className={"pane pane__view--" + data?.viewport?.key}>
         {composedPane}

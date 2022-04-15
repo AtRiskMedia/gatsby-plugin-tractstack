@@ -129,5 +129,6 @@ export {
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
+  StyledWrapper,
   getStoryStepGraph,
 };

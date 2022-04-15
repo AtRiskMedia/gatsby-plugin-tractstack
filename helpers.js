@@ -98,5 +98,5 @@ const getStoryStepGraph = (graph, targetId) => {
   return graph.edges.filter(e => e?.node?.id === targetId)[0];
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, getStoryStepGraph };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapper, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map
