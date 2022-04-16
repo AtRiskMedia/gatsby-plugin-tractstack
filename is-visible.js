@@ -57,34 +57,34 @@ const css = `
 }
 @keyframes fadeout {
     from {
-        opacity:0;
+        opacity:1;
     }
     to {
-        opacity:1;
+        opacity:0;
     }
 }
 @-moz-keyframes fadeout {
     from {
-        opacity:0;
+        opacity:1;
     }
     to {
-        opacity:1;
+        opacity:0;
     }
 }
 @-webkit-keyframes fadeout {
     from {
-        opacity:0;
+        opacity:1;
     }
     to {
-        opacity:1;
+        opacity:0;
     }
 }
 @-o-keyframes fadeout {
     from {
-        opacity:0;
+        opacity:1;
     }
     to {
-        opacity: 1;
+        opacity:0;
     }
 }`;
 
