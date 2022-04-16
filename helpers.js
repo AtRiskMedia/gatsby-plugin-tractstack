@@ -89,7 +89,6 @@ const MarkdownParagraph = (htmlAst, imageData = [], index, parent_css = "", css 
   });
   return /*#__PURE__*/React.createElement(StyledWrapper, {
     key: index,
-    className: "paneFragment",
     css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
   }, html);
 };

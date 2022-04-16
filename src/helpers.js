@@ -111,7 +111,6 @@ const MarkdownParagraph = (
   return (
     <StyledWrapper
       key={index}
-      className="paneFragment"
       css={parent_css + "z-index:" + parseInt(zIndex) + ";" + css}
     >
       {html}

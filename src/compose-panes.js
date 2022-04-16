@@ -122,7 +122,16 @@ function ComposePanes(data) {
             //
             break;
         }
-        return react_fragment;
+        return (
+          <div className="paneFragment">
+            <IsVisible
+              key={pane_fragment?.id}
+              payload={{ in: "fadeInUp", out: "fadeOut", speed: "2" }}
+            >
+              {react_fragment}
+            </IsVisible>
+          </div>
+        );
       });
 
     // return pane
@@ -141,16 +150,16 @@ function ComposePanes(data) {
     // at this viewport the pane may be empty
     if (Object.keys(composedPane).length === 0) return;
     return (
-      <IsVisible key={pane?.id}>
-        <StyledWrapper
-          className={"pane pane__view--" + data?.viewport?.key}
-          css={"height:" + parseInt(pane_height) + "vw;"}
-        >
-          {composedPane}
-        </StyledWrapper>
-      </IsVisible>
+      <StyledWrapper
+        key={pane?.id}
+        className={"pane pane__view--" + data?.viewport?.key}
+        css={"height:" + parseInt(pane_height) + "vw;"}
+      >
+        {composedPane}
+      </StyledWrapper>
     );
   });
+  // this is the storyFragment
   return composedPanes;
 }
 

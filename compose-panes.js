@@ -76,7 +76,16 @@ function ComposePanes(data) {
           break;
       }
 
-      return react_fragment;
+      return /*#__PURE__*/React.createElement("div", {
+        className: "paneFragment"
+      }, /*#__PURE__*/React.createElement(IsVisible, {
+        key: pane_fragment?.id,
+        payload: {
+          in: "fadeInUp",
+          out: "fadeOut",
+          speed: "2"
+        }
+      }, react_fragment));
     }); // return pane
 
     let pane_height;
@@ -97,13 +106,13 @@ function ComposePanes(data) {
 
 
     if (Object.keys(composedPane).length === 0) return;
-    return /*#__PURE__*/React.createElement(IsVisible, {
-      key: pane?.id
-    }, /*#__PURE__*/React.createElement(StyledWrapper, {
+    return /*#__PURE__*/React.createElement(StyledWrapper, {
+      key: pane?.id,
       className: "pane pane__view--" + data?.viewport?.key,
       css: "height:" + parseInt(pane_height) + "vw;"
-    }, composedPane));
-  });
+    }, composedPane);
+  }); // this is the storyFragment
+
   return composedPanes;
 }
 
