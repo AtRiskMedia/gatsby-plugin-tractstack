@@ -24,7 +24,35 @@ function ComposePanes(data) {
         ) {
           return;
         }
-        let react_fragment, alt_text, imageData;
+        let react_fragment,
+          alt_text,
+          imageData,
+          css_styles = "",
+          css_styles_parent = "";
+        // pre-pass to get viewport styles for markdown, background video and image
+        if (
+          [
+            "paragraph__markdown",
+            "paragraph__background_video",
+            "paragraph__background_image",
+          ].includes(pane_fragment?.internal?.type)
+        ) {
+          switch (data?.viewport?.key) {
+            case "mobile":
+              css_styles = pane_fragment?.field_css_styles_mobile;
+              css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
+              break;
+            case "tablet":
+              css_styles = pane_fragment?.field_css_styles_tablet;
+              css_styles_parent = pane_fragment?.field_css_styles_parent_tablet;
+              break;
+            case "desktop":
+              css_styles = pane_fragment?.field_css_styles_desktop;
+              css_styles_parent =
+                pane_fragment?.field_css_styles_parent_desktop;
+              break;
+          }
+        }
         switch (pane_fragment?.internal?.type) {
           case "paragraph__markdown":
             // get image data (if available)
@@ -41,24 +69,6 @@ function ComposePanes(data) {
             let htmlAst = sanitize(
               pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst
             );
-            let css_styles, css_styles_parent;
-            switch (data?.viewport?.key) {
-              case "mobile":
-                css_styles = pane_fragment?.field_css_styles_mobile;
-                css_styles_parent =
-                  pane_fragment?.field_css_styles_parent_mobile;
-                break;
-              case "tablet":
-                css_styles = pane_fragment?.field_css_styles_tablet;
-                css_styles_parent =
-                  pane_fragment?.field_css_styles_parent_tablet;
-                break;
-              case "desktop":
-                css_styles = pane_fragment?.field_css_styles_desktop;
-                css_styles_parent =
-                  pane_fragment?.field_css_styles_parent_desktop;
-                break;
-            }
             react_fragment = MarkdownParagraph(
               htmlAst,
               imageData,
@@ -74,7 +84,9 @@ function ComposePanes(data) {
               pane_fragment?.id,
               pane_fragment?.field_cdn_url,
               pane_fragment?.field_alt_text,
-              index
+              index,
+              css_styles_parent,
+              pane_fragment?.field_zindex
             );
             break;
 
@@ -91,7 +103,9 @@ function ComposePanes(data) {
             react_fragment = InjectGatsbyBackgroundImage(
               imageData[0],
               pane_fragment?.field_alt_text,
-              index
+              index,
+              css_styles_parent,
+              pane_fragment?.field_zindex
             );
             break;
 
@@ -100,7 +114,13 @@ function ComposePanes(data) {
             let publicURL =
               pane_fragment?.relationships?.field_svg_file?.localFile
                 ?.publicURL;
-            react_fragment = InjectSvg(publicURL, alt_text, index);
+            react_fragment = InjectSvg(
+              publicURL,
+              alt_text,
+              index,
+              pane_fragment?.field_css_styles_parent,
+              pane_fragment?.field_zindex
+            );
             break;
 
           case "paragraph__d3":
@@ -117,20 +137,20 @@ function ComposePanes(data) {
     let pane_height;
     switch (data?.viewport?.key) {
       case "mobile":
-        pane_height = pane?.field_pixel_height_mobile;
+        pane_height = pane?.field_height_ratio_mobile;
         break;
       case "tablet":
-        pane_height = pane?.field_pixel_height_tablet;
+        pane_height = pane?.field_height_ratio_tablet;
         break;
       case "desktop":
-        pane_height = pane?.field_pixel_height_desktop;
+        pane_height = pane?.field_height_ratio_desktop;
         break;
     }
     return (
       <StyledWrapper
         key={pane?.id}
         className={"pane pane__view--" + data?.viewport?.key}
-        css={"height:" + parseInt(pane_height) + "px;"}
+        css={"height:" + parseInt(pane_height) + "vw;"}
       >
         {composedPane}
       </StyledWrapper>

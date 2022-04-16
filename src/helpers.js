@@ -15,8 +15,7 @@ const InjectGatsbyBackgroundImage = (
   imageData,
   alt_text,
   index,
-  parent_css,
-  css,
+  parent_css = "",
   zIndex
 ) => {
   const image = getImage(imageData);
@@ -24,7 +23,7 @@ const InjectGatsbyBackgroundImage = (
   return (
     <div className="paneFragment" key={index}>
       <StyledWrapper
-        css={parent_css + "z-index:" + parseInt(zIndex) + ";" + css}
+        css={"z-index:" + parseInt(zIndex) + "; img {" + parent_css + "}"}
       >
         <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
           <div>
@@ -41,8 +40,8 @@ const InjectGatsbyBackgroundVideo = (
   url,
   alt_text,
   index,
-  parent_css,
-  css,
+  parent_css = "",
+  css = "",
   zIndex
 ) => {
   return (

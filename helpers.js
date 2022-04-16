@@ -12,14 +12,14 @@ const StyledWrapper = styled.div`
   ${props => props.css};
 `;
 
-const InjectGatsbyBackgroundImage = (imageData, alt_text, index, parent_css, css, zIndex) => {
+const InjectGatsbyBackgroundImage = (imageData, alt_text, index, parent_css = "", zIndex) => {
   const image = getImage(imageData);
   const bgImage = convertToBgImage(image);
   return /*#__PURE__*/React.createElement("div", {
     className: "paneFragment",
     key: index
   }, /*#__PURE__*/React.createElement(StyledWrapper, {
-    css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
+    css: "z-index:" + parseInt(zIndex) + "; img {" + parent_css + "}"
   }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
   }, bgImage, {
@@ -30,7 +30,7 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text, index, parent_css, css
   })))));
 };
 
-const InjectGatsbyBackgroundVideo = (id, url, alt_text, index, parent_css, css, zIndex) => {
+const InjectGatsbyBackgroundVideo = (id, url, alt_text, index, parent_css = "", css = "", zIndex) => {
   return /*#__PURE__*/React.createElement(StyledWrapper, {
     className: "paneFragment",
     key: index,
