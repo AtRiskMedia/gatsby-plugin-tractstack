@@ -19,76 +19,6 @@ const css = (animationIn, animationOut, animationSpeed) => {
       -webkit-animation-fill-mode: both
       animation-name: ` + animationOut + `;
         -webkit-animation-name: ` + animationOut + `;
-    }
-
-    @keyframes fadeInUp {
-        from {
-          transform: translate3d(0,40px,0)
-        }
-        to {
-          transform: translate3d(0,0,0);
-          opacity:1;
-        }
-    }
-    @-moz-keyframes fadeInUp {
-        from {
-          transform: translate3d(0,40px,0)
-        }
-        to {
-          transform: translate3d(0,0,0);
-          opacity:1;
-        }
-    }
-    @-webkit-keyframes fadeInUp {
-        from {
-          transform: translate3d(0,40px,0)
-        }
-        to {
-          transform: translate3d(0,0,0);
-          opacity:1;
-        }
-    }
-    @-o-keyframes fadeInUp {
-        from {
-          transform: translate3d(0,40px,0)
-        }
-        to {
-          transform: translate3d(0,0,0);
-          opacity: 1;
-        }
-    }
-
-    @keyframes fadeOut {
-        from {
-            opacity:1;
-        }
-        to {
-            opacity:0;
-        }
-    }
-    @-moz-keyframes fadeOut {
-        from {
-            opacity:1;
-        }
-        to {
-            opacity:0;
-        }
-    }
-    @-webkit-keyframes fadeOut {
-        from {
-            opacity:1;
-        }
-        to {
-            opacity:0;
-        }
-    }
-    @-o-keyframes fadeOut {
-        from {
-            opacity:1;
-        }
-        to {
-            opacity:0;
-        }
     }`;
 };
 
@@ -105,7 +35,7 @@ const IsVisible = props => {
     css: css(props?.payload?.in, props?.payload?.out, props?.payload?.speed)
   }, /*#__PURE__*/React.createElement("div", {
     ref: nodeRef,
-    className: class_is_visible
+    className: class_is_visible + " reveal"
   }, props.children));
 };
 

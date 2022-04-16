@@ -14,6 +14,17 @@ function ComposePanes(data) {
   if (typeof data?.viewport?.key === "undefined") return <></>;
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.data?.relationships?.field_panes.map((pane) => {
+    // check if background colour is set
+    const background_colour = pane?.relationships?.field_pane_fragments
+      // skip if current viewport is listed in field_hidden_viewports
+      .filter(
+        (e) =>
+          e.field_hidden_viewports
+            .replace(/\s+/g, "")
+            .split(",")
+            .indexOf(data?.viewport?.key) == -1
+      )
+      .filter((e) => e?.internal?.type === "paragraph__background_colour");
     let composedPane = pane?.relationships?.field_pane_fragments
       // skip if current viewport is listed in field_hidden_viewports
       .filter(
@@ -122,14 +133,21 @@ function ComposePanes(data) {
             //
             break;
         }
+        if (pane_fragment.id === "3ed49a50-e0a1-5e5c-a7cb-808f2a5d91ed") {
+          //if (pane_fragment.id === "dcdfffa1-f88a-5d87-88ed-d5c02a2944e3") {
+          return (
+            <div className="paneFragment" key={pane_fragment?.id}>
+              <IsVisible
+                payload={{ in: "fadeInUp", out: "fadeOut", speed: "2" }}
+              >
+                {react_fragment}
+              </IsVisible>
+            </div>
+          );
+        }
         return (
-          <div className="paneFragment">
-            <IsVisible
-              key={pane_fragment?.id}
-              payload={{ in: "fadeInUp", out: "fadeOut", speed: "2" }}
-            >
-              {react_fragment}
-            </IsVisible>
+          <div className="paneFragment" key={pane_fragment?.id}>
+            {react_fragment}
           </div>
         );
       });
@@ -149,11 +167,18 @@ function ComposePanes(data) {
     }
     // at this viewport the pane may be empty
     if (Object.keys(composedPane).length === 0) return;
+    let this_css = "height:" + parseInt(pane_height) + "vw;";
+    if (background_colour.length)
+      this_css =
+        this_css +
+        " background-color:" +
+        background_colour[0].field_background_colour +
+        ";";
     return (
       <StyledWrapper
         key={pane?.id}
         className={"pane pane__view--" + data?.viewport?.key}
-        css={"height:" + parseInt(pane_height) + "vw;"}
+        css={this_css}
       >
         {composedPane}
       </StyledWrapper>
