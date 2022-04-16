@@ -1,13 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { sanitize } from "hast-util-sanitize";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapper } from "./helpers";
+import { IsVisible } from "./is-visible.js";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
   const composedPanes = data?.data?.relationships?.field_panes.map(pane => {
-    const composedPane = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
+    let composedPane = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1).map((pane_fragment, index) => {
       let react_fragment,
           alt_text,
@@ -92,14 +93,16 @@ function ComposePanes(data) {
       case "desktop":
         pane_height = pane?.field_height_ratio_desktop;
         break;
-    }
+    } // at this viewport the pane may be empty
+
 
     if (Object.keys(composedPane).length === 0) return;
-    return /*#__PURE__*/React.createElement(StyledWrapper, {
-      key: pane?.id,
+    return /*#__PURE__*/React.createElement(IsVisible, {
+      key: pane?.id
+    }, /*#__PURE__*/React.createElement(StyledWrapper, {
       className: "pane pane__view--" + data?.viewport?.key,
       css: "height:" + parseInt(pane_height) + "vw;"
-    }, composedPane);
+    }, composedPane));
   });
   return composedPanes;
 }

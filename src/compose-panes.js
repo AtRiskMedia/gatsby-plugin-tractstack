@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { sanitize } from "hast-util-sanitize";
 import {
   MarkdownParagraph,
@@ -7,13 +7,14 @@ import {
   InjectSvg,
   StyledWrapper,
 } from "./helpers";
+import { IsVisible } from "./is-visible.js";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return <></>;
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.data?.relationships?.field_panes.map((pane) => {
-    const composedPane = pane?.relationships?.field_pane_fragments
+    let composedPane = pane?.relationships?.field_pane_fragments
       // skip if current viewport is listed in field_hidden_viewports
       .filter(
         (e) =>
@@ -137,15 +138,17 @@ function ComposePanes(data) {
         pane_height = pane?.field_height_ratio_desktop;
         break;
     }
+    // at this viewport the pane may be empty
     if (Object.keys(composedPane).length === 0) return;
     return (
-      <StyledWrapper
-        key={pane?.id}
-        className={"pane pane__view--" + data?.viewport?.key}
-        css={"height:" + parseInt(pane_height) + "vw;"}
-      >
-        {composedPane}
-      </StyledWrapper>
+      <IsVisible key={pane?.id}>
+        <StyledWrapper
+          className={"pane pane__view--" + data?.viewport?.key}
+          css={"height:" + parseInt(pane_height) + "vw;"}
+        >
+          {composedPane}
+        </StyledWrapper>
+      </IsVisible>
     );
   });
   return composedPanes;
