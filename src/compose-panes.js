@@ -13,46 +13,36 @@ function ComposePanes(data) {
   if (typeof data?.viewport?.key === "undefined") return <></>;
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.data?.relationships?.field_panes.map((pane) => {
-    const composedPane = pane?.relationships?.field_pane_fragments.map(
-      (pane_fragment, index) => {
-        // skip if current viewport is listed in field_hidden_viewports
-        if (
-          pane_fragment?.field_hidden_viewports
+    const composedPane = pane?.relationships?.field_pane_fragments
+      // skip if current viewport is listed in field_hidden_viewports
+      .filter(
+        (e) =>
+          e.field_hidden_viewports
             .replace(/\s+/g, "")
             .split(",")
-            .indexOf(data?.viewport?.key) > -1
-        ) {
-          return;
-        }
+            .indexOf(data?.viewport?.key) == -1
+      )
+      .map((pane_fragment, index) => {
         let react_fragment,
           alt_text,
           imageData,
           css_styles = "",
           css_styles_parent = "";
-        // pre-pass to get viewport styles for markdown, background video and image
-        if (
-          [
-            "paragraph__markdown",
-            "paragraph__background_video",
-            "paragraph__background_image",
-          ].includes(pane_fragment?.internal?.type)
-        ) {
-          switch (data?.viewport?.key) {
-            case "mobile":
-              css_styles = pane_fragment?.field_css_styles_mobile;
-              css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
-              break;
-            case "tablet":
-              css_styles = pane_fragment?.field_css_styles_tablet;
-              css_styles_parent = pane_fragment?.field_css_styles_parent_tablet;
-              break;
-            case "desktop":
-              css_styles = pane_fragment?.field_css_styles_desktop;
-              css_styles_parent =
-                pane_fragment?.field_css_styles_parent_desktop;
-              break;
-          }
+        switch (data?.viewport?.key) {
+          case "mobile":
+            css_styles = pane_fragment?.field_css_styles_mobile;
+            css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
+            break;
+          case "tablet":
+            css_styles = pane_fragment?.field_css_styles_tablet;
+            css_styles_parent = pane_fragment?.field_css_styles_parent_tablet;
+            break;
+          case "desktop":
+            css_styles = pane_fragment?.field_css_styles_desktop;
+            css_styles_parent = pane_fragment?.field_css_styles_parent_desktop;
+            break;
         }
+        // render this paneFragment
         switch (pane_fragment?.internal?.type) {
           case "paragraph__markdown":
             // get image data (if available)
@@ -118,7 +108,7 @@ function ComposePanes(data) {
               publicURL,
               alt_text,
               index,
-              pane_fragment?.field_css_styles_parent,
+              css_styles_parent,
               pane_fragment?.field_zindex
             );
             break;
@@ -132,8 +122,9 @@ function ComposePanes(data) {
             break;
         }
         return react_fragment;
-      }
-    );
+      });
+
+    // return pane
     let pane_height;
     switch (data?.viewport?.key) {
       case "mobile":
@@ -146,6 +137,7 @@ function ComposePanes(data) {
         pane_height = pane?.field_height_ratio_desktop;
         break;
     }
+    if (Object.keys(composedPane).length === 0) return;
     return (
       <StyledWrapper
         key={pane?.id}
@@ -154,12 +146,6 @@ function ComposePanes(data) {
       >
         {composedPane}
       </StyledWrapper>
-    );
-
-    return (
-      <div key={pane?.id} className={"pane pane__view--" + data?.viewport?.key}>
-        {composedPane}
-      </div>
     );
   });
   return composedPanes;
