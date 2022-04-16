@@ -1,44 +1,54 @@
 import React, { useRef } from "react";
 import { useIsVisible } from "react-is-visible";
 import { StyledWrapper } from "./helpers";
-const css = `.onscreen {
-    animation: fadein 2s;
-    -moz-animation: fadein 2s;
-    -webkit-animation: fadein 2s;
-    -o-animation: fadein 2s;
+const css = `
+.onscreen {
+  opacity: 0;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-fill-mode: both
+  animation-name: fadeInUp;
+  -webkit-animation-name: fadeInUp;
 }
-@keyframes fadein {
+
+@keyframes fadeInUp {
     from {
-        opacity:0;
+      transform: translate3d(0,40px,0)
     }
     to {
-        opacity:1;
+      transform: translate3d(0,0,0);
+      opacity:1;
     }
 }
-@-moz-keyframes fadein {
+@-moz-keyframes fadeInUp {
     from {
-        opacity:0;
+      transform: translate3d(0,40px,0)
     }
     to {
-        opacity:1;
+      transform: translate3d(0,0,0);
+      opacity:1;
     }
 }
-@-webkit-keyframes fadein {
+@-webkit-keyframes fadeInUp {
     from {
-        opacity:0;
+      transform: translate3d(0,40px,0)
     }
     to {
-        opacity:1;
+      transform: translate3d(0,0,0);
+      opacity:1;
     }
 }
-@-o-keyframes fadein {
+@-o-keyframes fadeInUp {
     from {
-        opacity:0;
+      transform: translate3d(0,40px,0)
     }
     to {
-        opacity: 1;
+      transform: translate3d(0,0,0);
+      opacity: 1;
     }
 }
+
 .offscreen {
     animation: fadeout 2s;
     -moz-animation: fadeout 2s;
