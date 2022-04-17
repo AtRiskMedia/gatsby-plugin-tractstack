@@ -135,6 +135,13 @@ function ComposePanes(data) {
             //
             break;
         }
+        if (data?.prefersReducedMotion) {
+          return (
+            <div className="paneFragment" key={pane_fragment?.id}>
+              {react_fragment}
+            </div>
+          );
+        }
         // TODO: pull animation payload from actions lisp
         return (
           <div className="paneFragment" key={pane_fragment?.id}>
@@ -143,7 +150,7 @@ function ComposePanes(data) {
                 in: "fadeInUp",
                 out: "fadeOut",
                 speed: "2",
-                delay: ".1",
+                delay: ".5",
               }}
             >
               {react_fragment}

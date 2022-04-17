@@ -78,6 +78,13 @@ function ComposePanes(data) {
         case "paragraph__h5p":
           //
           break;
+      }
+
+      if (data?.prefersReducedMotion) {
+        return /*#__PURE__*/React.createElement("div", {
+          className: "paneFragment",
+          key: pane_fragment?.id
+        }, react_fragment);
       } // TODO: pull animation payload from actions lisp
 
 
