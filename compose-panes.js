@@ -7,8 +7,13 @@ function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
-  const composedPanes = data?.data?.relationships?.field_panes.map(pane => {
-    // check if background colour is set
+  const composedPanes = data?.data?.relationships?.field_panes.map((pane, i) => {
+    // check for actions lisp
+    // TODO: need to parse the actions
+    const actions = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type !== "paragraph__background_colour").filter(e => typeof e?.field_actions_lisp === "string").map(p => {
+      return p?.field_actions_lisp;
+    }); // check for background colour
+
     const background_colour = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1).filter(e => e?.internal?.type === "paragraph__background_colour");
     let composedPane = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
@@ -86,6 +91,8 @@ function ComposePanes(data) {
           key: pane_fragment?.id
         }, react_fragment);
       } // TODO: pull animation payload from actions lisp
+      //
+      // add slight time delay offset for each subsequent pane
 
 
       return /*#__PURE__*/React.createElement("div", {
@@ -96,10 +103,10 @@ function ComposePanes(data) {
           in: "fadeInUp",
           out: "fadeOut",
           speed: "2",
-          delay: ".1"
+          delay: 0.25 * i
         }
       }, react_fragment));
-    }); // return pane
+    }); // compose this pane
 
     let pane_height;
 
@@ -115,7 +122,7 @@ function ComposePanes(data) {
       case "desktop":
         pane_height = pane?.field_height_ratio_desktop;
         break;
-    } // at this viewport the pane may be empty
+    } // skip if empty pane
 
 
     if (Object.keys(composedPane).length === 0) return;
