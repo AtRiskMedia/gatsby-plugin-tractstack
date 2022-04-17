@@ -34,6 +34,8 @@ function ComposePanes(data) {
             .split(",")
             .indexOf(data?.viewport?.key) == -1
       )
+      // and filter out paneFragment if background_colour
+      .filter((e) => e?.internal?.type !== "paragraph__background_colour")
       .map((pane_fragment, index) => {
         let react_fragment,
           alt_text,
@@ -133,21 +135,19 @@ function ComposePanes(data) {
             //
             break;
         }
-        if (pane_fragment.id === "3ed49a50-e0a1-5e5c-a7cb-808f2a5d91ed") {
-          //if (pane_fragment.id === "dcdfffa1-f88a-5d87-88ed-d5c02a2944e3") {
-          return (
-            <div className="paneFragment" key={pane_fragment?.id}>
-              <IsVisible
-                payload={{ in: "fadeInUp", out: "fadeOut", speed: "2" }}
-              >
-                {react_fragment}
-              </IsVisible>
-            </div>
-          );
-        }
+        // TODO: pull animation payload from actions lisp
         return (
           <div className="paneFragment" key={pane_fragment?.id}>
-            {react_fragment}
+            <IsVisible
+              payload={{
+                in: "fadeInUp",
+                out: "fadeOut",
+                speed: "2",
+                delay: ".1",
+              }}
+            >
+              {react_fragment}
+            </IsVisible>
           </div>
         );
       });
