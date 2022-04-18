@@ -2,45 +2,58 @@ import React, { useRef } from "react";
 import { useIsVisible } from "react-is-visible";
 import { StyledWrapper } from "./helpers";
 
-const css = (animationIn, animationOut, animationSpeed, animationDelay) => {
-  return (
-    `.onscreen {
-      opacity: 0;
-      animation-delay: ` +
-    animationDelay +
-    `s;
-      animation-duration: ` +
-    animationSpeed +
-    `s;
-      animation-fill-mode: both;
-      -webkit-animation-duration: ` +
-    animationSpeed +
-    `s;
-      -webkit-animation-fill-mode: both
-      animation-name: ` +
-    animationIn +
-    `;
-        -webkit-animation-name: ` +
-    animationIn +
-    `;
+const css = (payload) => {
+  let css = "",
+    animationIn = payload?.in[0],
+    animationInSpeed = payload?.in[1],
+    animationInDelay = payload?.in[2],
+    animationOut = payload?.out[0],
+    animationOutSpeed = payload?.out[1],
+    animationOutDelay = payload?.out[2];
+  if (typeof animationIn === "string") {
+    css =
+      `.onscreen { opacity: 0; animation-fill-mode: both; animation-name: ` +
+      animationIn +
+      `; -webkit-animation-name: ` +
+      animationIn +
+      `; `;
+    if (typeof animationInSpeed === "number") {
+      css =
+        css +
+        `animation-duration: ` +
+        animationInSpeed +
+        `s; -webkit-animation-duration: ` +
+        animationInSpeed +
+        `s; `;
     }
-    .offscreen {
-      animation-duration: ` +
-    animationSpeed +
-    `s;
-      animation-fill-mode: both;
-      -webkit-animation-duration: ` +
-    animationSpeed +
-    `s;
-      -webkit-animation-fill-mode: both
-      animation-name: ` +
-    animationOut +
-    `;
-        -webkit-animation-name: ` +
-    animationOut +
-    `;
-    }`
-  );
+    if (typeof animationInDelay === "number") {
+      css = css + `animation-delay: ` + animationInDelay + `s; `;
+    }
+    css = css + "}";
+  }
+  if (typeof animationOut === "string") {
+    css =
+      css +
+      `.offscreen { opacity: 0; animation-fill-mode: both; animation-name: ` +
+      animationOut +
+      `; -webkit-animation-name: ` +
+      animationOut +
+      `; `;
+    if (typeof animationOutSpeed === "number") {
+      css =
+        css +
+        `animation-duration: ` +
+        animationOutSpeed +
+        `s; -webkit-animation-duration: ` +
+        animationOutSpeed +
+        `s; `;
+    }
+    if (typeof animationOutDelay === "number") {
+      css = css + `animation-delay: ` + animationOutDelay + `s; `;
+    }
+    css = css + "}";
+  }
+  return css;
 };
 
 const IsVisible = (props) => {
@@ -51,14 +64,7 @@ const IsVisible = (props) => {
     class_is_visible = "onscreen";
   }
   return (
-    <StyledWrapper
-      css={css(
-        props?.payload?.in,
-        props?.payload?.out,
-        props?.payload?.speed,
-        props?.payload?.delay
-      )}
-    >
+    <StyledWrapper css={css(props?.payload)}>
       <div ref={nodeRef} className={class_is_visible + " reveal"}>
         {props.children}
       </div>

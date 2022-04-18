@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import { sanitize } from "hast-util-sanitize";
 import {
   MarkdownParagraph,
   InjectGatsbyBackgroundImage,
@@ -15,14 +14,6 @@ function ComposePanes(data) {
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.data?.relationships?.field_panes.map(
     (pane, i) => {
-      // check for actions lisp
-      // TODO: need to parse the actions
-      const actions = pane?.relationships?.field_pane_fragments
-        .filter((e) => e?.internal?.type !== "paragraph__background_colour")
-        .filter((e) => typeof e?.field_actions_lisp === "string")
-        .map((p) => {
-          return p?.field_actions_lisp;
-        });
       // check for background colour
       const background_colour = pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
@@ -80,11 +71,8 @@ function ComposePanes(data) {
                 }
               );
               // replaces images with Gatsby Images and prepares html
-              let htmlAst = sanitize(
-                pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst
-              );
               react_fragment = MarkdownParagraph(
-                htmlAst,
+                pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst,
                 imageData,
                 index,
                 css_styles_parent,
@@ -152,21 +140,30 @@ function ComposePanes(data) {
               </div>
             );
           }
-          // TODO: pull animation payload from actions lisp
-          //
-          // add slight time delay offset for each subsequent pane
+          // check for options payload
+          const actions = JSON.parse(pane_fragment?.field_options);
+          if (!"onscreen" in actions && !"offscreen" in actions) {
+            // if no options, do not animate
+            <div className="paneFragment" key={pane_fragment?.id}>
+              {react_fragment}
+            </div>;
+          }
+          // else animate
+          let payload = {
+            in: [
+              actions?.onscreen?.function,
+              actions?.onscreen?.speed,
+              actions?.onscreen?.delay,
+            ],
+            out: [
+              actions?.offscreen?.function,
+              actions?.offscreen?.speed,
+              actions?.offscreen?.delay,
+            ],
+          };
           return (
             <div className="paneFragment" key={pane_fragment?.id}>
-              <IsVisible
-                payload={{
-                  in: "fadeInUp",
-                  out: "fadeOut",
-                  speed: "2",
-                  delay: 0.25 * i,
-                }}
-              >
-                {react_fragment}
-              </IsVisible>
+              <IsVisible payload={payload}>{react_fragment}</IsVisible>
             </div>
           );
         });

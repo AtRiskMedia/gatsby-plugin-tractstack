@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import { sanitize } from "hast-util-sanitize";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapper } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
@@ -8,12 +7,7 @@ function ComposePanes(data) {
   if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
   const composedPanes = data?.data?.relationships?.field_panes.map((pane, i) => {
-    // check for actions lisp
-    // TODO: need to parse the actions
-    const actions = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type !== "paragraph__background_colour").filter(e => typeof e?.field_actions_lisp === "string").map(p => {
-      return p?.field_actions_lisp;
-    }); // check for background colour
-
+    // check for background colour
     const background_colour = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1).filter(e => e?.internal?.type === "paragraph__background_colour");
     let composedPane = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
@@ -50,8 +44,7 @@ function ComposePanes(data) {
             return [image.id, image.filename, image.localFile?.childImageSharp?.gatsbyImageData];
           }); // replaces images with Gatsby Images and prepares html
 
-          let htmlAst = sanitize(pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst);
-          react_fragment = MarkdownParagraph(htmlAst, imageData, index, css_styles_parent, css_styles, pane_fragment?.field_zindex);
+          react_fragment = MarkdownParagraph(pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst, imageData, index, css_styles_parent, css_styles, pane_fragment?.field_zindex);
           break;
 
         case "paragraph__background_video":
@@ -90,21 +83,31 @@ function ComposePanes(data) {
           className: "paneFragment",
           key: pane_fragment?.id
         }, react_fragment);
-      } // TODO: pull animation payload from actions lisp
-      //
-      // add slight time delay offset for each subsequent pane
+      } // check for options payload
 
 
+      const actions = JSON.parse(pane_fragment?.field_options);
+
+      if (!"onscreen" in actions && !"offscreen" in actions) {
+        // if no options, do not animate
+
+        /*#__PURE__*/
+        React.createElement("div", {
+          className: "paneFragment",
+          key: pane_fragment?.id
+        }, react_fragment);
+      } // else animate
+
+
+      let payload = {
+        in: [actions?.onscreen?.function, actions?.onscreen?.speed, actions?.onscreen?.delay],
+        out: [actions?.offscreen?.function, actions?.offscreen?.speed, actions?.offscreen?.delay]
+      };
       return /*#__PURE__*/React.createElement("div", {
         className: "paneFragment",
         key: pane_fragment?.id
       }, /*#__PURE__*/React.createElement(IsVisible, {
-        payload: {
-          in: "fadeInUp",
-          out: "fadeOut",
-          speed: "2",
-          delay: 0.25 * i
-        }
+        payload: payload
       }, react_fragment));
     }); // compose this pane
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { toH } from "hast-to-hyperscript";
+import { sanitize } from "hast-util-sanitize";
 import h from "hyperscript";
 import styled from "styled-components";
 import { graphql, useStaticQuery } from "gatsby";
@@ -77,8 +78,8 @@ const MarkdownParagraph = (
   css = "",
   zIndex
 ) => {
-  const html = htmlAst.children
-    .filter((child) => child?.type && child.type === "element")
+  const html = sanitize(htmlAst)
+    .children.filter((child) => child?.type && child.type === "element")
     .map((child, index) => {
       for (const [i, tag] of Object.entries(child.children)) {
         if (tag?.tagName && tag.tagName === "img") {
