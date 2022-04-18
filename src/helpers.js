@@ -8,7 +8,10 @@ import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 
-const StyledWrapper = styled.div`
+const StyledWrapperDiv = styled.div`
+  ${(props) => props.css};
+`;
+const StyledWrapperSection = styled.section`
   ${(props) => props.css};
 `;
 
@@ -23,7 +26,7 @@ const InjectGatsbyBackgroundImage = (
   const bgImage = convertToBgImage(image);
   return (
     <div className="paneFragment" key={index}>
-      <StyledWrapper
+      <StyledWrapperDiv
         css={"z-index:" + parseInt(zIndex) + "; img {" + parent_css + "}"}
       >
         <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
@@ -31,7 +34,7 @@ const InjectGatsbyBackgroundImage = (
             <GatsbyImage image={image} alt={alt_text} />
           </div>
         </BackgroundImage>
-      </StyledWrapper>
+      </StyledWrapperDiv>
     </div>
   );
 };
@@ -46,7 +49,7 @@ const InjectGatsbyBackgroundVideo = (
   zIndex
 ) => {
   return (
-    <StyledWrapper
+    <StyledWrapperDiv
       className="paneFragment"
       key={index}
       css={parent_css + "z-index:" + parseInt(zIndex) + ";" + css}
@@ -54,19 +57,19 @@ const InjectGatsbyBackgroundVideo = (
       <video autoPlay={true} muted loop id={id} title={alt_text}>
         <source src={url} type="video/mp4" />
       </video>
-    </StyledWrapper>
+    </StyledWrapperDiv>
   );
 };
 
 const InjectSvg = (publicURL, alt_text, index, parent_css, css, zIndex) => {
   return (
-    <StyledWrapper
+    <StyledWrapperDiv
       className="paneFragment"
       key={index}
       css={parent_css + "z-index:" + parseInt(zIndex) + ";" + css}
     >
       <img src={publicURL} alt={alt_text} className="paneFragmentCSS" />
-    </StyledWrapper>
+    </StyledWrapperDiv>
   );
 };
 
@@ -110,12 +113,12 @@ const MarkdownParagraph = (
       );
     });
   return (
-    <StyledWrapper
+    <StyledWrapperDiv
       key={index}
       css={parent_css + "z-index:" + parseInt(zIndex) + ";" + css}
     >
       {html}
-    </StyledWrapper>
+    </StyledWrapperDiv>
   );
 };
 
@@ -128,6 +131,7 @@ export {
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
-  StyledWrapper,
+  StyledWrapperDiv,
+  StyledWrapperSection,
   getStoryStepGraph,
 };

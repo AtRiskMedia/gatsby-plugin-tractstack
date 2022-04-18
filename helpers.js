@@ -9,7 +9,10 @@ import { graphql, useStaticQuery } from "gatsby";
 import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
-const StyledWrapper = styled.div`
+const StyledWrapperDiv = styled.div`
+  ${props => props.css};
+`;
+const StyledWrapperSection = styled.section`
   ${props => props.css};
 `;
 
@@ -19,7 +22,7 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text, index, parent_css = ""
   return /*#__PURE__*/React.createElement("div", {
     className: "paneFragment",
     key: index
-  }, /*#__PURE__*/React.createElement(StyledWrapper, {
+  }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: "z-index:" + parseInt(zIndex) + "; img {" + parent_css + "}"
   }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
@@ -32,7 +35,7 @@ const InjectGatsbyBackgroundImage = (imageData, alt_text, index, parent_css = ""
 };
 
 const InjectGatsbyBackgroundVideo = (id, url, alt_text, index, parent_css = "", css = "", zIndex) => {
-  return /*#__PURE__*/React.createElement(StyledWrapper, {
+  return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     className: "paneFragment",
     key: index,
     css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
@@ -49,7 +52,7 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, index, parent_css = "", 
 };
 
 const InjectSvg = (publicURL, alt_text, index, parent_css, css, zIndex) => {
-  return /*#__PURE__*/React.createElement(StyledWrapper, {
+  return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     className: "paneFragment",
     key: index,
     css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
@@ -88,7 +91,7 @@ const MarkdownParagraph = (htmlAst, imageData = [], index, parent_css = "", css 
       }
     });
   });
-  return /*#__PURE__*/React.createElement(StyledWrapper, {
+  return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     key: index,
     css: parent_css + "z-index:" + parseInt(zIndex) + ";" + css
   }, html);
@@ -98,5 +101,5 @@ const getStoryStepGraph = (graph, targetId) => {
   return graph.edges.filter(e => e?.node?.id === targetId)[0];
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapper, getStoryStepGraph };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapperDiv, StyledWrapperSection, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map

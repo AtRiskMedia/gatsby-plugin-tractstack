@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { useIsVisible } from "react-is-visible";
-import { StyledWrapper } from "./helpers";
+import { StyledWrapperDiv } from "./helpers";
 
 const css = payload => {
   let css = "",
@@ -51,7 +51,7 @@ const IsVisible = props => {
     class_is_visible = "onscreen";
   }
 
-  return /*#__PURE__*/React.createElement(StyledWrapper, {
+  return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css(props?.payload)
   }, /*#__PURE__*/React.createElement("div", {
     ref: nodeRef,

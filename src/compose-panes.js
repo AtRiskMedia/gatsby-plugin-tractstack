@@ -4,7 +4,7 @@ import {
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
-  StyledWrapper,
+  StyledWrapperSection,
 } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
@@ -191,13 +191,13 @@ function ComposePanes(data) {
           background_colour[0].field_background_colour +
           ";";
       return (
-        <StyledWrapper
+        <StyledWrapperSection
           key={pane?.id}
           className={"pane pane__view--" + data?.viewport?.key}
           css={this_css}
         >
           {composedPane}
-        </StyledWrapper>
+        </StyledWrapperSection>
       );
     }
   );

@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapper } from "./helpers";
+import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapperSection } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
 function ComposePanes(data) {
@@ -131,7 +131,7 @@ function ComposePanes(data) {
     if (Object.keys(composedPane).length === 0) return;
     let this_css = "height:" + parseInt(pane_height) + "vw;";
     if (background_colour.length) this_css = this_css + " background-color:" + background_colour[0].field_background_colour + ";";
-    return /*#__PURE__*/React.createElement(StyledWrapper, {
+    return /*#__PURE__*/React.createElement(StyledWrapperSection, {
       key: pane?.id,
       className: "pane pane__view--" + data?.viewport?.key,
       css: this_css
