@@ -64,17 +64,23 @@ function ComposePanes(data) {
               imageData = pane_fragment?.relationships?.field_image?.map(
                 (image) => {
                   return [
-                    image.id,
-                    image.filename,
-                    image.localFile?.childImageSharp?.gatsbyImageData,
+                    image?.id,
+                    image?.filename,
+                    image?.localFile?.childImageSharp?.gatsbyImageData,
                   ];
                 }
               );
-              // replaces images with Gatsby Images and prepares html
+              // now pre-render MarkdownParagraph elements and inject images
+              let child =
+                pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
+              child.children =
+                pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
+                  (e) => !(e.type === "text" && e.value === "\n")
+                );
               react_fragment = MarkdownParagraph(
-                pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst,
+                pane_fragment?.id,
+                child,
                 imageData,
-                index,
                 css_styles_parent,
                 css_styles,
                 pane_fragment?.field_zindex
@@ -86,8 +92,8 @@ function ComposePanes(data) {
                 pane_fragment?.id,
                 pane_fragment?.field_cdn_url,
                 pane_fragment?.field_alt_text,
-                index,
                 css_styles_parent,
+                css_styles,
                 pane_fragment?.field_zindex
               );
               break;
@@ -103,23 +109,20 @@ function ComposePanes(data) {
                 }
               );
               react_fragment = InjectGatsbyBackgroundImage(
+                pane_fragment?.id,
                 imageData[0],
                 pane_fragment?.field_alt_text,
-                index,
                 css_styles_parent,
                 pane_fragment?.field_zindex
               );
               break;
 
             case "paragraph__svg":
-              alt_text = pane_fragment?.field_svg_file?.description;
-              let publicURL =
-                pane_fragment?.relationships?.field_svg_file?.localFile
-                  ?.publicURL;
               react_fragment = InjectSvg(
-                publicURL,
-                alt_text,
-                index,
+                pane_fragment?.id,
+                pane_fragment?.relationships?.field_svg_file?.localFile
+                  ?.publicURL,
+                pane_fragment?.field_svg_file?.description,
                 css_styles_parent,
                 pane_fragment?.field_zindex
               );
