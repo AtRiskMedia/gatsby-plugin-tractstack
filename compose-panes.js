@@ -91,10 +91,12 @@ function ComposePanes(data) {
         in: [effects?.onscreen?.function, effects?.onscreen?.speed, effects?.onscreen?.delay],
         out: [effects?.offscreen?.function, effects?.offscreen?.speed, effects?.offscreen?.delay]
       };
-      return /*#__PURE__*/React.createElement(IsVisible, {
+      return /*#__PURE__*/React.createElement("div", {
         key: pane_fragment?.id,
+        className: "paneFragment"
+      }, /*#__PURE__*/React.createElement(IsVisible, {
         payload: payload
-      }, react_fragment);
+      }, react_fragment));
     }); // compose this pane
 
     let pane_height;

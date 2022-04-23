@@ -152,9 +152,9 @@ function ComposePanes(data) {
             ],
           };
           return (
-            <IsVisible key={pane_fragment?.id} payload={payload}>
-              {react_fragment}
-            </IsVisible>
+            <div key={pane_fragment?.id} className="paneFragment">
+              <IsVisible payload={payload}>{react_fragment}</IsVisible>
+            </div>
           );
         });
 

@@ -2,7 +2,8 @@ import React, { useRef } from "react";
 import { useIsVisible } from "react-is-visible";
 import { StyledWrapperDiv } from "./helpers";
 
-const css = (payload) => {
+const PrepareCss = (payload) => {
+  if (!payload?.in && !payload?.out) return "";
   let css = "",
     animationIn = payload?.in[0],
     animationInSpeed = payload?.in[1],
@@ -64,12 +65,10 @@ const IsVisible = (props) => {
     class_is_visible = "onscreen";
   }
   return (
-    <StyledWrapperDiv css={css(props?.payload)} className="paneFragment">
-      <div ref={nodeRef} className={class_is_visible + " reveal"}>
-        {props.children}
-      </div>
-    </StyledWrapperDiv>
+    <div ref={nodeRef} className={class_is_visible + " reveal"}>
+      {props.children}
+    </div>
   );
 };
 
-export { IsVisible };
+export { IsVisible, PrepareCss };

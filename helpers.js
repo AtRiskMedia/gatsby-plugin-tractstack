@@ -13,7 +13,9 @@ const HtmlAstToReact = (children, imageData = []) => {
   // breaks gatsby images free of enclosing p tag
   let contents;
   const fragment = children.map((e, index) => {
-    if (e?.type === "text") return /*#__PURE__*/React.createElement("span", null, e?.value);
+    if (e?.type === "text") return /*#__PURE__*/React.createElement("span", {
+      key: index
+    }, e?.value);
 
     switch (e?.tagName) {
       case "h1":
@@ -50,7 +52,7 @@ const HtmlAstToReact = (children, imageData = []) => {
         let breakout = false;
         contents = e?.children?.map((p, i) => {
           if (p?.type === "text") {
-            let value = p?.value.replace(/\r?\n|\r/g, "");
+            let value = p?.value?.replace(/\r?\n|\r/g, "");
             if (value.length) return /*#__PURE__*/React.createElement("span", {
               key: i
             }, value);
@@ -231,5 +233,5 @@ const getStoryStepGraph = (graph, targetId) => {
   return graph?.edges?.filter(e => e?.node?.id === targetId)[0];
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapperDiv, StyledWrapperSection, getStoryStepGraph };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map

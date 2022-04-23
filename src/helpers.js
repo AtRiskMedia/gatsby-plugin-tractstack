@@ -11,7 +11,7 @@ const HtmlAstToReact = (children, imageData = []) => {
   // breaks gatsby images free of enclosing p tag
   let contents;
   const fragment = children.map((e, index) => {
-    if (e?.type === "text") return <span>{e?.value}</span>;
+    if (e?.type === "text") return <span key={index}>{e?.value}</span>;
     switch (e?.tagName) {
       case "h1":
         return (
@@ -54,7 +54,7 @@ const HtmlAstToReact = (children, imageData = []) => {
         let breakout = false;
         contents = e?.children?.map((p, i) => {
           if (p?.type === "text") {
-            let value = p?.value.replace(/\r?\n|\r/g, "");
+            let value = p?.value?.replace(/\r?\n|\r/g, "");
             if (value.length) return <span key={i}>{value}</span>;
           }
           if (p?.type === "element") {
@@ -249,5 +249,6 @@ export {
   InjectSvg,
   StyledWrapperDiv,
   StyledWrapperSection,
+  PaneFragment,
   getStoryStepGraph,
 };
