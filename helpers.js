@@ -17,34 +17,34 @@ const HtmlAstToReact = (children, imageData = []) => {
 
     switch (e?.tagName) {
       case "h1":
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, e?.children[0].value));
+        }, /*#__PURE__*/React.createElement("h1", null, e?.children[0].value));
 
       case "h2":
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, e?.children[0].value));
+        }, /*#__PURE__*/React.createElement("h2", null, e?.children[0].value));
 
       case "h3":
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, e?.children[0].value));
+        }, /*#__PURE__*/React.createElement("h3", null, e?.children[0].value));
 
       case "h4":
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h4", {
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, e?.children[0].value));
+        }, /*#__PURE__*/React.createElement("h4", null, e?.children[0].value));
 
       case "h5":
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h5", {
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, e?.children[0].value));
+        }, /*#__PURE__*/React.createElement("h5", null, e?.children[0].value));
 
       case "h6":
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h6", {
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, e?.children[0].value));
+        }, /*#__PURE__*/React.createElement("h6", null, e?.children[0].value));
 
       case "p":
         let breakout = false;
@@ -64,6 +64,24 @@ const HtmlAstToReact = (children, imageData = []) => {
                   key: i
                 });
 
+              case "em":
+                if (typeof p?.children[0]?.value === "string") {
+                  return /*#__PURE__*/React.createElement("em", {
+                    key: i
+                  }, p?.children[0]?.value);
+                }
+
+                break;
+
+              case "strong":
+                if (typeof p?.children[0]?.value === "string") {
+                  return /*#__PURE__*/React.createElement("strong", {
+                    key: i
+                  }, p?.children[0]?.value);
+                }
+
+                break;
+
               case "a":
                 if (typeof p?.properties?.href === "string" && p?.children[0]?.type === "text" && typeof p?.children[0]?.value === "string") {
                   // is this an internal link?
@@ -73,6 +91,8 @@ const HtmlAstToReact = (children, imageData = []) => {
                     key: i
                   }, p?.children[0]?.value);
                 }
+
+                break;
 
               case "img":
                 // is this case for gatsby image? = png, jpg ... != svg
@@ -90,8 +110,10 @@ const HtmlAstToReact = (children, imageData = []) => {
                   });
                 }
 
+                break;
+
               default:
-                console.log("helpers.js: MISS on", p?.tagName);
+                console.log("helpers.js > p: MISS on", p?.tagName);
             } // use recursion to compose the MarkdownParagraph
 
 
@@ -102,11 +124,12 @@ const HtmlAstToReact = (children, imageData = []) => {
         if (breakout) return /*#__PURE__*/React.createElement("div", {
           key: index
         }, contents);
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, contents));
+        }, /*#__PURE__*/React.createElement("p", null, contents));
 
       case "ul":
+      case "ol":
         contents = e?.children?.map((li, i) => {
           if (li?.type === "element") {
             // assumes link contains text only
@@ -115,9 +138,24 @@ const HtmlAstToReact = (children, imageData = []) => {
             }, li?.children[0].value);
           }
         });
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("ul", {
+        let list;
+        if (e?.tagName === "ol") list = /*#__PURE__*/React.createElement("ol", null, contents);
+        if (e?.tagName === "ul") list = /*#__PURE__*/React.createElement("ul", null, contents);
+        return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, contents));
+        }, list);
+
+      case "blockquote":
+        let raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
+        let quote = HtmlAstToReact(raw, imageData);
+
+        if (typeof e?.children[0]?.value === "string") {
+          return /*#__PURE__*/React.createElement("blockquote", {
+            key: index
+          }, quote);
+        }
+
+        break;
 
       default:
         console.log("helpers.js: MISS on", e);

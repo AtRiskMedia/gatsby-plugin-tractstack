@@ -15,38 +15,38 @@ const HtmlAstToReact = (children, imageData = []) => {
     switch (e?.tagName) {
       case "h1":
         return (
-          <div>
-            <h1 key={index}>{e?.children[0].value}</h1>
+          <div key={index}>
+            <h1>{e?.children[0].value}</h1>
           </div>
         );
       case "h2":
         return (
-          <div>
-            <h2 key={index}>{e?.children[0].value}</h2>
+          <div key={index}>
+            <h2>{e?.children[0].value}</h2>
           </div>
         );
       case "h3":
         return (
-          <div>
-            <h3 key={index}>{e?.children[0].value}</h3>
+          <div key={index}>
+            <h3>{e?.children[0].value}</h3>
           </div>
         );
       case "h4":
         return (
-          <div>
-            <h4 key={index}>{e?.children[0].value}</h4>
+          <div key={index}>
+            <h4>{e?.children[0].value}</h4>
           </div>
         );
       case "h5":
         return (
-          <div>
-            <h5 key={index}>{e?.children[0].value}</h5>
+          <div key={index}>
+            <h5>{e?.children[0].value}</h5>
           </div>
         );
       case "h6":
         return (
-          <div>
-            <h6 key={index}>{e?.children[0].value}</h6>
+          <div key={index}>
+            <h6>{e?.children[0].value}</h6>
           </div>
         );
 
@@ -63,6 +63,18 @@ const HtmlAstToReact = (children, imageData = []) => {
               case "br":
                 return <br key={i} />;
 
+              case "em":
+                if (typeof p?.children[0]?.value === "string") {
+                  return <em key={i}>{p?.children[0]?.value}</em>;
+                }
+                break;
+
+              case "strong":
+                if (typeof p?.children[0]?.value === "string") {
+                  return <strong key={i}>{p?.children[0]?.value}</strong>;
+                }
+                break;
+
               case "a":
                 if (
                   typeof p?.properties?.href === "string" &&
@@ -77,6 +89,7 @@ const HtmlAstToReact = (children, imageData = []) => {
                     </Link>
                   );
                 }
+                break;
 
               case "img":
                 // is this case for gatsby image? = png, jpg ... != svg
@@ -99,9 +112,10 @@ const HtmlAstToReact = (children, imageData = []) => {
                     />
                   );
                 }
+                break;
 
               default:
-                console.log("helpers.js: MISS on", p?.tagName);
+                console.log("helpers.js > p: MISS on", p?.tagName);
             }
             // use recursion to compose the MarkdownParagraph
             return HtmlAstToReact(p?.children, imageData);
@@ -110,23 +124,33 @@ const HtmlAstToReact = (children, imageData = []) => {
         // breakout is true when contents is gatsby image
         if (breakout) return <div key={index}>{contents}</div>;
         return (
-          <div>
-            <p key={index}>{contents}</p>
+          <div key={index}>
+            <p>{contents}</p>
           </div>
         );
 
       case "ul":
+      case "ol":
         contents = e?.children?.map((li, i) => {
           if (li?.type === "element") {
             // assumes link contains text only
             return <li key={i}>{li?.children[0].value}</li>;
           }
         });
-        return (
-          <div>
-            <ul key={index}>{contents}</ul>
-          </div>
+        let list;
+        if (e?.tagName === "ol") list = <ol>{contents}</ol>;
+        if (e?.tagName === "ul") list = <ul>{contents}</ul>;
+        return <div key={index}>{list}</div>;
+
+      case "blockquote":
+        let raw = e?.children.filter(
+          (e) => !(e.type === "text" && e.value === "\n")
         );
+        let quote = HtmlAstToReact(raw, imageData);
+        if (typeof e?.children[0]?.value === "string") {
+          return <blockquote key={index}>{quote}</blockquote>;
+        }
+        break;
 
       default:
         console.log("helpers.js: MISS on", e);
