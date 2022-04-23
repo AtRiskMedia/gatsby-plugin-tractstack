@@ -19,34 +19,15 @@ const HtmlAstToReact = (children, imageData = []) => {
 
     switch (e?.tagName) {
       case "h1":
-        return /*#__PURE__*/React.createElement("div", {
-          key: index
-        }, /*#__PURE__*/React.createElement("h1", null, e?.children[0].value));
-
       case "h2":
-        return /*#__PURE__*/React.createElement("div", {
-          key: index
-        }, /*#__PURE__*/React.createElement("h2", null, e?.children[0].value));
-
       case "h3":
-        return /*#__PURE__*/React.createElement("div", {
-          key: index
-        }, /*#__PURE__*/React.createElement("h3", null, e?.children[0].value));
-
       case "h4":
-        return /*#__PURE__*/React.createElement("div", {
-          key: index
-        }, /*#__PURE__*/React.createElement("h4", null, e?.children[0].value));
-
       case "h5":
-        return /*#__PURE__*/React.createElement("div", {
-          key: index
-        }, /*#__PURE__*/React.createElement("h5", null, e?.children[0].value));
-
       case "h6":
+        const Tag = e?.tagName;
         return /*#__PURE__*/React.createElement("div", {
           key: index
-        }, /*#__PURE__*/React.createElement("h6", null, e?.children[0].value));
+        }, /*#__PURE__*/React.createElement(Tag, null, e?.children[0].value));
 
       case "p":
         let breakout = false;

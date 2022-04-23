@@ -14,39 +14,15 @@ const HtmlAstToReact = (children, imageData = []) => {
     if (e?.type === "text") return <span key={index}>{e?.value}</span>;
     switch (e?.tagName) {
       case "h1":
-        return (
-          <div key={index}>
-            <h1>{e?.children[0].value}</h1>
-          </div>
-        );
       case "h2":
-        return (
-          <div key={index}>
-            <h2>{e?.children[0].value}</h2>
-          </div>
-        );
       case "h3":
-        return (
-          <div key={index}>
-            <h3>{e?.children[0].value}</h3>
-          </div>
-        );
       case "h4":
-        return (
-          <div key={index}>
-            <h4>{e?.children[0].value}</h4>
-          </div>
-        );
       case "h5":
-        return (
-          <div key={index}>
-            <h5>{e?.children[0].value}</h5>
-          </div>
-        );
       case "h6":
+        const Tag = e?.tagName;
         return (
           <div key={index}>
-            <h6>{e?.children[0].value}</h6>
+            <Tag>{e?.children[0].value}</Tag>
           </div>
         );
 
