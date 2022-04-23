@@ -1,4 +1,5 @@
 import { ComposePanes } from "./compose-panes";
+import { BuildController } from "./build-controller";
 import { getStoryStepGraph } from "./helpers";
 
 const viewportWidths = {
@@ -7,4 +8,4 @@ const viewportWidths = {
   desktop: 1920,
 };
 
-export { ComposePanes, getStoryStepGraph, viewportWidths };
+export { ComposePanes, BuildController, getStoryStepGraph, viewportWidths };

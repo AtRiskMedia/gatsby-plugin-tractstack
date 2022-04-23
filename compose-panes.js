@@ -74,22 +74,22 @@ function ComposePanes(data) {
       } // check for options payload
 
 
-      const actions = JSON.parse(pane_fragment?.field_options);
+      const options = JSON.parse(pane_fragment?.field_options);
+      let effects = options?.effects;
 
-      if (!"onscreen" in actions && !"offscreen" in actions) {
+      if (!"onscreen" in effects && !"offscreen" in effects) {
         // if no options, do not animate
 
         /*#__PURE__*/
         React.createElement("div", {
-          className: "paneFragment22",
           key: pane_fragment?.id
         }, react_fragment);
       } // else animate
 
 
       let payload = {
-        in: [actions?.onscreen?.function, actions?.onscreen?.speed, actions?.onscreen?.delay],
-        out: [actions?.offscreen?.function, actions?.offscreen?.speed, actions?.offscreen?.delay]
+        in: [effects?.onscreen?.function, effects?.onscreen?.speed, effects?.onscreen?.delay],
+        out: [effects?.offscreen?.function, effects?.offscreen?.speed, effects?.offscreen?.delay]
       };
       return /*#__PURE__*/React.createElement(IsVisible, {
         key: pane_fragment?.id,

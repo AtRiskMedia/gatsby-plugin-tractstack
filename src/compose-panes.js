@@ -132,24 +132,23 @@ function ComposePanes(data) {
             );
           }
           // check for options payload
-          const actions = JSON.parse(pane_fragment?.field_options);
-          if (!"onscreen" in actions && !"offscreen" in actions) {
+          const options = JSON.parse(pane_fragment?.field_options);
+          let effects = options?.effects;
+          if (!"onscreen" in effects && !"offscreen" in effects) {
             // if no options, do not animate
-            <div className="paneFragment22" key={pane_fragment?.id}>
-              {react_fragment}
-            </div>;
+            <div key={pane_fragment?.id}>{react_fragment}</div>;
           }
           // else animate
           let payload = {
             in: [
-              actions?.onscreen?.function,
-              actions?.onscreen?.speed,
-              actions?.onscreen?.delay,
+              effects?.onscreen?.function,
+              effects?.onscreen?.speed,
+              effects?.onscreen?.delay,
             ],
             out: [
-              actions?.offscreen?.function,
-              actions?.offscreen?.speed,
-              actions?.offscreen?.delay,
+              effects?.offscreen?.function,
+              effects?.offscreen?.speed,
+              effects?.offscreen?.delay,
             ],
           };
           return (
