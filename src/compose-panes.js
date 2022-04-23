@@ -124,36 +124,35 @@ function ComposePanes(data) {
               //
               break;
           }
-          if (data?.prefersReducedMotion) {
-            return (
-              <div className="paneFragment" key={pane_fragment?.id}>
-                {react_fragment}
-              </div>
+          // can we wrap this in animation?
+          if (data?.prefersReducedMotion === false) {
+            // check for options payload
+            const options = JSON.parse(pane_fragment?.field_options);
+            let effects = options?.effects;
+            if (effects && !"onscreen" in effects && !"offscreen" in effects) {
+              // if no options, do not animate
+              <div key={pane_fragment?.id}>{react_fragment}</div>;
+            }
+            // else animate
+            let effects_payload = {
+              in: [
+                effects?.onscreen?.function,
+                effects?.onscreen?.speed,
+                effects?.onscreen?.delay,
+              ],
+              out: [
+                effects?.offscreen?.function,
+                effects?.offscreen?.speed,
+                effects?.offscreen?.delay,
+              ],
+            };
+            react_fragment = (
+              <IsVisible effects={effects_payload}>{react_fragment}</IsVisible>
             );
           }
-          // check for options payload
-          const options = JSON.parse(pane_fragment?.field_options);
-          let effects = options?.effects;
-          if (!"onscreen" in effects && !"offscreen" in effects) {
-            // if no options, do not animate
-            <div key={pane_fragment?.id}>{react_fragment}</div>;
-          }
-          // else animate
-          let payload = {
-            in: [
-              effects?.onscreen?.function,
-              effects?.onscreen?.speed,
-              effects?.onscreen?.delay,
-            ],
-            out: [
-              effects?.offscreen?.function,
-              effects?.offscreen?.speed,
-              effects?.offscreen?.delay,
-            ],
-          };
           return (
-            <div key={pane_fragment?.id} className="paneFragment">
-              <IsVisible payload={payload}>{react_fragment}</IsVisible>
+            <div className="paneFragment" key={pane_fragment?.id}>
+              {react_fragment}
             </div>
           );
         });

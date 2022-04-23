@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useIsVisible } from "react-is-visible";
 import { StyledWrapperDiv } from "./helpers";
 
-const PrepareCss = payload => {
+const InjectCssAnimation = payload => {
   if (!payload?.in && !payload?.out) return "";
   let css = "",
       animationIn = payload?.in[0],
@@ -52,11 +52,14 @@ const IsVisible = props => {
     class_is_visible = "onscreen";
   }
 
-  return /*#__PURE__*/React.createElement("div", {
+  let css = InjectCssAnimation(props?.effects);
+  return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
+    css: css
+  }, /*#__PURE__*/React.createElement("div", {
     ref: nodeRef,
     className: class_is_visible + " reveal"
-  }, props.children);
+  }, props.children));
 };
 
-export { IsVisible, PrepareCss };
+export { IsVisible };
 //# sourceMappingURL=is-visible.js.map
