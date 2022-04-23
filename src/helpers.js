@@ -11,7 +11,7 @@ const HtmlAstToReact = (children, imageData = []) => {
   // breaks gatsby images free of enclosing p tag
   let contents;
   const fragment = children.map((e, index) => {
-    if (e?.type === "text") return e?.value;
+    if (e?.type === "text") return <span>{e?.value}</span>;
     switch (e?.tagName) {
       case "h1":
         return <h1 key={index}>{e?.children[0].value}</h1>;
@@ -29,7 +29,10 @@ const HtmlAstToReact = (children, imageData = []) => {
       case "p":
         let breakout = false;
         contents = e?.children?.map((p, i) => {
-          if (p?.type === "text") return p?.value;
+          if (p?.type === "text") {
+            let value = p?.value.replace(/\r?\n|\r/g, "");
+            if (value.length) return <span key={i}>{value}</span>;
+          }
           if (p?.type === "element") {
             // determine which element ... could be p, img, br, a, ?
             switch (p?.tagName) {
@@ -59,32 +62,28 @@ const HtmlAstToReact = (children, imageData = []) => {
                   extcheck &&
                   (extcheck[0] === ".png" || extcheck[0] === ".jpg")
                 ) {
-                  // imageData contains an array of images, match this image on filename
-                  let thisImageData = imageData.filter(
-                    (matchImage) => matchImage[1] === p?.properties?.src
+                  // imageData in this case is an array ... must find correct element
+                  let this_imageData = imageData.filter(
+                    (image) => image.filename === p?.properties?.src
+                  )[0]?.localFile?.childImageSharp?.gatsbyImageData;
+                  breakout = true;
+                  return (
+                    <GatsbyImage
+                      key={i}
+                      alt={p?.properties?.alt}
+                      image={this_imageData}
+                    />
                   );
-                  if (
-                    thisImageData &&
-                    thisImageData[0] &&
-                    thisImageData[0][2]
-                  ) {
-                    breakout = true;
-                    return (
-                      <GatsbyImage
-                        key={i}
-                        alt={p?.properties?.alt}
-                        image={thisImageData[0][2]}
-                      />
-                    );
-                  }
                 }
 
               default:
                 console.log("helpers.js: MISS on", p?.tagName);
             }
+            // use recursion to compose the MarkdownParagraph
             return HtmlAstToReact(p?.children, imageData);
           }
         });
+        // breakout is true when contents is gatsby image
         if (breakout) return <div key={index}>{contents}</div>;
         return <p key={index}>{contents}</p>;
 
@@ -101,7 +100,7 @@ const HtmlAstToReact = (children, imageData = []) => {
         console.log("helpers.js: MISS on", e);
     }
   });
-  return fragment;
+  return <div>{fragment}</div>;
 };
 
 const StyledWrapperDiv = styled.div`
@@ -113,9 +112,9 @@ const StyledWrapperSection = styled.section`
 
 const PaneFragment = (id, child, css) => {
   return (
-    <div className="paneFragment" key={id}>
-      <StyledWrapperDiv css={css}>{child}</StyledWrapperDiv>
-    </div>
+    <StyledWrapperDiv key={id} css={css}>
+      {child}
+    </StyledWrapperDiv>
   );
 };
 
@@ -132,13 +131,14 @@ const InjectGatsbyBackgroundImage = (
   parent_css = "",
   zIndex
 ) => {
-  const image = getImage(imageData);
-  const bgImage = convertToBgImage(image);
+  const this_imageData = getImage(imageData);
+  const bgImage = convertToBgImage(this_imageData);
+
   let css = `z-index: ${parseInt(zIndex)}; img { ${parent_css} }`;
   let child = (
     <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
       <div className="paneFragmentImage">
-        <GatsbyImage image={image} alt={alt_text} />
+        <GatsbyImage image={this_imageData} alt={alt_text} />
       </div>
     </BackgroundImage>
   );

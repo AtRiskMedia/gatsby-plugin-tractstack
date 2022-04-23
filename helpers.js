@@ -13,7 +13,7 @@ const HtmlAstToReact = (children, imageData = []) => {
   // breaks gatsby images free of enclosing p tag
   let contents;
   const fragment = children.map((e, index) => {
-    if (e?.type === "text") return e?.value;
+    if (e?.type === "text") return /*#__PURE__*/React.createElement("span", null, e?.value);
 
     switch (e?.tagName) {
       case "h1":
@@ -49,7 +49,12 @@ const HtmlAstToReact = (children, imageData = []) => {
       case "p":
         let breakout = false;
         contents = e?.children?.map((p, i) => {
-          if (p?.type === "text") return p?.value;
+          if (p?.type === "text") {
+            let value = p?.value.replace(/\r?\n|\r/g, "");
+            if (value.length) return /*#__PURE__*/React.createElement("span", {
+              key: i
+            }, value);
+          }
 
           if (p?.type === "element") {
             // determine which element ... could be p, img, br, a, ?
@@ -75,26 +80,25 @@ const HtmlAstToReact = (children, imageData = []) => {
                 let extcheck = p?.properties?.src?.match(pass);
 
                 if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
-                  // imageData contains an array of images, match this image on filename
-                  let thisImageData = imageData.filter(matchImage => matchImage[1] === p?.properties?.src);
-
-                  if (thisImageData && thisImageData[0] && thisImageData[0][2]) {
-                    breakout = true;
-                    return /*#__PURE__*/React.createElement(GatsbyImage, {
-                      key: i,
-                      alt: p?.properties?.alt,
-                      image: thisImageData[0][2]
-                    });
-                  }
+                  // imageData in this case is an array ... must find correct element
+                  let this_imageData = imageData.filter(image => image.filename === p?.properties?.src)[0]?.localFile?.childImageSharp?.gatsbyImageData;
+                  breakout = true;
+                  return /*#__PURE__*/React.createElement(GatsbyImage, {
+                    key: i,
+                    alt: p?.properties?.alt,
+                    image: this_imageData
+                  });
                 }
 
               default:
                 console.log("helpers.js: MISS on", p?.tagName);
-            }
+            } // use recursion to compose the MarkdownParagraph
+
 
             return HtmlAstToReact(p?.children, imageData);
           }
-        });
+        }); // breakout is true when contents is gatsby image
+
         if (breakout) return /*#__PURE__*/React.createElement("div", {
           key: index
         }, contents);
@@ -119,7 +123,7 @@ const HtmlAstToReact = (children, imageData = []) => {
         console.log("helpers.js: MISS on", e);
     }
   });
-  return fragment;
+  return /*#__PURE__*/React.createElement("div", null, fragment);
 };
 
 const StyledWrapperDiv = styled.div`
@@ -130,12 +134,10 @@ const StyledWrapperSection = styled.section`
 `;
 
 const PaneFragment = (id, child, css) => {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "paneFragment",
-    key: id
-  }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
+  return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
+    key: id,
     css: css
-  }, child));
+  }, child);
 };
 
 const InjectSvg = (id, url, alt_text, parent_css, zIndex) => {
@@ -149,8 +151,8 @@ const InjectSvg = (id, url, alt_text, parent_css, zIndex) => {
 };
 
 const InjectGatsbyBackgroundImage = (id, imageData, alt_text, parent_css = "", zIndex) => {
-  const image = getImage(imageData);
-  const bgImage = convertToBgImage(image);
+  const this_imageData = getImage(imageData);
+  const bgImage = convertToBgImage(this_imageData);
   let css = `z-index: ${parseInt(zIndex)}; img { ${parent_css} }`;
   let child = /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
@@ -159,7 +161,7 @@ const InjectGatsbyBackgroundImage = (id, imageData, alt_text, parent_css = "", z
   }), /*#__PURE__*/React.createElement("div", {
     className: "paneFragmentImage"
   }, /*#__PURE__*/React.createElement(GatsbyImage, {
-    image: image,
+    image: this_imageData,
     alt: alt_text
   })));
   return PaneFragment(id, child, css);

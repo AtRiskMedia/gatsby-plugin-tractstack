@@ -64,7 +64,7 @@ const IsVisible = (props) => {
     class_is_visible = "onscreen";
   }
   return (
-    <StyledWrapperDiv css={css(props?.payload)}>
+    <StyledWrapperDiv css={css(props?.payload)} className="paneFragment">
       <div ref={nodeRef} className={class_is_visible + " reveal"}>
         {props.children}
       </div>

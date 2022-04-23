@@ -12,10 +12,10 @@ function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return <></>;
   // loop through the panes in view and render each pane fragment
-  const composedPanes = data?.data?.relationships?.field_panes.map(
+  const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
       // check for background colour
-      const background_colour = pane?.relationships?.field_pane_fragments
+      let background_colour = pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
         .filter(
           (e) =>
@@ -25,6 +25,7 @@ function ComposePanes(data) {
               .indexOf(data?.viewport?.key) == -1
         )
         .filter((e) => e?.internal?.type === "paragraph__background_colour");
+
       let composedPane = pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
         .filter(
@@ -34,7 +35,7 @@ function ComposePanes(data) {
               .split(",")
               .indexOf(data?.viewport?.key) == -1
         )
-        // and filter out paneFragment if background_colour
+        // already processed background_colour
         .filter((e) => e?.internal?.type !== "paragraph__background_colour")
         .map((pane_fragment, index) => {
           let react_fragment,
@@ -42,6 +43,8 @@ function ComposePanes(data) {
             imageData,
             css_styles = "",
             css_styles_parent = "";
+
+          // select css for viewport
           switch (data?.viewport?.key) {
             case "mobile":
               css_styles = pane_fragment?.field_css_styles_mobile;
@@ -57,19 +60,10 @@ function ComposePanes(data) {
                 pane_fragment?.field_css_styles_parent_desktop;
               break;
           }
+
           // render this paneFragment
           switch (pane_fragment?.internal?.type) {
             case "paragraph__markdown":
-              // get image data (if available)
-              imageData = pane_fragment?.relationships?.field_image?.map(
-                (image) => {
-                  return [
-                    image?.id,
-                    image?.filename,
-                    image?.localFile?.childImageSharp?.gatsbyImageData,
-                  ];
-                }
-              );
               // now pre-render MarkdownParagraph elements and inject images
               let child =
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
@@ -80,7 +74,7 @@ function ComposePanes(data) {
               react_fragment = MarkdownParagraph(
                 pane_fragment?.id,
                 child,
-                imageData,
+                pane_fragment?.relationships?.field_image,
                 css_styles_parent,
                 css_styles,
                 pane_fragment?.field_zindex
@@ -99,18 +93,12 @@ function ComposePanes(data) {
               break;
 
             case "paragraph__background_image":
-              imageData = pane_fragment?.relationships?.field_image?.map(
-                (image) => {
-                  let key = data?.viewport?.key;
-                  let this_image_data = image[key];
-                  if (typeof this_image_data !== "undefined") {
-                    return this_image_data.childImageSharp?.gatsbyImageData;
-                  }
-                }
-              );
               react_fragment = InjectGatsbyBackgroundImage(
                 pane_fragment?.id,
-                imageData[0],
+                pane_fragment?.relationships?.field_image[0] &&
+                  pane_fragment?.relationships?.field_image[0][
+                    data?.viewport?.key
+                  ],
                 pane_fragment?.field_alt_text,
                 css_styles_parent,
                 pane_fragment?.field_zindex
@@ -147,7 +135,7 @@ function ComposePanes(data) {
           const actions = JSON.parse(pane_fragment?.field_options);
           if (!"onscreen" in actions && !"offscreen" in actions) {
             // if no options, do not animate
-            <div className="paneFragment" key={pane_fragment?.id}>
+            <div className="paneFragment22" key={pane_fragment?.id}>
               {react_fragment}
             </div>;
           }
@@ -165,9 +153,9 @@ function ComposePanes(data) {
             ],
           };
           return (
-            <div className="paneFragment" key={pane_fragment?.id}>
-              <IsVisible payload={payload}>{react_fragment}</IsVisible>
-            </div>
+            <IsVisible key={pane_fragment?.id} payload={payload}>
+              {react_fragment}
+            </IsVisible>
           );
         });
 

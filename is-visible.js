@@ -52,7 +52,8 @@ const IsVisible = props => {
   }
 
   return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
-    css: css(props?.payload)
+    css: css(props?.payload),
+    className: "paneFragment"
   }, /*#__PURE__*/React.createElement("div", {
     ref: nodeRef,
     className: class_is_visible + " reveal"

@@ -6,18 +6,18 @@ function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
-  const composedPanes = data?.data?.relationships?.field_panes.map((pane, i) => {
+  const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
     // check for background colour
-    const background_colour = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
+    let background_colour = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1).filter(e => e?.internal?.type === "paragraph__background_colour");
     let composedPane = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
-    .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1) // and filter out paneFragment if background_colour
+    .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1) // already processed background_colour
     .filter(e => e?.internal?.type !== "paragraph__background_colour").map((pane_fragment, index) => {
       let react_fragment,
           alt_text,
           imageData,
           css_styles = "",
-          css_styles_parent = "";
+          css_styles_parent = ""; // select css for viewport
 
       switch (data?.viewport?.key) {
         case "mobile":
@@ -39,14 +39,10 @@ function ComposePanes(data) {
 
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
-          // get image data (if available)
-          imageData = pane_fragment?.relationships?.field_image?.map(image => {
-            return [image?.id, image?.filename, image?.localFile?.childImageSharp?.gatsbyImageData];
-          }); // now pre-render MarkdownParagraph elements and inject images
-
+          // now pre-render MarkdownParagraph elements and inject images
           let child = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
           child.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
-          react_fragment = MarkdownParagraph(pane_fragment?.id, child, imageData, css_styles_parent, css_styles, pane_fragment?.field_zindex);
+          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, css_styles_parent, css_styles, pane_fragment?.field_zindex);
           break;
 
         case "paragraph__background_video":
@@ -54,15 +50,7 @@ function ComposePanes(data) {
           break;
 
         case "paragraph__background_image":
-          imageData = pane_fragment?.relationships?.field_image?.map(image => {
-            let key = data?.viewport?.key;
-            let this_image_data = image[key];
-
-            if (typeof this_image_data !== "undefined") {
-              return this_image_data.childImageSharp?.gatsbyImageData;
-            }
-          });
-          react_fragment = InjectGatsbyBackgroundImage(pane_fragment?.id, imageData[0], pane_fragment?.field_alt_text, css_styles_parent, pane_fragment?.field_zindex);
+          react_fragment = InjectGatsbyBackgroundImage(pane_fragment?.id, pane_fragment?.relationships?.field_image[0] && pane_fragment?.relationships?.field_image[0][data?.viewport?.key], pane_fragment?.field_alt_text, css_styles_parent, pane_fragment?.field_zindex);
           break;
 
         case "paragraph__svg":
@@ -93,7 +81,7 @@ function ComposePanes(data) {
 
         /*#__PURE__*/
         React.createElement("div", {
-          className: "paneFragment",
+          className: "paneFragment22",
           key: pane_fragment?.id
         }, react_fragment);
       } // else animate
@@ -103,12 +91,10 @@ function ComposePanes(data) {
         in: [actions?.onscreen?.function, actions?.onscreen?.speed, actions?.onscreen?.delay],
         out: [actions?.offscreen?.function, actions?.offscreen?.speed, actions?.offscreen?.delay]
       };
-      return /*#__PURE__*/React.createElement("div", {
-        className: "paneFragment",
-        key: pane_fragment?.id
-      }, /*#__PURE__*/React.createElement(IsVisible, {
+      return /*#__PURE__*/React.createElement(IsVisible, {
+        key: pane_fragment?.id,
         payload: payload
-      }, react_fragment));
+      }, react_fragment);
     }); // compose this pane
 
     let pane_height;
