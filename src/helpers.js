@@ -14,17 +14,41 @@ const HtmlAstToReact = (children, imageData = []) => {
     if (e?.type === "text") return <span>{e?.value}</span>;
     switch (e?.tagName) {
       case "h1":
-        return <h1 key={index}>{e?.children[0].value}</h1>;
+        return (
+          <div>
+            <h1 key={index}>{e?.children[0].value}</h1>
+          </div>
+        );
       case "h2":
-        return <h2 key={index}>{e?.children[0].value}</h2>;
+        return (
+          <div>
+            <h2 key={index}>{e?.children[0].value}</h2>
+          </div>
+        );
       case "h3":
-        return <h3 key={index}>{e?.children[0].value}</h3>;
+        return (
+          <div>
+            <h3 key={index}>{e?.children[0].value}</h3>
+          </div>
+        );
       case "h4":
-        return <h4 key={index}>{e?.children[0].value}</h4>;
+        return (
+          <div>
+            <h4 key={index}>{e?.children[0].value}</h4>
+          </div>
+        );
       case "h5":
-        return <h5 key={index}>{e?.children[0].value}</h5>;
+        return (
+          <div>
+            <h5 key={index}>{e?.children[0].value}</h5>
+          </div>
+        );
       case "h6":
-        return <h6 key={index}>{e?.children[0].value}</h6>;
+        return (
+          <div>
+            <h6 key={index}>{e?.children[0].value}</h6>
+          </div>
+        );
 
       case "p":
         let breakout = false;
@@ -85,7 +109,11 @@ const HtmlAstToReact = (children, imageData = []) => {
         });
         // breakout is true when contents is gatsby image
         if (breakout) return <div key={index}>{contents}</div>;
-        return <p key={index}>{contents}</p>;
+        return (
+          <div>
+            <p key={index}>{contents}</p>
+          </div>
+        );
 
       case "ul":
         contents = e?.children?.map((li, i) => {
@@ -94,13 +122,17 @@ const HtmlAstToReact = (children, imageData = []) => {
             return <li key={i}>{li?.children[0].value}</li>;
           }
         });
-        return <ul key={index}>{contents}</ul>;
+        return (
+          <div>
+            <ul key={index}>{contents}</ul>
+          </div>
+        );
 
       default:
         console.log("helpers.js: MISS on", e);
     }
   });
-  return <div>{fragment}</div>;
+  return fragment;
 };
 
 const StyledWrapperDiv = styled.div`

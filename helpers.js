@@ -17,34 +17,34 @@ const HtmlAstToReact = (children, imageData = []) => {
 
     switch (e?.tagName) {
       case "h1":
-        return /*#__PURE__*/React.createElement("h1", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
           key: index
-        }, e?.children[0].value);
+        }, e?.children[0].value));
 
       case "h2":
-        return /*#__PURE__*/React.createElement("h2", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
           key: index
-        }, e?.children[0].value);
+        }, e?.children[0].value));
 
       case "h3":
-        return /*#__PURE__*/React.createElement("h3", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
           key: index
-        }, e?.children[0].value);
+        }, e?.children[0].value));
 
       case "h4":
-        return /*#__PURE__*/React.createElement("h4", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h4", {
           key: index
-        }, e?.children[0].value);
+        }, e?.children[0].value));
 
       case "h5":
-        return /*#__PURE__*/React.createElement("h5", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h5", {
           key: index
-        }, e?.children[0].value);
+        }, e?.children[0].value));
 
       case "h6":
-        return /*#__PURE__*/React.createElement("h6", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h6", {
           key: index
-        }, e?.children[0].value);
+        }, e?.children[0].value));
 
       case "p":
         let breakout = false;
@@ -102,9 +102,9 @@ const HtmlAstToReact = (children, imageData = []) => {
         if (breakout) return /*#__PURE__*/React.createElement("div", {
           key: index
         }, contents);
-        return /*#__PURE__*/React.createElement("p", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
           key: index
-        }, contents);
+        }, contents));
 
       case "ul":
         contents = e?.children?.map((li, i) => {
@@ -115,15 +115,15 @@ const HtmlAstToReact = (children, imageData = []) => {
             }, li?.children[0].value);
           }
         });
-        return /*#__PURE__*/React.createElement("ul", {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("ul", {
           key: index
-        }, contents);
+        }, contents));
 
       default:
         console.log("helpers.js: MISS on", e);
     }
   });
-  return /*#__PURE__*/React.createElement("div", null, fragment);
+  return fragment;
 };
 
 const StyledWrapperDiv = styled.div`
