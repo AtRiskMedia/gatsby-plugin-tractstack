@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapperSection } from "./helpers";
+import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperSection } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
 function ComposePanes(data) {
@@ -16,6 +16,7 @@ function ComposePanes(data) {
       let react_fragment,
           alt_text,
           imageData,
+          shape = "",
           css_styles = "",
           css_styles_parent = ""; // select css for viewport
 
@@ -23,16 +24,19 @@ function ComposePanes(data) {
         case "mobile":
           css_styles = pane_fragment?.field_css_styles_mobile;
           css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
+          if (pane_fragment?.internal?.type === "paragraph__background_pane") shape = pane_fragment?.field_shape_mobile;
           break;
 
         case "tablet":
           css_styles = pane_fragment?.field_css_styles_tablet;
           css_styles_parent = pane_fragment?.field_css_styles_parent_tablet;
+          if (pane_fragment?.internal?.type === "paragraph__background_pane") shape = pane_fragment?.field_shape_tablet;
           break;
 
         case "desktop":
           css_styles = pane_fragment?.field_css_styles_desktop;
           css_styles_parent = pane_fragment?.field_css_styles_parent_desktop;
+          if (pane_fragment?.internal?.type === "paragraph__background_pane") shape = pane_fragment?.field_shape_desktop;
           break;
       } // render this paneFragment
 
@@ -43,6 +47,10 @@ function ComposePanes(data) {
           let child = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
           child.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
           react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, css_styles_parent, css_styles, pane_fragment?.field_zindex);
+          break;
+
+        case "paragraph__background_pane":
+          react_fragment = InjectSvgShape(pane_fragment?.id, shape, data?.viewport?.key, css_styles_parent, pane_fragment?.field_zindex);
           break;
 
         case "paragraph__background_video":

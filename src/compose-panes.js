@@ -4,6 +4,7 @@ import {
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
+  InjectSvgShape,
   StyledWrapperSection,
 } from "./helpers";
 import { IsVisible } from "./is-visible.js";
@@ -41,6 +42,7 @@ function ComposePanes(data) {
           let react_fragment,
             alt_text,
             imageData,
+            shape = "",
             css_styles = "",
             css_styles_parent = "";
 
@@ -49,15 +51,27 @@ function ComposePanes(data) {
             case "mobile":
               css_styles = pane_fragment?.field_css_styles_mobile;
               css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
+              if (
+                pane_fragment?.internal?.type === "paragraph__background_pane"
+              )
+                shape = pane_fragment?.field_shape_mobile;
               break;
             case "tablet":
               css_styles = pane_fragment?.field_css_styles_tablet;
               css_styles_parent = pane_fragment?.field_css_styles_parent_tablet;
+              if (
+                pane_fragment?.internal?.type === "paragraph__background_pane"
+              )
+                shape = pane_fragment?.field_shape_tablet;
               break;
             case "desktop":
               css_styles = pane_fragment?.field_css_styles_desktop;
               css_styles_parent =
                 pane_fragment?.field_css_styles_parent_desktop;
+              if (
+                pane_fragment?.internal?.type === "paragraph__background_pane"
+              )
+                shape = pane_fragment?.field_shape_desktop;
               break;
           }
 
@@ -77,6 +91,16 @@ function ComposePanes(data) {
                 pane_fragment?.relationships?.field_image,
                 css_styles_parent,
                 css_styles,
+                pane_fragment?.field_zindex
+              );
+              break;
+
+            case "paragraph__background_pane":
+              react_fragment = InjectSvgShape(
+                pane_fragment?.id,
+                shape,
+                data?.viewport?.key,
+                css_styles_parent,
                 pane_fragment?.field_zindex
               );
               break;
@@ -124,6 +148,7 @@ function ComposePanes(data) {
               //
               break;
           }
+
           // can we wrap this in animation?
           if (data?.prefersReducedMotion === false) {
             // check for options payload

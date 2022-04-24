@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "gatsby";
 import { IsVisible } from "./is-visible.js";
-import { StyledWrapperSection } from "./helpers.js";
+import { SvgPlay, SvgRewind, TractStackLogo } from "./shapes.js";
 
 function BuildController(data) {
   console.log("TODO: BuildController", data);
@@ -12,9 +12,9 @@ function BuildController(data) {
     className: "controller__graph"
   }, next ? /*#__PURE__*/React.createElement(Link, {
     to: next
-  }, "NEXT") : "", prev ? /*#__PURE__*/React.createElement(Link, {
+  }, /*#__PURE__*/React.createElement(SvgPlay, null)) : "", prev ? /*#__PURE__*/React.createElement(Link, {
     to: prev
-  }, "PREV") : ""); // can we wrap this in animation?
+  }, /*#__PURE__*/React.createElement(SvgRewind, null)) : ""); // can we wrap this in animation?
 
   if (data?.prefersReducedMotion === false) {
     effects_payload = {

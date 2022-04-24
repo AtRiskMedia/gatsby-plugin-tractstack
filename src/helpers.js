@@ -5,11 +5,12 @@ import { graphql, useStaticQuery, Link } from "gatsby";
 import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
+import { SvgPane } from "./shapes.js";
 
-const HtmlAstToReact = (children, imageData = []) => {
+const HtmlAstToReact = (children, imageData = [], naked = false) => {
   // recursive function
   // breaks gatsby images free of enclosing p tag
-  let contents;
+  let contents, raw;
   const fragment = children.map((e, index) => {
     if (e?.type === "text") return <span key={index}>{e?.value}</span>;
     switch (e?.tagName) {
@@ -26,79 +27,65 @@ const HtmlAstToReact = (children, imageData = []) => {
           </div>
         );
 
+      case "br":
+        return <br key={index} />;
+
+      case "em":
+        if (typeof e?.children[0]?.value === "string") {
+          return <em key={index}>{e?.children[0]?.value}</em>;
+        }
+        break;
+
+      case "strong":
+        if (typeof e?.children[0]?.value === "string") {
+          return <strong key={index}>{e?.children[0]?.value}</strong>;
+        }
+        break;
+
+      case "a":
+        if (
+          typeof e?.properties?.href === "string" &&
+          e?.children[0]?.type === "text" &&
+          typeof e?.children[0]?.value === "string"
+        ) {
+          // is this an internal link?
+          // TODO
+          return (
+            <Link to={e?.properties?.href} key={index}>
+              {e?.children[0]?.value}
+            </Link>
+          );
+        }
+        break;
+
+      case "img":
+        // is this case for gatsby image? = png, jpg ... != svg
+        let pass = /\.[A-Za-z0-9]+$/;
+        let extcheck = e?.properties?.src?.match(pass);
+        if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
+          // imageData in this case is an array ... must find correct element
+          let this_imageData = imageData.filter(
+            (image) => image.filename === e?.properties?.src
+          )[0]?.localFile?.childImageSharp?.gatsbyImageData;
+          return (
+            <GatsbyImage
+              key={index}
+              alt={e?.properties?.alt}
+              image={this_imageData}
+            />
+          );
+        }
+        break;
+
       case "p":
-        let breakout = false;
         contents = e?.children?.map((p, i) => {
-          if (p?.type === "text") {
-            let value = p?.value?.replace(/\r?\n|\r/g, "");
-            if (value.length) return <span key={i}>{value}</span>;
-          }
-          if (p?.type === "element") {
-            // determine which element ... could be p, img, br, a, ?
-            switch (p?.tagName) {
-              case "br":
-                return <br key={i} />;
-
-              case "em":
-                if (typeof p?.children[0]?.value === "string") {
-                  return <em key={i}>{p?.children[0]?.value}</em>;
-                }
-                break;
-
-              case "strong":
-                if (typeof p?.children[0]?.value === "string") {
-                  return <strong key={i}>{p?.children[0]?.value}</strong>;
-                }
-                break;
-
-              case "a":
-                if (
-                  typeof p?.properties?.href === "string" &&
-                  p?.children[0]?.type === "text" &&
-                  typeof p?.children[0]?.value === "string"
-                ) {
-                  // is this an internal link?
-                  // TODO
-                  return (
-                    <Link to={p?.properties?.href} key={i}>
-                      {p?.children[0]?.value}
-                    </Link>
-                  );
-                }
-                break;
-
-              case "img":
-                // is this case for gatsby image? = png, jpg ... != svg
-                let pass = /\.[A-Za-z0-9]+$/;
-                let extcheck = p?.properties?.src?.match(pass);
-                if (
-                  extcheck &&
-                  (extcheck[0] === ".png" || extcheck[0] === ".jpg")
-                ) {
-                  // imageData in this case is an array ... must find correct element
-                  let this_imageData = imageData.filter(
-                    (image) => image.filename === p?.properties?.src
-                  )[0]?.localFile?.childImageSharp?.gatsbyImageData;
-                  breakout = true;
-                  return (
-                    <GatsbyImage
-                      key={i}
-                      alt={p?.properties?.alt}
-                      image={this_imageData}
-                    />
-                  );
-                }
-                break;
-
-              default:
-                console.log("helpers.js > p: MISS on", p?.tagName);
-            }
-            // use recursion to compose the MarkdownParagraph
-            return HtmlAstToReact(p?.children, imageData);
-          }
+          // use recursion to compose the MarkdownParagraph
+          return HtmlAstToReact([p], imageData);
         });
-        // breakout is true when contents is gatsby image
-        if (breakout) return <div key={index}>{contents}</div>;
+        // is this an image?
+        if (contents.length === 1 && contents[0][0].props?.image) {
+          return <div key={index}>{contents[0][0]}</div>;
+        }
         return (
           <div key={index}>
             <p>{contents}</p>
@@ -107,24 +94,29 @@ const HtmlAstToReact = (children, imageData = []) => {
 
       case "ul":
       case "ol":
-        contents = e?.children?.map((li, i) => {
-          if (li?.type === "element") {
-            // assumes link contains text only
-            return <li key={i}>{li?.children[0].value}</li>;
-          }
-        });
+        raw = e?.children.filter(
+          (e) => !(e.type === "text" && e.value === "\n")
+        );
+        contents = HtmlAstToReact(raw, imageData);
         let list;
         if (e?.tagName === "ol") list = <ol>{contents}</ol>;
         if (e?.tagName === "ul") list = <ul>{contents}</ul>;
         return <div key={index}>{list}</div>;
 
+      case "li":
+        contents = e?.children?.map((li, i) => {
+          // use recursion to compose the MarkdownParagraph
+          return HtmlAstToReact([li], imageData);
+        });
+        return <li key={index}>{contents}</li>;
+
       case "blockquote":
-        let raw = e?.children.filter(
+        raw = e?.children.filter(
           (e) => !(e.type === "text" && e.value === "\n")
         );
-        let quote = HtmlAstToReact(raw, imageData);
+        let contents = HtmlAstToReact(raw, imageData);
         if (typeof e?.children[0]?.value === "string") {
-          return <blockquote key={index}>{quote}</blockquote>;
+          return <blockquote key={index}>{contents}</blockquote>;
         }
         break;
 
@@ -148,6 +140,15 @@ const PaneFragment = (id, child, css) => {
       {child}
     </StyledWrapperDiv>
   );
+};
+
+// pre-rendered svg shapes for each viewport
+// TODO
+// will rely on shapes.js
+const InjectSvgShape = (id, shape, viewport, parent_css, zIndex) => {
+  let css = `${parent_css} z-index: ${parseInt(zIndex)};`;
+  let child = SvgPane(shape, viewport);
+  return PaneFragment(id, child, css);
 };
 
 const InjectSvg = (id, url, alt_text, parent_css, zIndex) => {
@@ -223,6 +224,7 @@ export {
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
+  InjectSvgShape,
   StyledWrapperDiv,
   StyledWrapperSection,
   PaneFragment,

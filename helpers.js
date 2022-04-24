@@ -7,11 +7,12 @@ import { graphql, useStaticQuery, Link } from "gatsby";
 import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
+import { SvgPane } from "./shapes.js";
 
-const HtmlAstToReact = (children, imageData = []) => {
+const HtmlAstToReact = (children, imageData = [], naked = false) => {
   // recursive function
   // breaks gatsby images free of enclosing p tag
-  let contents;
+  let contents, raw;
   const fragment = children.map((e, index) => {
     if (e?.type === "text") return /*#__PURE__*/React.createElement("span", {
       key: index
@@ -29,98 +30,78 @@ const HtmlAstToReact = (children, imageData = []) => {
           key: index
         }, /*#__PURE__*/React.createElement(Tag, null, e?.children[0].value));
 
-      case "p":
-        let breakout = false;
-        contents = e?.children?.map((p, i) => {
-          if (p?.type === "text") {
-            let value = p?.value?.replace(/\r?\n|\r/g, "");
-            if (value.length) return /*#__PURE__*/React.createElement("span", {
-              key: i
-            }, value);
-          }
-
-          if (p?.type === "element") {
-            // determine which element ... could be p, img, br, a, ?
-            switch (p?.tagName) {
-              case "br":
-                return /*#__PURE__*/React.createElement("br", {
-                  key: i
-                });
-
-              case "em":
-                if (typeof p?.children[0]?.value === "string") {
-                  return /*#__PURE__*/React.createElement("em", {
-                    key: i
-                  }, p?.children[0]?.value);
-                }
-
-                break;
-
-              case "strong":
-                if (typeof p?.children[0]?.value === "string") {
-                  return /*#__PURE__*/React.createElement("strong", {
-                    key: i
-                  }, p?.children[0]?.value);
-                }
-
-                break;
-
-              case "a":
-                if (typeof p?.properties?.href === "string" && p?.children[0]?.type === "text" && typeof p?.children[0]?.value === "string") {
-                  // is this an internal link?
-                  // TODO
-                  return /*#__PURE__*/React.createElement(Link, {
-                    to: p?.properties?.href,
-                    key: i
-                  }, p?.children[0]?.value);
-                }
-
-                break;
-
-              case "img":
-                // is this case for gatsby image? = png, jpg ... != svg
-                let pass = /\.[A-Za-z0-9]+$/;
-                let extcheck = p?.properties?.src?.match(pass);
-
-                if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
-                  // imageData in this case is an array ... must find correct element
-                  let this_imageData = imageData.filter(image => image.filename === p?.properties?.src)[0]?.localFile?.childImageSharp?.gatsbyImageData;
-                  breakout = true;
-                  return /*#__PURE__*/React.createElement(GatsbyImage, {
-                    key: i,
-                    alt: p?.properties?.alt,
-                    image: this_imageData
-                  });
-                }
-
-                break;
-
-              default:
-                console.log("helpers.js > p: MISS on", p?.tagName);
-            } // use recursion to compose the MarkdownParagraph
-
-
-            return HtmlAstToReact(p?.children, imageData);
-          }
-        }); // breakout is true when contents is gatsby image
-
-        if (breakout) return /*#__PURE__*/React.createElement("div", {
+      case "br":
+        return /*#__PURE__*/React.createElement("br", {
           key: index
-        }, contents);
+        });
+
+      case "em":
+        if (typeof e?.children[0]?.value === "string") {
+          return /*#__PURE__*/React.createElement("em", {
+            key: index
+          }, e?.children[0]?.value);
+        }
+
+        break;
+
+      case "strong":
+        if (typeof e?.children[0]?.value === "string") {
+          return /*#__PURE__*/React.createElement("strong", {
+            key: index
+          }, e?.children[0]?.value);
+        }
+
+        break;
+
+      case "a":
+        if (typeof e?.properties?.href === "string" && e?.children[0]?.type === "text" && typeof e?.children[0]?.value === "string") {
+          // is this an internal link?
+          // TODO
+          return /*#__PURE__*/React.createElement(Link, {
+            to: e?.properties?.href,
+            key: index
+          }, e?.children[0]?.value);
+        }
+
+        break;
+
+      case "img":
+        // is this case for gatsby image? = png, jpg ... != svg
+        let pass = /\.[A-Za-z0-9]+$/;
+        let extcheck = e?.properties?.src?.match(pass);
+
+        if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
+          // imageData in this case is an array ... must find correct element
+          let this_imageData = imageData.filter(image => image.filename === e?.properties?.src)[0]?.localFile?.childImageSharp?.gatsbyImageData;
+          return /*#__PURE__*/React.createElement(GatsbyImage, {
+            key: index,
+            alt: e?.properties?.alt,
+            image: this_imageData
+          });
+        }
+
+        break;
+
+      case "p":
+        contents = e?.children?.map((p, i) => {
+          // use recursion to compose the MarkdownParagraph
+          return HtmlAstToReact([p], imageData);
+        }); // is this an image?
+
+        if (contents.length === 1 && contents[0][0].props?.image) {
+          return /*#__PURE__*/React.createElement("div", {
+            key: index
+          }, contents[0][0]);
+        }
+
         return /*#__PURE__*/React.createElement("div", {
           key: index
         }, /*#__PURE__*/React.createElement("p", null, contents));
 
       case "ul":
       case "ol":
-        contents = e?.children?.map((li, i) => {
-          if (li?.type === "element") {
-            // assumes link contains text only
-            return /*#__PURE__*/React.createElement("li", {
-              key: i
-            }, li?.children[0].value);
-          }
-        });
+        raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
+        contents = HtmlAstToReact(raw, imageData);
         let list;
         if (e?.tagName === "ol") list = /*#__PURE__*/React.createElement("ol", null, contents);
         if (e?.tagName === "ul") list = /*#__PURE__*/React.createElement("ul", null, contents);
@@ -128,14 +109,23 @@ const HtmlAstToReact = (children, imageData = []) => {
           key: index
         }, list);
 
+      case "li":
+        contents = e?.children?.map((li, i) => {
+          // use recursion to compose the MarkdownParagraph
+          return HtmlAstToReact([li], imageData);
+        });
+        return /*#__PURE__*/React.createElement("li", {
+          key: index
+        }, contents);
+
       case "blockquote":
-        let raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        let quote = HtmlAstToReact(raw, imageData);
+        raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
+        let contents = HtmlAstToReact(raw, imageData);
 
         if (typeof e?.children[0]?.value === "string") {
           return /*#__PURE__*/React.createElement("blockquote", {
             key: index
-          }, quote);
+          }, contents);
         }
 
         break;
@@ -159,6 +149,15 @@ const PaneFragment = (id, child, css) => {
     key: id,
     css: css
   }, child);
+}; // pre-rendered svg shapes for each viewport
+// TODO
+// will rely on shapes.js
+
+
+const InjectSvgShape = (id, shape, viewport, parent_css, zIndex) => {
+  let css = `${parent_css} z-index: ${parseInt(zIndex)};`;
+  let child = SvgPane(shape, viewport);
+  return PaneFragment(id, child, css);
 };
 
 const InjectSvg = (id, url, alt_text, parent_css, zIndex) => {
@@ -214,5 +213,5 @@ const getStoryStepGraph = (graph, targetId) => {
   return graph?.edges?.filter(e => e?.node?.id === targetId)[0];
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph };
 //# sourceMappingURL=helpers.js.map
