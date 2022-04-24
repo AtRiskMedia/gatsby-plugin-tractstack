@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "gatsby";
 import { IsVisible } from "./is-visible.js";
-import { SvgPlay, SvgRewind, TractStackLogo } from "./shapes.js";
+import { SvgPane, SvgPlay, SvgRewind, TractStackLogo } from "./shapes.js";
 
 function BuildController(data) {
   console.log("TODO: BuildController", data);
@@ -9,22 +9,27 @@ function BuildController(data) {
   if (data?.graph?.next?.field_slug) next = `/${data?.graph?.next?.field_slug}`;
   if (data?.graph?.previous?.field_slug)
     prev = `/${data?.graph?.previous?.field_slug}`;
+  let controller_pane = SvgPane("pane", data?.viewport?.key, true);
   react_fragment = (
-    <div className="controller__graph">
-      {next ? (
-        <Link to={next}>
-          <SvgPlay />
-        </Link>
-      ) : (
-        ""
-      )}
-      {prev ? (
-        <Link to={prev}>
-          <SvgRewind />
-        </Link>
-      ) : (
-        ""
-      )}
+    <div
+      className={`controller__view controller__view--${data?.viewport?.key}`}
+    >
+      <div className="controller__graph">
+        {next ? (
+          <Link to={next}>
+            <SvgPlay />
+          </Link>
+        ) : (
+          ""
+        )}
+        {prev ? (
+          <Link to={prev}>
+            <SvgRewind />
+          </Link>
+        ) : (
+          ""
+        )}
+      </div>
     </div>
   );
 
@@ -40,11 +45,11 @@ function BuildController(data) {
   }
 
   return (
-    <section
-      key={data?.graph?.current?.id}
-      className={"controller controller__view--" + data?.viewport?.key}
-    >
-      {react_fragment}
+    <section key={data?.graph?.current?.id} className="controller">
+      <div className="controller__container">
+        <div className="controller__container--view">{react_fragment}</div>
+        <div className="controller__container--view">{controller_pane}</div>
+      </div>
     </section>
   );
 }
