@@ -2,26 +2,6 @@ import React, { useRef } from "react";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperSection } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
-const SortStoryFragmentOrder = data => {
-  switch (data) {
-    // return weight ... lowest is first
-    case "paragraph__background_image":
-    case "paragraph__background_video":
-    case "paragraph__svg":
-      return 0;
-
-    case "paragraph__background_pane":
-      return 1;
-
-    case "paragraph__markdown":
-      return 10;
-
-    default:
-      console.log("MISS in compose-panes.js SortStoryFragmentOrder:", data);
-      return 1;
-  }
-};
-
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
@@ -33,7 +13,7 @@ function ComposePanes(data) {
     let composedPane = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1) // already processed background_colour
     .filter(e => e?.internal?.type !== "paragraph__background_colour") // sort
-    .sort((a, b) => SortStoryFragmentOrder(a?.internal?.type) > SortStoryFragmentOrder(b?.internal?.type) ? 1 : -1).map((pane_fragment, index) => {
+    .sort((a, b) => a?.field_zindex > b?.field_zindex ? 1 : -1).map((pane_fragment, index) => {
       let react_fragment,
           alt_text,
           imageData,

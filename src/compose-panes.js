@@ -9,26 +9,6 @@ import {
 } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
-const SortStoryFragmentOrder = (data) => {
-  switch (data) {
-    // return weight ... lowest is first
-    case "paragraph__background_image":
-    case "paragraph__background_video":
-    case "paragraph__svg":
-      return 0;
-
-    case "paragraph__background_pane":
-      return 1;
-
-    case "paragraph__markdown":
-      return 10;
-
-    default:
-      console.log("MISS in compose-panes.js SortStoryFragmentOrder:", data);
-      return 1;
-  }
-};
-
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.key === "undefined") return <></>;
@@ -59,12 +39,7 @@ function ComposePanes(data) {
         // already processed background_colour
         .filter((e) => e?.internal?.type !== "paragraph__background_colour")
         // sort
-        .sort((a, b) =>
-          SortStoryFragmentOrder(a?.internal?.type) >
-          SortStoryFragmentOrder(b?.internal?.type)
-            ? 1
-            : -1
-        )
+        .sort((a, b) => (a?.field_zindex > b?.field_zindex ? 1 : -1))
         .map((pane_fragment, index) => {
           let react_fragment,
             alt_text,
