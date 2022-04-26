@@ -38,7 +38,7 @@ function ComposePanes(data) {
         )
         // already processed background_colour
         .filter((e) => e?.internal?.type !== "paragraph__background_colour")
-        // sort
+        // sort by zIndex ***important
         .sort((a, b) => (a?.field_zindex > b?.field_zindex ? 1 : -1))
         .map((pane_fragment, index) => {
           let react_fragment,

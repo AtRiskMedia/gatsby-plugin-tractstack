@@ -205,7 +205,7 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_c
 
 const MarkdownParagraph = (id, htmlAst, imageData = [], parent_css = "", child_css = "", zIndex) => {
   const paragraph = HtmlAstToReact(htmlAst?.children, imageData);
-  const css = `${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
+  let css = `height:100%;${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
   return PaneFragment(id, paragraph, css);
 };
 

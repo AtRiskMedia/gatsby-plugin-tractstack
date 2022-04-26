@@ -4,7 +4,7 @@ import { StyledWrapperDiv } from "./helpers";
 
 const InjectCssAnimation = payload => {
   if (!payload?.in && !payload?.out) return "";
-  let css = "",
+  let css = "height:100%;",
       animationIn = payload?.in[0],
       animationInSpeed = payload?.in[1],
       animationInDelay = payload?.in[2],
@@ -13,7 +13,7 @@ const InjectCssAnimation = payload => {
       animationOutDelay = payload?.out[2];
 
   if (typeof animationIn === "string") {
-    css = `.onscreen { opacity: 0; animation-fill-mode: both; animation-name: ` + animationIn + `; -webkit-animation-name: ` + animationIn + `; `;
+    css = css + `.onscreen { opacity: 0; animation-fill-mode: both; animation-name: ` + animationIn + `; -webkit-animation-name: ` + animationIn + `; `;
 
     if (typeof animationInSpeed === "number") {
       css = css + `animation-duration: ` + animationInSpeed + `s; -webkit-animation-duration: ` + animationInSpeed + `s; `;
