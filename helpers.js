@@ -9,8 +9,8 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes.js";
 
-const ButtonCallbackFunction = (target, payload) => {
-  switch (target) {
+const ButtonCallbackFunction = (callback, payload) => {
+  switch (callback) {
     case "alert":
       alert(payload);
       break;
@@ -76,13 +76,10 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
 
           if (is_button) {
             // inject button with css class
-            // ...TODO: add event listeners
             return /*#__PURE__*/React.createElement("button", {
               key: index,
               className: is_button?.className,
               onClick: function (e) {
-                console.log("TODO helpers.js: need to implement callback functions handler");
-                console.log(is_button);
                 ButtonCallbackFunction(is_button?.callbackFunction, is_button?.callbackPayload);
               }
             }, e?.children[0]?.value);
