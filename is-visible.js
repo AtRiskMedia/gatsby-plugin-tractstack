@@ -3,9 +3,9 @@ import { useIsVisible } from "react-is-visible";
 import { StyledWrapperDiv } from "./helpers";
 
 const InjectCssAnimation = payload => {
-  if (!payload?.in && !payload?.out) return "";
-  let css = "height:100%;",
-      animationIn = payload?.in[0],
+  let css = "height:100%;";
+  if (!payload?.in && !payload?.out) return css;
+  let animationIn = payload?.in[0],
       animationInSpeed = payload?.in[1],
       animationInDelay = payload?.in[2],
       animationOut = payload?.out[0],

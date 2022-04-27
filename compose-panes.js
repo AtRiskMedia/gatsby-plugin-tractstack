@@ -45,9 +45,21 @@ function ComposePanes(data) {
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
           // now pre-render MarkdownParagraph elements and inject images
+          let action,
+              buttonData = {};
           let child = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
           child.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
-          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, css_styles_parent, css_styles, pane_fragment?.field_zindex);
+
+          try {
+            action = JSON.parse(pane_fragment?.field_options);
+            if (typeof action?.buttons === "object") buttonData = action?.buttons;
+          } catch (e) {
+            if (e instanceof SyntaxError) {
+              console.log("ERROR parsing json in {}: ", e);
+            }
+          }
+
+          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, buttonData, css_styles_parent, css_styles, pane_fragment?.field_zindex);
           break;
 
         case "paragraph__background_pane":
@@ -76,9 +88,20 @@ function ComposePanes(data) {
       } // can we wrap this in animation?
 
 
+      let effects_payload = {};
+
       if (data?.prefersReducedMotion === false) {
         // check for options payload
-        const options = JSON.parse(pane_fragment?.field_options);
+        let options;
+
+        try {
+          options = JSON.parse(pane_fragment?.field_options);
+        } catch (e) {
+          if (e instanceof SyntaxError) {
+            console.log("ERROR parsing json in {}: ", e, pane_fragment);
+          }
+        }
+
         let effects = options?.effects;
 
         if (effects && !"onscreen" in effects && !"offscreen" in effects) {
@@ -91,19 +114,18 @@ function ComposePanes(data) {
         } // else animate
 
 
-        let effects_payload = {
+        effects_payload = {
           in: [effects?.onscreen?.function, effects?.onscreen?.speed, effects?.onscreen?.delay],
           out: [effects?.offscreen?.function, effects?.offscreen?.speed, effects?.offscreen?.delay]
         };
-        react_fragment = /*#__PURE__*/React.createElement(IsVisible, {
-          effects: effects_payload
-        }, react_fragment);
       }
 
       return /*#__PURE__*/React.createElement("div", {
         className: "paneFragment",
         key: pane_fragment?.id
-      }, react_fragment);
+      }, /*#__PURE__*/React.createElement(IsVisible, {
+        effects: effects_payload
+      }, react_fragment));
     }); // compose this pane
 
     let pane_height;

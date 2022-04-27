@@ -9,7 +9,18 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes.js";
 
-const HtmlAstToReact = (children, imageData = [], naked = false) => {
+const ButtonCallbackFunction = (target, payload) => {
+  switch (target) {
+    case "alert":
+      alert(payload);
+      break;
+
+    default:
+      console.log("MISS on helpers.js ButtonCallbackFunction:", target, payload);
+  }
+};
+
+const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
   // recursive function
   // breaks gatsby images free of enclosing p tag
   let contents, raw;
@@ -55,8 +66,30 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
 
       case "a":
         if (typeof e?.properties?.href === "string" && e?.children[0]?.type === "text" && typeof e?.children[0]?.value === "string") {
-          // is this an internal link?
-          // TODO
+          // check for buttons action payload
+          let is_button;
+
+          if (typeof buttonData === "object" && Object.keys(buttonData).length) {
+            let key = Object.keys(buttonData).find(target => buttonData[target]?.urlTarget === e?.properties?.href);
+            is_button = buttonData[key];
+          }
+
+          if (is_button) {
+            // inject button with css class
+            // ...TODO: add event listeners
+            return /*#__PURE__*/React.createElement("button", {
+              key: index,
+              className: is_button?.className,
+              onClick: function (e) {
+                console.log("TODO helpers.js: need to implement callback functions handler");
+                console.log(is_button);
+                ButtonCallbackFunction(is_button?.callbackFunction, is_button?.callbackPayload);
+              }
+            }, e?.children[0]?.value);
+          } // else, treat at internal link
+          // ...TODO: add check here and use a href for external links
+
+
           return /*#__PURE__*/React.createElement(Link, {
             to: e?.properties?.href,
             key: index
@@ -85,7 +118,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
       case "p":
         contents = e?.children?.map((p, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([p], imageData);
+          return HtmlAstToReact([p], imageData, buttonData);
         }); // is this an image?
 
         if (contents.length === 1 && contents[0][0].props?.image) {
@@ -101,7 +134,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
       case "ul":
       case "ol":
         raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        contents = HtmlAstToReact(raw, imageData);
+        contents = HtmlAstToReact(raw, imageData, buttonData);
         let list;
         if (e?.tagName === "ol") list = /*#__PURE__*/React.createElement("ol", null, contents);
         if (e?.tagName === "ul") list = /*#__PURE__*/React.createElement("ul", null, contents);
@@ -112,7 +145,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
       case "li":
         contents = e?.children?.map((li, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([li], imageData);
+          return HtmlAstToReact([li], imageData, buttonData);
         });
         return /*#__PURE__*/React.createElement("li", {
           key: index
@@ -120,7 +153,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
 
       case "blockquote":
         raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        let contents = HtmlAstToReact(raw, imageData);
+        let contents = HtmlAstToReact(raw, imageData, buttonData);
 
         if (typeof e?.children[0]?.value === "string") {
           return /*#__PURE__*/React.createElement("blockquote", {
@@ -203,9 +236,9 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_c
   return PaneFragment(id, child, css);
 };
 
-const MarkdownParagraph = (id, htmlAst, imageData = [], parent_css = "", child_css = "", zIndex) => {
-  const paragraph = HtmlAstToReact(htmlAst?.children, imageData);
-  let css = `height:100%;${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
+const MarkdownParagraph = (id, htmlAst, imageData = [], buttonData = [], parent_css = "", child_css = "", zIndex) => {
+  const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData);
+  let css = `height:100%; ${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
   return PaneFragment(id, paragraph, css);
 };
 

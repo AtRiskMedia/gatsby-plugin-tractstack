@@ -39,15 +39,13 @@ function BuildController(data) {
       in: ["fadeInLeft", 2, 1],
       out: ["fadeOut", 0.5, 0],
     };
-    react_fragment = (
-      <IsVisible effects={effects_payload}>{react_fragment}</IsVisible>
-    );
   }
-
   return (
     <section key={data?.graph?.current?.id} className="controller">
       <div className="controller__container">
-        <div className="controller__container--view">{react_fragment}</div>
+        <div className="controller__container--view">
+          <IsVisible effects={effects_payload}>{react_fragment}</IsVisible>
+        </div>
         <div className="controller__container--view">{controller_pane}</div>
       </div>
     </section>

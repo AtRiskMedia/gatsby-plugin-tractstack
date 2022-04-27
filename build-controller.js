@@ -24,9 +24,6 @@ function BuildController(data) {
       in: ["fadeInLeft", 2, 1],
       out: ["fadeOut", 0.5, 0]
     };
-    react_fragment = /*#__PURE__*/React.createElement(IsVisible, {
-      effects: effects_payload
-    }, react_fragment);
   }
 
   return /*#__PURE__*/React.createElement("section", {
@@ -36,7 +33,9 @@ function BuildController(data) {
     className: "controller__container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--view"
-  }, react_fragment), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(IsVisible, {
+    effects: effects_payload
+  }, react_fragment)), /*#__PURE__*/React.createElement("div", {
     className: "controller__container--view"
   }, controller_pane)));
 }

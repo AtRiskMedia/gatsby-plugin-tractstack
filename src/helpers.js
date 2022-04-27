@@ -7,7 +7,22 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes.js";
 
-const HtmlAstToReact = (children, imageData = [], naked = false) => {
+const ButtonCallbackFunction = (target, payload) => {
+  switch (target) {
+    case "alert":
+      alert(payload);
+      break;
+
+    default:
+      console.log(
+        "MISS on helpers.js ButtonCallbackFunction:",
+        target,
+        payload
+      );
+  }
+};
+
+const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
   // recursive function
   // breaks gatsby images free of enclosing p tag
   let contents, raw;
@@ -48,8 +63,37 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
           e?.children[0]?.type === "text" &&
           typeof e?.children[0]?.value === "string"
         ) {
-          // is this an internal link?
-          // TODO
+          // check for buttons action payload
+          let is_button;
+          if (
+            typeof buttonData === "object" &&
+            Object.keys(buttonData).length
+          ) {
+            let key = Object.keys(buttonData).find(
+              (target) => buttonData[target]?.urlTarget === e?.properties?.href
+            );
+            is_button = buttonData[key];
+          }
+          if (is_button) {
+            // inject button with css class
+            return (
+              <button
+                key={index}
+                className={is_button?.className}
+                onClick={function (e) {
+                  ButtonCallbackFunction(
+                    is_button?.callbackFunction,
+                    is_button?.callbackPayload
+                  );
+                }}
+              >
+                {e?.children[0]?.value}
+              </button>
+            );
+          }
+
+          // else, treat at internal link
+          // ...TODO: add check here and use a href for external links
           return (
             <Link to={e?.properties?.href} key={index}>
               {e?.children[0]?.value}
@@ -80,7 +124,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
       case "p":
         contents = e?.children?.map((p, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([p], imageData);
+          return HtmlAstToReact([p], imageData, buttonData);
         });
         // is this an image?
         if (contents.length === 1 && contents[0][0].props?.image) {
@@ -97,7 +141,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
         raw = e?.children.filter(
           (e) => !(e.type === "text" && e.value === "\n")
         );
-        contents = HtmlAstToReact(raw, imageData);
+        contents = HtmlAstToReact(raw, imageData, buttonData);
         let list;
         if (e?.tagName === "ol") list = <ol>{contents}</ol>;
         if (e?.tagName === "ul") list = <ul>{contents}</ul>;
@@ -106,7 +150,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
       case "li":
         contents = e?.children?.map((li, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([li], imageData);
+          return HtmlAstToReact([li], imageData, buttonData);
         });
         return <li key={index}>{contents}</li>;
 
@@ -114,7 +158,7 @@ const HtmlAstToReact = (children, imageData = [], naked = false) => {
         raw = e?.children.filter(
           (e) => !(e.type === "text" && e.value === "\n")
         );
-        let contents = HtmlAstToReact(raw, imageData);
+        let contents = HtmlAstToReact(raw, imageData, buttonData);
         if (typeof e?.children[0]?.value === "string") {
           return <blockquote key={index}>{contents}</blockquote>;
         }
@@ -206,12 +250,13 @@ const MarkdownParagraph = (
   id,
   htmlAst,
   imageData = [],
+  buttonData = [],
   parent_css = "",
   child_css = "",
   zIndex
 ) => {
-  const paragraph = HtmlAstToReact(htmlAst?.children, imageData);
-  let css = `height:100%;${parent_css} z-index: ${parseInt(
+  const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData);
+  let css = `height:100%; ${parent_css} z-index: ${parseInt(
     zIndex
   )}; ${child_css}`;
   return PaneFragment(id, paragraph, css);
