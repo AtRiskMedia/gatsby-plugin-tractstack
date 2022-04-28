@@ -7,7 +7,7 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes.js";
 
-const ButtonCallbackFunction = (callback, payload) => {
+const payloadButtonCallbackFunctions = (callback, payload) => {
   switch (callback) {
     case "alert":
       alert(payload);
@@ -15,8 +15,8 @@ const ButtonCallbackFunction = (callback, payload) => {
 
     default:
       console.log(
-        "MISS on helpers.js ButtonCallbackFunction:",
-        target,
+        "MISS on helpers.js payloadButtonCallbackFunctions:",
+        callback,
         payload
       );
   }
@@ -81,7 +81,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
                 key={index}
                 className={is_button?.className}
                 onClick={function (e) {
-                  ButtonCallbackFunction(
+                  payloadButtonCallbackFunctions(
                     is_button?.callbackFunction,
                     is_button?.callbackPayload
                   );
@@ -259,6 +259,7 @@ const MarkdownParagraph = (
   let css = `height:100%; ${parent_css} z-index: ${parseInt(
     zIndex
   )}; ${child_css}`;
+
   return PaneFragment(id, paragraph, css);
 };
 

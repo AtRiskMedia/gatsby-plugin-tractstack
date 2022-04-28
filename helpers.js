@@ -9,14 +9,14 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes.js";
 
-const ButtonCallbackFunction = (callback, payload) => {
+const payloadButtonCallbackFunctions = (callback, payload) => {
   switch (callback) {
     case "alert":
       alert(payload);
       break;
 
     default:
-      console.log("MISS on helpers.js ButtonCallbackFunction:", target, payload);
+      console.log("MISS on helpers.js payloadButtonCallbackFunctions:", callback, payload);
   }
 };
 
@@ -80,7 +80,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
               key: index,
               className: is_button?.className,
               onClick: function (e) {
-                ButtonCallbackFunction(is_button?.callbackFunction, is_button?.callbackPayload);
+                payloadButtonCallbackFunctions(is_button?.callbackFunction, is_button?.callbackPayload);
               }
             }, e?.children[0]?.value);
           } // else, treat at internal link
