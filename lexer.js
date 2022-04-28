@@ -1,3 +1,4 @@
+const ESCAPED = `\\`;
 const DOUBLEQUOTE = `"`;
 const BRACKETLEFT = `(`;
 const BRACKETRIGHT = `)`;
@@ -13,31 +14,32 @@ function lispLexer(payload = "", inString = false) {
     const char = payload.charAt(i);
 
     if (char === DOUBLEQUOTE && inString === false) {
-      console.log("open quote");
       const [tokenized, remaining] = lispLexer(payload.substring(i + 1), true);
       tokens.push(tokenized);
       payload = remaining;
       i = -1;
     } else if (char === DOUBLEQUOTE) {
-      console.log("close quote");
-
       if (curToken.length) {
         tokens.push(+curToken || curToken);
       }
 
       return [tokens, payload.substring(i + 1)];
     } else if (char === BRACKETLEFT) {
+      if (inString && payload?.charAt(i - 1) === ESCAPED) throw "PARSING ERROR";
       const [tokenized, remaining] = lispLexer(payload.substring(i + 1));
       tokens.push(tokenized);
       payload = remaining;
       i = -1;
     } else if (char === BRACKETRIGHT) {
+      if (inString && payload?.charAt(i - 1) === ESCAPED) throw "PARSING ERROR";
+
       if (curToken.length) {
         tokens.push(+curToken || curToken);
       }
 
       return [tokens, payload.substring(i + 1)];
     } else if (char === SEMICOLON) {
+      // skip comments
       while (payload.charAt(i) !== NEWLINE) {
         i++;
       }
