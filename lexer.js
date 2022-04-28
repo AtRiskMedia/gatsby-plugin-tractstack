@@ -1,4 +1,3 @@
-const ESCAPED = `\\`;
 const DOUBLEQUOTE = `"`;
 const BRACKETLEFT = `(`;
 const BRACKETRIGHT = `)`;
