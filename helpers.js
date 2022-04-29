@@ -252,6 +252,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     css = "height:100%; ";
   } else {
     selector_in = "#tractstack-controller";
+    css = "";
   }
 
   let animationIn = payload?.in[0],
@@ -276,7 +277,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   }
 
   if (typeof animationOut === "string") {
-    css = css + `${selector_out} { opacity: 0; animation-fill-mode: both; animation-name: ` + animationOut + `; -webkit-animation-name: ` + animationOut + `; `;
+    css = css + `${selector_out} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` + animationOut + `; -webkit-animation-name: ` + animationOut + `; `;
 
     if (typeof animationOutSpeed === "number") {
       css = css + `animation-duration: ` + animationOutSpeed + `s; -webkit-animation-duration: ` + animationOutSpeed + `s; `;

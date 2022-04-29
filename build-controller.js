@@ -34,7 +34,6 @@ function BuildController(data) {
   }
 
   let css = InjectCssAnimation(effects_payload, "tractstack-controller");
-  console.log(css);
   return /*#__PURE__*/React.createElement("section", {
     key: data?.graph?.current?.id,
     className: "controller"

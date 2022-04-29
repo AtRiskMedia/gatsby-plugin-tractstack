@@ -121,7 +121,6 @@ function ComposePanes(data) {
       }
 
       let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
-      console.log(1, css);
       return /*#__PURE__*/React.createElement("div", {
         className: "paneFragment",
         key: pane_fragment?.id
