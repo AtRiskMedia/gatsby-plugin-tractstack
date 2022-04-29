@@ -267,11 +267,9 @@ const getStoryStepGraph = (graph, targetId) => {
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
-  if (!payload?.in && !payload?.out) return css;
   let css, selector_in, selector_out;
   if (paneFragmentId !== "tractstack-controller") {
     selector_in = `#${paneFragmentId}.visible`;
-    selector_out = `#${paneFragmentId}.hidden`;
     css = "height:100%; ";
   } else {
     selector_in = "#tractstack-controller";
@@ -279,10 +277,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   }
   let animationIn = payload?.in[0],
     animationInSpeed = payload?.in[1],
-    animationInDelay = payload?.in[2],
-    animationOut = payload?.out[0],
-    animationOutSpeed = payload?.out[1],
-    animationOutDelay = payload?.out[2];
+    animationInDelay = payload?.in[2];
   if (typeof animationIn === "string") {
     css =
       css +
@@ -302,28 +297,6 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     }
     if (typeof animationInDelay === "number") {
       css = css + `animation-delay: ` + animationInDelay + `s; `;
-    }
-    css = css + "}\n";
-  }
-  if (typeof animationOut === "string") {
-    css =
-      css +
-      `${selector_out} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` +
-      animationOut +
-      `; -webkit-animation-name: ` +
-      animationOut +
-      `; `;
-    if (typeof animationOutSpeed === "number") {
-      css =
-        css +
-        `animation-duration: ` +
-        animationOutSpeed +
-        `s; -webkit-animation-duration: ` +
-        animationOutSpeed +
-        `s; `;
-    }
-    if (typeof animationOutDelay === "number") {
-      css = css + `animation-delay: ` + animationOutDelay + `s; `;
     }
     css = css + "}\n";
   }

@@ -6,18 +6,18 @@ import { lispLexer } from "./lexer";
 import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 
 function BuildController(data) {
-  console.log("TODO: BuildController", data); //
+  console.log("TODO: BuildController"); //
   //const input = "(goto (storyfragment welcome))";
   //const [output] = lispLexer(input);
   //console.log("actions payload:", output,actions);
 
   let next, prev, link, react_fragment, effects_payload;
-  if (data?.graph?.next?.field_slug) next = `/${data?.graph?.next?.field_slug}`;
-  if (data?.graph?.previous?.field_slug) prev = `/${data?.graph?.previous?.field_slug}`;
-  let controller_pane = SvgPane("pane", data?.viewport?.key, true);
+  if (data?.state?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.state?.storyStep?.storyStepGraph?.next?.field_slug}`;
+  if (data?.state?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.state?.storyStep?.storyStepGraph?.previous?.field_slug}`;
+  let controller_pane = SvgPane("pane", data?.state?.viewport?.viewport?.key, true);
   react_fragment = /*#__PURE__*/React.createElement("div", {
     id: "tractstack-controller",
-    className: `controller__view controller__view--${data?.viewport?.key}`
+    className: `controller__view controller__view--${data?.state?.viewport?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__graph"
   }, next ? /*#__PURE__*/React.createElement(Link, {
@@ -26,16 +26,15 @@ function BuildController(data) {
     to: prev
   }, /*#__PURE__*/React.createElement(SvgRewind, null)) : "")); // can we wrap this in animation?
 
-  if (data?.prefersReducedMotion === false) {
+  if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
-      in: ["fadeInLeft", 2, 1],
-      out: []
+      in: ["fadeInLeft", 2, 1]
     };
   }
 
   let css = InjectCssAnimation(effects_payload, "tractstack-controller");
   return /*#__PURE__*/React.createElement("section", {
-    key: data?.graph?.current?.id,
+    key: data?.state?.storyStep?.storyStepGraph?.current?.id,
     className: "controller"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container"
