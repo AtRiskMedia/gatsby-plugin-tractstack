@@ -5,7 +5,8 @@ import {
   InjectGatsbyBackgroundVideo,
   InjectSvg,
   InjectSvgShape,
-  StyledWrapperSection,
+  StyledWrapperDiv,
+  InjectCssAnimation,
 } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
@@ -194,9 +195,12 @@ function ComposePanes(data) {
               ],
             };
           }
+          let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
           return (
             <div className="paneFragment" key={pane_fragment?.id}>
-              <IsVisible effects={effects_payload}>{react_fragment}</IsVisible>
+              <StyledWrapperDiv css={css}>
+                <IsVisible id={pane_fragment?.id}>{react_fragment}</IsVisible>
+              </StyledWrapperDiv>
             </div>
           );
         });
@@ -224,13 +228,16 @@ function ComposePanes(data) {
           background_colour[0].field_background_colour +
           ";";
       return (
-        <StyledWrapperSection
-          key={pane?.id}
-          className={"pane pane__view--" + data?.viewport?.key}
-          css={this_css}
-        >
-          {composedPane}
-        </StyledWrapperSection>
+        <section key={pane?.id}>
+          <IsVisible id={pane?.id}>
+            <StyledWrapperDiv
+              className={"pane pane__view--" + data?.viewport?.key}
+              css={this_css}
+            >
+              {composedPane}
+            </StyledWrapperDiv>
+          </IsVisible>
+        </section>
       );
     }
   );

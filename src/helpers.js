@@ -267,6 +267,62 @@ const getStoryStepGraph = (graph, targetId) => {
   return graph?.edges?.filter((e) => e?.node?.id === targetId)[0];
 };
 
+const InjectCssAnimation = (payload, paneFragmentId) => {
+  let css = "height:100%;\n";
+  if (!payload?.in && !payload?.out) return css;
+  let animationIn = payload?.in[0],
+    animationInSpeed = payload?.in[1],
+    animationInDelay = payload?.in[2],
+    animationOut = payload?.out[0],
+    animationOutSpeed = payload?.out[1],
+    animationOutDelay = payload?.out[2];
+  if (typeof animationIn === "string") {
+    css =
+      css +
+      `#${paneFragmentId}.visible { opacity: 0; animation-fill-mode: both; animation-name: ` +
+      animationIn +
+      `; -webkit-animation-name: ` +
+      animationIn +
+      `; `;
+    if (typeof animationInSpeed === "number") {
+      css =
+        css +
+        `animation-duration: ` +
+        animationInSpeed +
+        `s; -webkit-animation-duration: ` +
+        animationInSpeed +
+        `s; `;
+    }
+    if (typeof animationInDelay === "number") {
+      css = css + `animation-delay: ` + animationInDelay + `s; `;
+    }
+    css = css + "}\n";
+  }
+  if (typeof animationOut === "string") {
+    css =
+      css +
+      `.${paneFragmentId}.hidden { opacity: 0; animation-fill-mode: both; animation-name: ` +
+      animationOut +
+      `; -webkit-animation-name: ` +
+      animationOut +
+      `; `;
+    if (typeof animationOutSpeed === "number") {
+      css =
+        css +
+        `animation-duration: ` +
+        animationOutSpeed +
+        `s; -webkit-animation-duration: ` +
+        animationOutSpeed +
+        `s; `;
+    }
+    if (typeof animationOutDelay === "number") {
+      css = css + `animation-delay: ` + animationOutDelay + `s; `;
+    }
+    css = css + "}\n";
+  }
+  return css;
+};
+
 export {
   MarkdownParagraph,
   InjectGatsbyBackgroundImage,
@@ -277,4 +333,5 @@ export {
   StyledWrapperSection,
   PaneFragment,
   getStoryStepGraph,
+  InjectCssAnimation,
 };

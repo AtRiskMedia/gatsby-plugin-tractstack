@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperSection } from "./helpers";
+import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
 function ComposePanes(data) {
@@ -120,12 +120,15 @@ function ComposePanes(data) {
         };
       }
 
+      let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
       return /*#__PURE__*/React.createElement("div", {
         className: "paneFragment",
         key: pane_fragment?.id
+      }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
+        css: css
       }, /*#__PURE__*/React.createElement(IsVisible, {
-        effects: effects_payload
-      }, react_fragment));
+        id: pane_fragment?.id
+      }, react_fragment)));
     }); // compose this pane
 
     let pane_height;
@@ -148,11 +151,14 @@ function ComposePanes(data) {
     if (Object.keys(composedPane).length === 0) return;
     let this_css = "height:" + parseInt(pane_height) + "vw;";
     if (background_colour.length) this_css = this_css + " background-color:" + background_colour[0].field_background_colour + ";";
-    return /*#__PURE__*/React.createElement(StyledWrapperSection, {
-      key: pane?.id,
+    return /*#__PURE__*/React.createElement("section", {
+      key: pane?.id
+    }, /*#__PURE__*/React.createElement(IsVisible, {
+      id: pane?.id
+    }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
       className: "pane pane__view--" + data?.viewport?.key,
       css: this_css
-    }, composedPane);
+    }, composedPane)));
   }); // this is the storyFragment
 
   return composedPanes;
