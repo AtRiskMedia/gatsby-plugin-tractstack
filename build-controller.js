@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "gatsby";
-import { IsVisible } from "./is-visible.js";
-import { SvgPane, SvgPlay, SvgRewind, TractStackLogo } from "./shapes.js";
-import { lispLexer } from "./lexer.js";
+import { IsVisible } from "./is-visible";
+import { SvgPane, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
+import { lispLexer } from "./lexer";
+import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 
 function BuildController(data) {
   console.log("TODO: BuildController", data); //
@@ -15,6 +16,7 @@ function BuildController(data) {
   if (data?.graph?.previous?.field_slug) prev = `/${data?.graph?.previous?.field_slug}`;
   let controller_pane = SvgPane("pane", data?.viewport?.key, true);
   react_fragment = /*#__PURE__*/React.createElement("div", {
+    id: "tractstack-controller",
     className: `controller__view controller__view--${data?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__graph"
@@ -27,10 +29,12 @@ function BuildController(data) {
   if (data?.prefersReducedMotion === false) {
     effects_payload = {
       in: ["fadeInLeft", 2, 1],
-      out: ["fadeOut", 0.5, 0]
+      out: []
     };
   }
 
+  let css = InjectCssAnimation(effects_payload, "tractstack-controller");
+  console.log(css);
   return /*#__PURE__*/React.createElement("section", {
     key: data?.graph?.current?.id,
     className: "controller"
@@ -38,11 +42,9 @@ function BuildController(data) {
     className: "controller__container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--view"
-  }, /*#__PURE__*/React.createElement(IsVisible, {
-    effects: effects_payload
-  }, react_fragment)), /*#__PURE__*/React.createElement("div", {
-    className: "controller__container--view"
-  }, controller_pane)));
+  }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
+    css: css
+  }, react_fragment)))); //<div className="controller__container--view">{controller_pane}</div>
 }
 
 export { BuildController };

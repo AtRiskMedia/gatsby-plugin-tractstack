@@ -180,8 +180,7 @@ const PaneFragment = (id, child, css) => {
     css: css
   }, child);
 }; // pre-rendered svg shapes for each viewport
-// TODO
-// will rely on shapes.js
+// relies on shapes.js
 
 
 const InjectSvgShape = (id, shape, viewport, parent_css, zIndex) => {
@@ -244,8 +243,17 @@ const getStoryStepGraph = (graph, targetId) => {
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
-  let css = "height:100%;\n";
   if (!payload?.in && !payload?.out) return css;
+  let css, selector_in, selector_out;
+
+  if (paneFragmentId !== "tractstack-controller") {
+    selector_in = `#${paneFragmentId}.visible`;
+    selector_out = `#${paneFragmentId}.hidden`;
+    css = "height:100%; ";
+  } else {
+    selector_in = "#tractstack-controller";
+  }
+
   let animationIn = payload?.in[0],
       animationInSpeed = payload?.in[1],
       animationInDelay = payload?.in[2],
@@ -254,7 +262,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       animationOutDelay = payload?.out[2];
 
   if (typeof animationIn === "string") {
-    css = css + `#${paneFragmentId}.visible { opacity: 0; animation-fill-mode: both; animation-name: ` + animationIn + `; -webkit-animation-name: ` + animationIn + `; `;
+    css = css + `${selector_in} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` + animationIn + `; -webkit-animation-name: ` + animationIn + `; `;
 
     if (typeof animationInSpeed === "number") {
       css = css + `animation-duration: ` + animationInSpeed + `s; -webkit-animation-duration: ` + animationInSpeed + `s; `;
@@ -268,7 +276,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   }
 
   if (typeof animationOut === "string") {
-    css = css + `.${paneFragmentId}.hidden { opacity: 0; animation-fill-mode: both; animation-name: ` + animationOut + `; -webkit-animation-name: ` + animationOut + `; `;
+    css = css + `${selector_out} { opacity: 0; animation-fill-mode: both; animation-name: ` + animationOut + `; -webkit-animation-name: ` + animationOut + `; `;
 
     if (typeof animationOutSpeed === "number") {
       css = css + `animation-duration: ` + animationOutSpeed + `s; -webkit-animation-duration: ` + animationOutSpeed + `s; `;

@@ -196,6 +196,7 @@ function ComposePanes(data) {
             };
           }
           let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
+          console.log(1, css);
           return (
             <div className="paneFragment" key={pane_fragment?.id}>
               <StyledWrapperDiv css={css}>

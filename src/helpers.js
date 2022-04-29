@@ -187,8 +187,7 @@ const PaneFragment = (id, child, css) => {
 };
 
 // pre-rendered svg shapes for each viewport
-// TODO
-// will rely on shapes.js
+// relies on shapes.js
 const InjectSvgShape = (id, shape, viewport, parent_css, zIndex) => {
   let css = `${parent_css} z-index: ${parseInt(zIndex)};`;
   let child = SvgPane(shape, viewport);
@@ -268,8 +267,15 @@ const getStoryStepGraph = (graph, targetId) => {
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
-  let css = "height:100%;\n";
   if (!payload?.in && !payload?.out) return css;
+  let css, selector_in, selector_out;
+  if (paneFragmentId !== "tractstack-controller") {
+    selector_in = `#${paneFragmentId}.visible`;
+    selector_out = `#${paneFragmentId}.hidden`;
+    css = "height:100%; ";
+  } else {
+    selector_in = "#tractstack-controller";
+  }
   let animationIn = payload?.in[0],
     animationInSpeed = payload?.in[1],
     animationInDelay = payload?.in[2],
@@ -279,7 +285,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   if (typeof animationIn === "string") {
     css =
       css +
-      `#${paneFragmentId}.visible { opacity: 0; animation-fill-mode: both; animation-name: ` +
+      `${selector_in} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` +
       animationIn +
       `; -webkit-animation-name: ` +
       animationIn +
@@ -301,7 +307,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   if (typeof animationOut === "string") {
     css =
       css +
-      `.${paneFragmentId}.hidden { opacity: 0; animation-fill-mode: both; animation-name: ` +
+      `${selector_out} { opacity: 0; animation-fill-mode: both; animation-name: ` +
       animationOut +
       `; -webkit-animation-name: ` +
       animationOut +
