@@ -12,22 +12,17 @@ import { IsVisible } from "./is-visible.js";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
-  if (typeof data?.viewport?.key === "undefined") return <></>;
+  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
+
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
       // check for background colour
-      let background_colour = pane?.relationships?.field_pane_fragments
-        // skip if current viewport is listed in field_hidden_viewports
-        .filter(
-          (e) =>
-            e.field_hidden_viewports
-              .replace(/\s+/g, "")
-              .split(",")
-              .indexOf(data?.viewport?.key) == -1
-        )
-        .filter((e) => e?.internal?.type === "paragraph__background_colour");
+      let background_colour = pane?.relationships?.field_pane_fragments.filter(
+        (e) => e?.internal?.type === "paragraph__background_colour"
+      );
 
+      // now compose the paneFragments for this pane
       let composedPane = pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
         .filter(
@@ -35,7 +30,7 @@ function ComposePanes(data) {
             e.field_hidden_viewports
               .replace(/\s+/g, "")
               .split(",")
-              .indexOf(data?.viewport?.key) == -1
+              .indexOf(data?.state?.viewport?.viewport?.key) == -1
         )
         // already processed background_colour
         .filter((e) => e?.internal?.type !== "paragraph__background_colour")
@@ -50,7 +45,7 @@ function ComposePanes(data) {
             css_styles_parent = "";
 
           // select css for viewport
-          switch (data?.viewport?.key) {
+          switch (data?.state?.viewport?.viewport?.key) {
             case "mobile":
               css_styles = pane_fragment?.field_css_styles_mobile;
               css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
@@ -114,7 +109,7 @@ function ComposePanes(data) {
               react_fragment = InjectSvgShape(
                 pane_fragment?.id,
                 shape,
-                data?.viewport?.key,
+                data?.state?.viewport?.viewport?.key,
                 css_styles_parent,
                 pane_fragment?.field_zindex
               );
@@ -136,7 +131,7 @@ function ComposePanes(data) {
                 pane_fragment?.id,
                 pane_fragment?.relationships?.field_image[0] &&
                   pane_fragment?.relationships?.field_image[0][
-                    data?.viewport?.key
+                    data?.state?.viewport?.viewport?.key
                   ],
                 pane_fragment?.field_alt_text,
                 css_styles_parent,
@@ -166,7 +161,9 @@ function ComposePanes(data) {
 
           // can we wrap this in animation?
           let effects_payload = {};
-          if (data?.prefersReducedMotion === false) {
+          if (
+            data?.state?.prefersReducedMotion?.prefersReducedMotion === false
+          ) {
             // check for options payload
             let options;
             try {
@@ -177,21 +174,11 @@ function ComposePanes(data) {
               }
             }
             let effects = options?.effects;
-            if (effects && !"onscreen" in effects && !"offscreen" in effects) {
-              // if no options, do not animate
-              <div key={pane_fragment?.id}>{react_fragment}</div>;
-            }
-            // else animate
             effects_payload = {
               in: [
                 effects?.onscreen?.function,
                 effects?.onscreen?.speed,
                 effects?.onscreen?.delay,
-              ],
-              out: [
-                effects?.offscreen?.function,
-                effects?.offscreen?.speed,
-                effects?.offscreen?.delay,
               ],
             };
           }
@@ -199,7 +186,9 @@ function ComposePanes(data) {
           return (
             <div className="paneFragment" key={pane_fragment?.id}>
               <StyledWrapperDiv css={css}>
-                <IsVisible id={pane_fragment?.id}>{react_fragment}</IsVisible>
+                <IsVisible id={pane_fragment?.id} hooks={data?.hooks}>
+                  {react_fragment}
+                </IsVisible>
               </StyledWrapperDiv>
             </div>
           );
@@ -207,7 +196,7 @@ function ComposePanes(data) {
 
       // compose this pane
       let pane_height;
-      switch (data?.viewport?.key) {
+      switch (data?.state?.viewport?.viewport?.key) {
         case "mobile":
           pane_height = pane?.field_height_ratio_mobile;
           break;
@@ -220,6 +209,7 @@ function ComposePanes(data) {
       }
       // skip if empty pane
       if (Object.keys(composedPane).length === 0) return;
+
       let this_css = "height:" + parseInt(pane_height) + "vw;";
       if (background_colour.length)
         this_css =
@@ -231,7 +221,9 @@ function ComposePanes(data) {
         <section key={pane?.id}>
           <IsVisible id={pane?.id}>
             <StyledWrapperDiv
-              className={"pane pane__view--" + data?.viewport?.key}
+              className={
+                "pane pane__view--" + data?.state?.viewport?.viewport?.key
+              }
               css={this_css}
             >
               {composedPane}

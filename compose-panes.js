@@ -4,14 +4,14 @@ import { IsVisible } from "./is-visible.js";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
-  if (typeof data?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
+  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
     // check for background colour
-    let background_colour = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
-    .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1).filter(e => e?.internal?.type === "paragraph__background_colour");
+    let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // now compose the paneFragments for this pane
+
     let composedPane = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
-    .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.viewport?.key) == -1) // already processed background_colour
+    .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.state?.viewport?.viewport?.key) == -1) // already processed background_colour
     .filter(e => e?.internal?.type !== "paragraph__background_colour") // sort by zIndex ***important
     .sort((a, b) => a?.field_zindex > b?.field_zindex ? 1 : -1).map((pane_fragment, index) => {
       let react_fragment,
@@ -21,7 +21,7 @@ function ComposePanes(data) {
           css_styles = "",
           css_styles_parent = ""; // select css for viewport
 
-      switch (data?.viewport?.key) {
+      switch (data?.state?.viewport?.viewport?.key) {
         case "mobile":
           css_styles = pane_fragment?.field_css_styles_mobile;
           css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
@@ -63,7 +63,7 @@ function ComposePanes(data) {
           break;
 
         case "paragraph__background_pane":
-          react_fragment = InjectSvgShape(pane_fragment?.id, shape, data?.viewport?.key, css_styles_parent, pane_fragment?.field_zindex);
+          react_fragment = InjectSvgShape(pane_fragment?.id, shape, data?.state?.viewport?.viewport?.key, css_styles_parent, pane_fragment?.field_zindex);
           break;
 
         case "paragraph__background_video":
@@ -71,7 +71,7 @@ function ComposePanes(data) {
           break;
 
         case "paragraph__background_image":
-          react_fragment = InjectGatsbyBackgroundImage(pane_fragment?.id, pane_fragment?.relationships?.field_image[0] && pane_fragment?.relationships?.field_image[0][data?.viewport?.key], pane_fragment?.field_alt_text, css_styles_parent, pane_fragment?.field_zindex);
+          react_fragment = InjectGatsbyBackgroundImage(pane_fragment?.id, pane_fragment?.relationships?.field_image[0] && pane_fragment?.relationships?.field_image[0][data?.state?.viewport?.viewport?.key], pane_fragment?.field_alt_text, css_styles_parent, pane_fragment?.field_zindex);
           break;
 
         case "paragraph__svg":
@@ -90,7 +90,7 @@ function ComposePanes(data) {
 
       let effects_payload = {};
 
-      if (data?.prefersReducedMotion === false) {
+      if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
         // check for options payload
         let options;
 
@@ -103,20 +103,8 @@ function ComposePanes(data) {
         }
 
         let effects = options?.effects;
-
-        if (effects && !"onscreen" in effects && !"offscreen" in effects) {
-          // if no options, do not animate
-
-          /*#__PURE__*/
-          React.createElement("div", {
-            key: pane_fragment?.id
-          }, react_fragment);
-        } // else animate
-
-
         effects_payload = {
-          in: [effects?.onscreen?.function, effects?.onscreen?.speed, effects?.onscreen?.delay],
-          out: [effects?.offscreen?.function, effects?.offscreen?.speed, effects?.offscreen?.delay]
+          in: [effects?.onscreen?.function, effects?.onscreen?.speed, effects?.onscreen?.delay]
         };
       }
 
@@ -127,13 +115,14 @@ function ComposePanes(data) {
       }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
         css: css
       }, /*#__PURE__*/React.createElement(IsVisible, {
-        id: pane_fragment?.id
+        id: pane_fragment?.id,
+        hooks: data?.hooks
       }, react_fragment)));
     }); // compose this pane
 
     let pane_height;
 
-    switch (data?.viewport?.key) {
+    switch (data?.state?.viewport?.viewport?.key) {
       case "mobile":
         pane_height = pane?.field_height_ratio_mobile;
         break;
@@ -156,7 +145,7 @@ function ComposePanes(data) {
     }, /*#__PURE__*/React.createElement(IsVisible, {
       id: pane?.id
     }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
-      className: "pane pane__view--" + data?.viewport?.key,
+      className: "pane pane__view--" + data?.state?.viewport?.viewport?.key,
       css: this_css
     }, composedPane)));
   }); // this is the storyFragment

@@ -1,16 +1,9 @@
 import React from "react";
 import { Link } from "gatsby";
-import { IsVisible } from "./is-visible";
 import { SvgPane, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
-import { lispLexer } from "./lexer";
 import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 
 function BuildController(data) {
-  console.log("TODO: BuildController"); //
-  //const input = "(goto (storyfragment welcome))";
-  //const [output] = lispLexer(input);
-  //console.log("actions payload:", output,actions);
-
   let next, prev, link, react_fragment, effects_payload;
   if (data?.state?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.state?.storyStep?.storyStepGraph?.next?.field_slug}`;
   if (data?.state?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.state?.storyStep?.storyStepGraph?.previous?.field_slug}`;
