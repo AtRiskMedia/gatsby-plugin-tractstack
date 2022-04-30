@@ -184,13 +184,15 @@ function ComposePanes(data) {
           }
           let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
           return (
-            <div className="paneFragment" key={pane_fragment?.id}>
-              <StyledWrapperDiv css={css}>
-                <IsVisible id={pane_fragment?.id} hooks={data?.hooks}>
-                  {react_fragment}
-                </IsVisible>
-              </StyledWrapperDiv>
-            </div>
+            <StyledWrapperDiv
+              className="paneFragment"
+              key={pane_fragment?.id}
+              css={css}
+            >
+              <IsVisible id={pane_fragment?.id} hooks={data?.hooks}>
+                {react_fragment}
+              </IsVisible>
+            </StyledWrapperDiv>
           );
         });
 

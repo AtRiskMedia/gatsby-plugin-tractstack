@@ -109,15 +109,14 @@ function ComposePanes(data) {
       }
 
       let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
-      return /*#__PURE__*/React.createElement("div", {
+      return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
         className: "paneFragment",
-        key: pane_fragment?.id
-      }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
+        key: pane_fragment?.id,
         css: css
       }, /*#__PURE__*/React.createElement(IsVisible, {
         id: pane_fragment?.id,
         hooks: data?.hooks
-      }, react_fragment)));
+      }, react_fragment));
     }); // compose this pane
 
     let pane_height;
