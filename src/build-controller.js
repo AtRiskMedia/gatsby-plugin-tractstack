@@ -20,6 +20,7 @@ function BuildController(data) {
       className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
     >
       <div className="controller__graph">
+        {data?.state?.viewport?.panes}
         {next ? (
           <Link to={next}>
             <SvgPlay />

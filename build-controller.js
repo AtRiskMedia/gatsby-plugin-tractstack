@@ -13,7 +13,7 @@ function BuildController(data) {
     className: `controller__view controller__view--${data?.state?.viewport?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__graph"
-  }, next ? /*#__PURE__*/React.createElement(Link, {
+  }, data?.state?.viewport?.panes, next ? /*#__PURE__*/React.createElement(Link, {
     to: next
   }, /*#__PURE__*/React.createElement(SvgPlay, null)) : "", prev ? /*#__PURE__*/React.createElement(Link, {
     to: prev
