@@ -5,24 +5,25 @@ import { graphql, useStaticQuery, Link } from "gatsby";
 import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
-import { SvgPane } from "./shapes.js";
+import { SvgPane } from "./shapes";
+import { lispLexer } from "./lexer";
 
 const lispCallback = (payload, context) => {
-  /*
-  switch (callback) {
+  let lisp_data = payload[Object.keys(payload)[0]][0];
+  let command = lisp_data[0];
+  let parameter_one = lisp_data[1][0];
+  let parameter_two = lisp_data[1][1];
+  switch (command) {
     case "alert":
-      alert(payload);
+      alert(parameter_one);
+      break;
+    case "goto":
+      console.log("TODO: lispCallback, goto", parameter_one, parameter_two);
       break;
 
     default:
-      console.log(
-        "MISS on helpers.js lispCallback:",
-        callback,
-        payload
-      );
+      console.log("MISS on helpers.js lispCallback:", callback, payload);
   }
-  */
-  console.log("lispCallback", context, payload);
 };
 
 const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
@@ -78,14 +79,17 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
             is_button = buttonData[key];
           }
           if (is_button) {
-            // inject button with css class
+            // inject button with callback function, add css className
+            let payload = is_button?.callbackPayload;
+            let payload_ast = lispLexer(payload);
+            function injectPayload() {
+              lispCallback(payload_ast, "button");
+            }
             return (
               <button
                 key={index}
                 className={is_button?.className}
-                onClick={function (e) {
-                  lispCallback(is_button?.callbackPayload);
-                }}
+                onClick={() => injectPayload()}
               >
                 {e?.children[0]?.value}
               </button>

@@ -1,4 +1,4 @@
-const DOUBLEQUOTE = `"`;
+const DOUBLEQUOTE = [`"`, `\"`];
 const BRACKETLEFT = `(`;
 const BRACKETRIGHT = `)`;
 const SEMICOLON = `;`;
@@ -11,12 +11,12 @@ function lispLexer(payload = "", inString = false) {
 
   for (let i = 0; i < payload.length; i++) {
     const char = payload.charAt(i);
-    if (char === DOUBLEQUOTE && inString === false) {
+    if (DOUBLEQUOTE.includes(char) && inString === false) {
       const [tokenized, remaining] = lispLexer(payload.substring(i + 1), true);
       tokens.push(tokenized);
       payload = remaining;
       i = -1;
-    } else if (char === DOUBLEQUOTE) {
+    } else if (DOUBLEQUOTE.includes(char)) {
       if (curToken.length) {
         tokens.push(+curToken || curToken);
       }
