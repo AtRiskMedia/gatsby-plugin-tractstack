@@ -12,8 +12,10 @@ function BuildController(data) {
     id: "tractstack-controller",
     className: `controller__view controller__view--${data?.state?.viewport?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {
+    id: "calls-to-action"
+  }), /*#__PURE__*/React.createElement("div", {
     className: "controller__graph"
-  }, data?.state?.viewport?.panes, next ? /*#__PURE__*/React.createElement(Link, {
+  }, next ? /*#__PURE__*/React.createElement(Link, {
     to: next
   }, /*#__PURE__*/React.createElement(SvgPlay, null)) : "", prev ? /*#__PURE__*/React.createElement(Link, {
     to: prev

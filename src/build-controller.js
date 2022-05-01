@@ -19,8 +19,8 @@ function BuildController(data) {
       id={"tractstack-controller"}
       className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
     >
+      <div id="calls-to-action"></div>
       <div className="controller__graph">
-        {data?.state?.viewport?.panes}
         {next ? (
           <Link to={next}>
             <SvgPlay />

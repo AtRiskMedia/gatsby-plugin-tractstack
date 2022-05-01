@@ -243,14 +243,13 @@ const getStoryStepGraph = (graph, targetId) => {
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
-  let css, selector_in, selector_out;
+  let css = "",
+      selector;
 
   if (paneFragmentId !== "tractstack-controller") {
-    selector_in = `#${paneFragmentId}.visible`;
-    css = "height:100%; ";
+    selector = `#${paneFragmentId}.visible`;
   } else {
-    selector_in = "#tractstack-controller";
-    css = "";
+    selector = "#tractstack-controller";
   }
 
   let animationIn = payload?.in[0],
@@ -258,7 +257,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       animationInDelay = payload?.in[2];
 
   if (typeof animationIn === "string") {
-    css = css + `${selector_in} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` + animationIn + `; -webkit-animation-name: ` + animationIn + `; `;
+    css = css + `${selector} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` + animationIn + `; -webkit-animation-name: ` + animationIn + `; `;
 
     if (typeof animationInSpeed === "number") {
       css = css + `animation-duration: ` + animationInSpeed + `s; -webkit-animation-duration: ` + animationInSpeed + `s; `;
@@ -271,6 +270,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     css = css + "}\n";
   }
 
+  console.log(css);
   return css;
 };
 

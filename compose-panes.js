@@ -6,6 +6,7 @@ function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
+  let effects_css = "";
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
     // check for background colour
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // now compose the paneFragments for this pane
@@ -85,37 +86,13 @@ function ComposePanes(data) {
         case "paragraph__h5p":
           //
           break;
-      } // can we wrap this in animation?
-
-
-      let effects_payload = {};
-
-      if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
-        // check for options payload
-        let options;
-
-        try {
-          options = JSON.parse(pane_fragment?.field_options);
-        } catch (e) {
-          if (e instanceof SyntaxError) {
-            console.log("ERROR parsing json in {}: ", e, pane_fragment);
-          }
-        }
-
-        let effects = options?.effects;
-        effects_payload = {
-          in: [effects?.onscreen?.function, effects?.onscreen?.speed, effects?.onscreen?.delay]
-        };
       }
 
-      let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
-      return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
+      return /*#__PURE__*/React.createElement("div", {
         className: "paneFragment",
-        key: pane_fragment?.id,
-        css: css
+        key: pane_fragment?.id
       }, /*#__PURE__*/React.createElement(IsVisible, {
-        id: pane_fragment?.id,
-        hooks: data?.hooks
+        id: pane_fragment?.id
       }, react_fragment));
     }); // compose this pane
 
@@ -136,7 +113,46 @@ function ComposePanes(data) {
     } // skip if empty pane
 
 
-    if (Object.keys(composedPane).length === 0) return;
+    if (Object.keys(composedPane).length === 0) return; // can we wrap this in animation?
+
+    let effects_payload = {};
+
+    if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
+      /*
+      // check for options payload
+      let options;
+      try {
+        options = JSON.parse(pane_fragment?.field_options);
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          console.log("ERROR parsing json in {}: ", e, pane_fragment);
+        }
+      }
+      let effects = options?.payload?.effects;
+      effects_payload = {
+        in: [
+          effects?.onscreen?.function,
+          effects?.onscreen?.speed,
+          effects?.onscreen?.delay
+        ]
+      };
+      */
+      let effects = data?.state?.controller?.payload?.effects;
+      let effects_payload;
+
+      for (const key in effects) {
+        if (effects[key]?.pane === pane?.id) {
+          // inject css animation for each
+          effects_payload = {
+            in: [effects[key]?.function, effects[key]?.speed, effects[key]?.delay]
+          };
+          let this_effects_css = InjectCssAnimation(effects_payload, effects[key]?.paneFragment);
+          effects_css = effects_css + this_effects_css;
+        }
+      }
+    } // prepare css for pane
+
+
     let this_css = "height:" + parseInt(pane_height) + "vw;";
     if (background_colour.length) this_css = this_css + " background-color:" + background_colour[0].field_background_colour + ";";
     return /*#__PURE__*/React.createElement("section", {
@@ -145,7 +161,7 @@ function ComposePanes(data) {
       id: pane?.id
     }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
       className: "pane pane__view--" + data?.state?.viewport?.viewport?.key,
-      css: this_css
+      css: this_css + effects_css
     }, composedPane)));
   }); // this is the storyFragment
 

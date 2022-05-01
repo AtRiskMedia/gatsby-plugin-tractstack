@@ -15,6 +15,7 @@ function ComposePanes(data) {
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
 
   // loop through the panes in view and render each pane fragment
+  let effects_css = "";
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
       // check for background colour
@@ -159,40 +160,10 @@ function ComposePanes(data) {
               break;
           }
 
-          // can we wrap this in animation?
-          let effects_payload = {};
-          if (
-            data?.state?.prefersReducedMotion?.prefersReducedMotion === false
-          ) {
-            // check for options payload
-            let options;
-            try {
-              options = JSON.parse(pane_fragment?.field_options);
-            } catch (e) {
-              if (e instanceof SyntaxError) {
-                console.log("ERROR parsing json in {}: ", e, pane_fragment);
-              }
-            }
-            let effects = options?.effects;
-            effects_payload = {
-              in: [
-                effects?.onscreen?.function,
-                effects?.onscreen?.speed,
-                effects?.onscreen?.delay,
-              ],
-            };
-          }
-          let css = InjectCssAnimation(effects_payload, pane_fragment?.id);
           return (
-            <StyledWrapperDiv
-              className="paneFragment"
-              key={pane_fragment?.id}
-              css={css}
-            >
-              <IsVisible id={pane_fragment?.id} hooks={data?.hooks}>
-                {react_fragment}
-              </IsVisible>
-            </StyledWrapperDiv>
+            <div className="paneFragment" key={pane_fragment?.id}>
+              <IsVisible id={pane_fragment?.id}>{react_fragment}</IsVisible>
+            </div>
           );
         });
 
@@ -212,6 +183,51 @@ function ComposePanes(data) {
       // skip if empty pane
       if (Object.keys(composedPane).length === 0) return;
 
+      // can we wrap this in animation?
+      let effects_payload = {};
+      if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
+        /*
+        // check for options payload
+        let options;
+        try {
+          options = JSON.parse(pane_fragment?.field_options);
+        } catch (e) {
+          if (e instanceof SyntaxError) {
+            console.log("ERROR parsing json in {}: ", e, pane_fragment);
+          }
+        }
+        let effects = options?.payload?.effects;
+        effects_payload = {
+          in: [
+            effects?.onscreen?.function,
+            effects?.onscreen?.speed,
+            effects?.onscreen?.delay
+          ]
+        };
+*/
+        let effects = data?.state?.controller?.payload?.effects;
+        let effects_payload;
+        for (const key in effects) {
+          if (effects[key]?.pane === pane?.id) {
+            // inject css animation for each
+            effects_payload = {
+              in: [
+                effects[key]?.function,
+                effects[key]?.speed,
+                effects[key]?.delay,
+              ],
+            };
+
+            let this_effects_css = InjectCssAnimation(
+              effects_payload,
+              effects[key]?.paneFragment
+            );
+            effects_css = effects_css + this_effects_css;
+          }
+        }
+      }
+
+      // prepare css for pane
       let this_css = "height:" + parseInt(pane_height) + "vw;";
       if (background_colour.length)
         this_css =
@@ -219,6 +235,7 @@ function ComposePanes(data) {
           " background-color:" +
           background_colour[0].field_background_colour +
           ";";
+
       return (
         <section key={pane?.id}>
           <IsVisible id={pane?.id}>
@@ -226,7 +243,7 @@ function ComposePanes(data) {
               className={
                 "pane pane__view--" + data?.state?.viewport?.viewport?.key
               }
-              css={this_css}
+              css={this_css + effects_css}
             >
               {composedPane}
             </StyledWrapperDiv>

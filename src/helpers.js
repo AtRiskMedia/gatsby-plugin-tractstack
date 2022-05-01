@@ -267,13 +267,12 @@ const getStoryStepGraph = (graph, targetId) => {
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
-  let css, selector_in, selector_out;
+  let css = "",
+    selector;
   if (paneFragmentId !== "tractstack-controller") {
-    selector_in = `#${paneFragmentId}.visible`;
-    css = "height:100%; ";
+    selector = `#${paneFragmentId}.visible`;
   } else {
-    selector_in = "#tractstack-controller";
-    css = "";
+    selector = "#tractstack-controller";
   }
   let animationIn = payload?.in[0],
     animationInSpeed = payload?.in[1],
@@ -281,7 +280,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   if (typeof animationIn === "string") {
     css =
       css +
-      `${selector_in} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` +
+      `${selector} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` +
       animationIn +
       `; -webkit-animation-name: ` +
       animationIn +
@@ -300,6 +299,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     }
     css = css + "}\n";
   }
+  console.log(css);
   return css;
 };
 
