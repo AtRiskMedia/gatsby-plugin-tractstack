@@ -9,15 +9,21 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes.js";
 
-const payloadButtonCallbackFunctions = (callback, payload) => {
+const lispCallback = (payload, context) => {
+  /*
   switch (callback) {
     case "alert":
       alert(payload);
       break;
-
-    default:
-      console.log("MISS on helpers.js payloadButtonCallbackFunctions:", callback, payload);
+     default:
+      console.log(
+        "MISS on helpers.js lispCallback:",
+        callback,
+        payload
+      );
   }
+  */
+  console.log("lispCallback", context, payload);
 };
 
 const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
@@ -80,7 +86,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
               key: index,
               className: is_button?.className,
               onClick: function (e) {
-                payloadButtonCallbackFunctions(is_button?.callbackFunction, is_button?.callbackPayload);
+                lispCallback(is_button?.callbackPayload);
               }
             }, e?.children[0]?.value);
           } // else, treat at internal link
@@ -270,9 +276,8 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     css = css + "}\n";
   }
 
-  console.log(css);
   return css;
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback };
 //# sourceMappingURL=helpers.js.map

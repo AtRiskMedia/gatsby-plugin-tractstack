@@ -1,6 +1,6 @@
 import { ComposePanes } from "./compose-panes";
 import { BuildController } from "./build-controller";
-import { getStoryStepGraph } from "./helpers";
+import { getStoryStepGraph, lispCallback } from "./helpers";
 import { lispLexer } from "./lexer";
 
 const viewportWidths = {
@@ -15,4 +15,5 @@ export {
   getStoryStepGraph,
   viewportWidths,
   lispLexer,
+  lispCallback,
 };

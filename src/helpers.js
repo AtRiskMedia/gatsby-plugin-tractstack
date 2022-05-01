@@ -7,7 +7,8 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes.js";
 
-const payloadButtonCallbackFunctions = (callback, payload) => {
+const lispCallback = (payload, context) => {
+  /*
   switch (callback) {
     case "alert":
       alert(payload);
@@ -15,11 +16,13 @@ const payloadButtonCallbackFunctions = (callback, payload) => {
 
     default:
       console.log(
-        "MISS on helpers.js payloadButtonCallbackFunctions:",
+        "MISS on helpers.js lispCallback:",
         callback,
         payload
       );
   }
+  */
+  console.log("lispCallback", context, payload);
 };
 
 const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
@@ -81,10 +84,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
                 key={index}
                 className={is_button?.className}
                 onClick={function (e) {
-                  payloadButtonCallbackFunctions(
-                    is_button?.callbackFunction,
-                    is_button?.callbackPayload
-                  );
+                  lispCallback(is_button?.callbackPayload);
                 }}
               >
                 {e?.children[0]?.value}
@@ -299,7 +299,6 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     }
     css = css + "}\n";
   }
-  console.log(css);
   return css;
 };
 
@@ -314,4 +313,5 @@ export {
   PaneFragment,
   getStoryStepGraph,
   InjectCssAnimation,
+  lispCallback,
 };

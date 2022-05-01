@@ -7,6 +7,7 @@ import {
   InjectSvgShape,
   StyledWrapperDiv,
   InjectCssAnimation,
+  lispCallback,
 } from "./helpers";
 import { IsVisible } from "./is-visible.js";
 
@@ -15,7 +16,7 @@ function ComposePanes(data) {
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
 
   // loop through the panes in view and render each pane fragment
-  let effects_css = "";
+  let css = "";
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
       // check for background colour
@@ -162,7 +163,13 @@ function ComposePanes(data) {
 
           return (
             <div className="paneFragment" key={pane_fragment?.id}>
-              <IsVisible id={pane_fragment?.id}>{react_fragment}</IsVisible>
+              <IsVisible
+                id={pane_fragment?.id}
+                className="paneFragment"
+                key={pane_fragment?.id}
+              >
+                {react_fragment}
+              </IsVisible>
             </div>
           );
         });
@@ -183,28 +190,9 @@ function ComposePanes(data) {
       // skip if empty pane
       if (Object.keys(composedPane).length === 0) return;
 
-      // can we wrap this in animation?
+      // may we wrap this in animation?
       let effects_payload = {};
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
-        /*
-        // check for options payload
-        let options;
-        try {
-          options = JSON.parse(pane_fragment?.field_options);
-        } catch (e) {
-          if (e instanceof SyntaxError) {
-            console.log("ERROR parsing json in {}: ", e, pane_fragment);
-          }
-        }
-        let effects = options?.payload?.effects;
-        effects_payload = {
-          in: [
-            effects?.onscreen?.function,
-            effects?.onscreen?.speed,
-            effects?.onscreen?.delay
-          ]
-        };
-*/
         let effects = data?.state?.controller?.payload?.effects;
         let effects_payload;
         for (const key in effects) {
@@ -222,28 +210,28 @@ function ComposePanes(data) {
               effects_payload,
               effects[key]?.paneFragment
             );
-            effects_css = effects_css + this_effects_css;
+            css = css + this_effects_css;
           }
         }
       }
 
       // prepare css for pane
-      let this_css = "height:" + parseInt(pane_height) + "vw;";
+      css = css + "height:" + parseInt(pane_height) + "vw;\n";
       if (background_colour.length)
-        this_css =
-          this_css +
+        css =
+          css +
           " background-color:" +
           background_colour[0].field_background_colour +
-          ";";
+          ";\n";
 
       return (
         <section key={pane?.id}>
-          <IsVisible id={pane?.id}>
+          <IsVisible id={pane?.id} hooks={data?.hooks}>
             <StyledWrapperDiv
               className={
                 "pane pane__view--" + data?.state?.viewport?.viewport?.key
               }
-              css={this_css + effects_css}
+              css={css}
             >
               {composedPane}
             </StyledWrapperDiv>
