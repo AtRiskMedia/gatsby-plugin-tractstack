@@ -1,10 +1,20 @@
 import React, { useRef } from "react";
-import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, lispCallback } from "./helpers";
 import { IsVisible } from "./is-visible.js";
+import animateScrollTo from "animated-scroll-to";
+import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, lispCallback, getVisiblePane } from "./helpers";
 
 function ComposePanes(data) {
-  // if viewport is not yet defined, return empty fragment
-  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
+  console.log("state", data?.state); // if viewport is not yet defined, return empty fragment
+
+  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // is there a current pane to scroll to?
+
+  let visiblePane = getVisiblePane(data?.state?.viewport?.lastVisiblePane, data?.state?.viewport?.panes);
+
+  if (visiblePane) {
+    let ref = document.getElementById(visiblePane);
+    if (ref) animateScrollTo(ref);
+  } // loop through the panes in view and render each pane fragment
+
 
   let css = "";
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
@@ -88,8 +98,9 @@ function ComposePanes(data) {
           break;
       }
 
+      let thisClass = `paneFragment paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
       return /*#__PURE__*/React.createElement("div", {
-        className: "paneFragment",
+        className: thisClass,
         key: pane_fragment?.id
       }, /*#__PURE__*/React.createElement(IsVisible, {
         id: pane_fragment?.id,

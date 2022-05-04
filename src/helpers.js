@@ -8,6 +8,40 @@ import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes";
 import { lispLexer } from "./lexer";
 
+const getVisiblePane = (paneId = "", panes = []) => {
+  if (!paneId) return null;
+  // use first element in panes
+  return panes[0];
+  // ...or, if paneId is in panes, use paneId as current
+  //if (panes.includes(paneId)) return paneId;
+};
+
+// from https://tobbelindstrom.com/blog/measure-scrollbar-width-and-height/
+const getScrollbarSize = () => {
+  if (typeof window !== "undefined") {
+    const { body } = document;
+    const scrollDiv = document.createElement("div");
+
+    // Append element with defined styling
+    scrollDiv.setAttribute(
+      "style",
+      "width: 1337px; height: 1337px; position: absolute; left: -9999px; overflow: scroll;"
+    );
+    body.appendChild(scrollDiv);
+
+    // Collect width & height of scrollbar
+    const calculateValue = (type) =>
+      scrollDiv[`offset${type}`] - scrollDiv[`client${type}`];
+    const scrollbarWidth = calculateValue("Width");
+
+    // Remove element
+    body.removeChild(scrollDiv);
+
+    return scrollbarWidth;
+  }
+  return 12;
+};
+
 const lispCallback = (payload, context) => {
   let lisp_data = payload[Object.keys(payload)[0]][0];
   let command = lisp_data[0];
@@ -318,4 +352,6 @@ export {
   getStoryStepGraph,
   InjectCssAnimation,
   lispCallback,
+  getVisiblePane,
+  getScrollbarSize,
 };
