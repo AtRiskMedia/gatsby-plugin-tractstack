@@ -39,10 +39,15 @@ const getScrollbarSize = () => {
 };
 
 const lispCallback = (payload, context, hooks = []) => {
+  console.log("lispCallback", context, payload);
   let lisp_data = payload[Object.keys(payload)[0]][0];
   let command = lisp_data[0];
-  let parameter_one = lisp_data[1][0];
-  let parameter_two = lisp_data[1][1];
+  let parameter_one, parameter_two;
+
+  if (typeof lisp_data[1] !== "undefined") {
+    let parameter_one = lisp_data[1][0];
+    let parameter_two = lisp_data[1][1];
+  }
 
   switch (command) {
     case "alert":
@@ -50,11 +55,19 @@ const lispCallback = (payload, context, hooks = []) => {
       break;
 
     case "goto":
-      console.log("TODO: lispCallback, goto", parameter_one, parameter_two);
+      // requires hooks.hookGoto
+      if (parameter_one === "storyFragment" && typeof parameter_two === "string") hooks.hookGoto(`/${parameter_two}`); //console.log("TODO: lispCallback, goto", parameter_one, parameter_two);
+
+      break;
+
+    case "icon":
+      // adds call-to-action to controller
+      // parameter_one is icon name, parameter_two is function
+      if (typeof parameter_one === "string" && typeof parameter_two === "object") lispCallback(parameter_two, "icon", hooks);
       break;
 
     default:
-      console.log("MISS on helpers.js lispCallback:", callback, payload);
+      console.log("MISS on helpers.js lispCallback:", context, payload, hooks);
   }
 };
 
@@ -275,8 +288,8 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_c
   return PaneFragment(id, child, css);
 };
 
-const MarkdownParagraph = (id, htmlAst, imageData = [], buttonData = [], parent_css = "", child_css = "", zIndex) => {
-  const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData);
+const MarkdownParagraph = (id, htmlAst, imageData = [], buttonData = [], parent_css = "", child_css = "", zIndex, hooks = []) => {
+  const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData, hooks);
   let css = `height:100%; ${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
   return PaneFragment(id, paragraph, css);
 };

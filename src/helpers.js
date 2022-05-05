@@ -41,20 +41,39 @@ const getScrollbarSize = () => {
 };
 
 const lispCallback = (payload, context, hooks = []) => {
+  console.log("lispCallback", context, payload);
   let lisp_data = payload[Object.keys(payload)[0]][0];
   let command = lisp_data[0];
-  let parameter_one = lisp_data[1][0];
-  let parameter_two = lisp_data[1][1];
+  let parameter_one, parameter_two;
+  if (typeof lisp_data[1] !== "undefined") {
+    let parameter_one = lisp_data[1][0];
+    let parameter_two = lisp_data[1][1];
+  }
   switch (command) {
     case "alert":
       alert(parameter_one);
       break;
     case "goto":
-      console.log("TODO: lispCallback, goto", parameter_one, parameter_two);
+      // requires hooks.hookGoto
+      if (
+        parameter_one === "storyFragment" &&
+        typeof parameter_two === "string"
+      )
+        hooks.hookGoto(`/${parameter_two}`);
+      //console.log("TODO: lispCallback, goto", parameter_one, parameter_two);
+      break;
+    case "icon":
+      // adds call-to-action to controller
+      // parameter_one is icon name, parameter_two is function
+      if (
+        typeof parameter_one === "string" &&
+        typeof parameter_two === "object"
+      )
+        lispCallback(parameter_two, "icon", hooks);
       break;
 
     default:
-      console.log("MISS on helpers.js lispCallback:", callback, payload);
+      console.log("MISS on helpers.js lispCallback:", context, payload, hooks);
   }
 };
 
@@ -293,9 +312,15 @@ const MarkdownParagraph = (
   buttonData = [],
   parent_css = "",
   child_css = "",
-  zIndex
+  zIndex,
+  hooks = []
 ) => {
-  const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData);
+  const paragraph = HtmlAstToReact(
+    htmlAst?.children,
+    imageData,
+    buttonData,
+    hooks
+  );
   let css = `height:100%; ${parent_css} z-index: ${parseInt(
     zIndex
   )}; ${child_css}`;

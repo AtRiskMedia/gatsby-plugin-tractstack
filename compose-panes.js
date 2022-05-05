@@ -4,7 +4,7 @@ import animateScrollTo from "animated-scroll-to";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, lispCallback, getVisiblePane } from "./helpers";
 
 function ComposePanes(data) {
-  console.log("redux", data?.state); // if viewport is not yet defined, return empty fragment
+  console.log("ComposePanes", data?.state); // if viewport is not yet defined, return empty fragment
 
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // is there a current pane to scroll to?
 

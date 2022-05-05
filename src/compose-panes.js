@@ -14,7 +14,7 @@ import {
 } from "./helpers";
 
 function ComposePanes(data) {
-  console.log("redux", data?.state);
+  console.log("ComposePanes", data?.state);
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
 
