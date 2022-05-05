@@ -41,39 +41,60 @@ const getScrollbarSize = () => {
 };
 
 const lispCallback = (payload, context, hooks = []) => {
-  console.log("lispCallback", context, payload);
-  let lisp_data = payload[Object.keys(payload)[0]][0];
+  let icon;
+  let lisp_data = payload[Object.keys(payload)[0]];
   let command = lisp_data[0];
   let parameter_one, parameter_two;
-  if (typeof lisp_data[1] !== "undefined") {
-    let parameter_one = lisp_data[1][0];
-    let parameter_two = lisp_data[1][1];
+  if (typeof lisp_data[1] === "object") {
+    parameter_one = lisp_data[1][0];
+    parameter_two = lisp_data[1][1];
   }
+  // pre-process on context
+  switch (context) {
+    case "paneVisible":
+      // process as "icon" function
+      icon = parameter_one;
+      command = parameter_two[0];
+      parameter_one = parameter_two[1];
+      // TODO: do something with the icon
+      console.log("todo -- add icon to controller:", icon);
+      // ...command will now run below
+      break;
+    case "paneHidden":
+      // process as "icon" function
+      icon = parameter_one;
+      command = parameter_two[0];
+      parameter_one = parameter_two[1];
+      // TODO: do something with the icon
+      console.log("todo -- remove icon to controller:", icon);
+      // ...command will now run below
+      break;
+  }
+  // now process the command
   switch (command) {
     case "alert":
       alert(parameter_one);
       break;
+
     case "goto":
-      // requires hooks.hookGoto
+      // calls hooks.hookGoto for gatsby navigate
       if (
         parameter_one === "storyFragment" &&
         typeof parameter_two === "string"
       )
         hooks.hookGoto(`/${parameter_two}`);
-      //console.log("TODO: lispCallback, goto", parameter_one, parameter_two);
-      break;
-    case "icon":
-      // adds call-to-action to controller
-      // parameter_one is icon name, parameter_two is function
-      if (
-        typeof parameter_one === "string" &&
-        typeof parameter_two === "object"
-      )
-        lispCallback(parameter_two, "icon", hooks);
       break;
 
     default:
-      console.log("MISS on helpers.js lispCallback:", context, payload, hooks);
+      console.log(
+        "MISS on helpers.js lispCallback:",
+        context,
+        command,
+        parameter_one,
+        parameter_two,
+        payload,
+        lisp_data
+      );
   }
 };
 
@@ -139,7 +160,7 @@ const HtmlAstToReact = (
             let payload = is_button?.callbackPayload;
             let payload_ast = lispLexer(payload);
             function injectPayload() {
-              lispCallback(payload_ast, "button", hooks);
+              lispCallback(payload_ast[0], "button", hooks);
             }
             return (
               <button
