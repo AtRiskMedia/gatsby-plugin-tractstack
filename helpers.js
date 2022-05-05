@@ -11,10 +11,9 @@ import { SvgPane } from "./shapes";
 import { lispLexer } from "./lexer";
 
 const getVisiblePane = (paneId = "", panes = []) => {
-  if (!paneId) return null; // use first element in panes
+  if (!paneId) return null; // return first element in panes
 
-  return panes[0]; // ...or, if paneId is in panes, use paneId as current
-  //if (panes.includes(paneId)) return paneId;
+  return panes[0];
 }; // from https://tobbelindstrom.com/blog/measure-scrollbar-width-and-height/
 
 
@@ -39,7 +38,7 @@ const getScrollbarSize = () => {
   return 12;
 };
 
-const lispCallback = (payload, context) => {
+const lispCallback = (payload, context, hooks = []) => {
   let lisp_data = payload[Object.keys(payload)[0]][0];
   let command = lisp_data[0];
   let parameter_one = lisp_data[1][0];
@@ -59,7 +58,7 @@ const lispCallback = (payload, context) => {
   }
 };
 
-const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
+const HtmlAstToReact = (children, imageData = [], buttonData = [], hooks = []) => {
   // recursive function
   // breaks gatsby images free of enclosing p tag
   let contents, raw;
@@ -119,7 +118,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
             let payload_ast = lispLexer(payload);
 
             function injectPayload() {
-              lispCallback(payload_ast, "button");
+              lispCallback(payload_ast, "button", hooks);
             }
 
             return /*#__PURE__*/React.createElement("button", {
@@ -131,8 +130,8 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
           // ...TODO: add check here and use a href for external links
 
 
-          return /*#__PURE__*/React.createElement(Link, {
-            to: e?.properties?.href,
+          return /*#__PURE__*/React.createElement("a", {
+            onClick: () => hooks?.hookGoto(e?.properties?.href),
             key: index
           }, e?.children[0]?.value);
         }
@@ -159,7 +158,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
       case "p":
         contents = e?.children?.map((p, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([p], imageData, buttonData);
+          return HtmlAstToReact([p], imageData, buttonData, hooks);
         }); // is this an image?
 
         if (contents.length === 1 && contents[0][0].props?.image) {
@@ -175,7 +174,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
       case "ul":
       case "ol":
         raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        contents = HtmlAstToReact(raw, imageData, buttonData);
+        contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
         let list;
         if (e?.tagName === "ol") list = /*#__PURE__*/React.createElement("ol", null, contents);
         if (e?.tagName === "ul") list = /*#__PURE__*/React.createElement("ul", null, contents);
@@ -186,7 +185,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
       case "li":
         contents = e?.children?.map((li, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([li], imageData, buttonData);
+          return HtmlAstToReact([li], imageData, buttonData, hooks);
         });
         return /*#__PURE__*/React.createElement("li", {
           key: index
@@ -194,7 +193,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = []) => {
 
       case "blockquote":
         raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        let contents = HtmlAstToReact(raw, imageData, buttonData);
+        let contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
 
         if (typeof e?.children[0]?.value === "string") {
           return /*#__PURE__*/React.createElement("blockquote", {

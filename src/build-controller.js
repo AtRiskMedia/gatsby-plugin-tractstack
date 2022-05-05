@@ -22,16 +22,16 @@ function BuildController(data) {
       <div id="calls-to-action"></div>
       <div className="controller__graph">
         {next ? (
-          <Link to={next}>
+          <a onClick={() => data?.hooks?.hookGoto(next)}>
             <SvgPlay />
-          </Link>
+          </a>
         ) : (
           ""
         )}
         {prev ? (
-          <Link to={prev}>
+          <a onClick={() => data?.hooks?.hookGoto(prev)}>
             <SvgRewind />
-          </Link>
+          </a>
         ) : (
           ""
         )}

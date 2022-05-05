@@ -4,7 +4,7 @@ import animateScrollTo from "animated-scroll-to";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, lispCallback, getVisiblePane } from "./helpers";
 
 function ComposePanes(data) {
-  console.log("state", data?.state); // if viewport is not yet defined, return empty fragment
+  console.log("redux", data?.state); // if viewport is not yet defined, return empty fragment
 
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // is there a current pane to scroll to?
 
@@ -70,7 +70,7 @@ function ComposePanes(data) {
             }
           }
 
-          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, buttonData, css_styles_parent, css_styles, pane_fragment?.field_zindex);
+          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, buttonData, css_styles_parent, css_styles, pane_fragment?.field_zindex, data?.hooks);
           break;
 
         case "paragraph__background_pane":

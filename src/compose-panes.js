@@ -10,7 +10,7 @@ import {
   StyledWrapperDiv,
   InjectCssAnimation,
   lispCallback,
-  getVisiblePane
+  getVisiblePane,
 } from "./helpers";
 
 function ComposePanes(data) {
@@ -34,21 +34,21 @@ function ComposePanes(data) {
     (pane, i) => {
       // check for background colour
       let background_colour = pane?.relationships?.field_pane_fragments.filter(
-        e => e?.internal?.type === "paragraph__background_colour"
+        (e) => e?.internal?.type === "paragraph__background_colour"
       );
 
       // now compose the paneFragments for this pane
       let composedPane = pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
         .filter(
-          e =>
+          (e) =>
             e.field_hidden_viewports
               .replace(/\s+/g, "")
               .split(",")
               .indexOf(data?.state?.viewport?.viewport?.key) == -1
         )
         // already processed background_colour
-        .filter(e => e?.internal?.type !== "paragraph__background_colour")
+        .filter((e) => e?.internal?.type !== "paragraph__background_colour")
         // sort by zIndex ***important
         .sort((a, b) => (a?.field_zindex > b?.field_zindex ? 1 : -1))
         .map((pane_fragment, index) => {
@@ -96,9 +96,10 @@ function ComposePanes(data) {
                 buttonData = {};
               let child =
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-              child.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
-                e => !(e.type === "text" && e.value === "\n")
-              );
+              child.children =
+                pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
+                  (e) => !(e.type === "text" && e.value === "\n")
+                );
               try {
                 action = JSON.parse(pane_fragment?.field_options);
                 if (typeof action?.buttons === "object")
@@ -115,7 +116,8 @@ function ComposePanes(data) {
                 buttonData,
                 css_styles_parent,
                 css_styles,
-                pane_fragment?.field_zindex
+                pane_fragment?.field_zindex,
+                data?.hooks
               );
               break;
 
@@ -214,8 +216,8 @@ function ComposePanes(data) {
               in: [
                 effects[key]?.function,
                 effects[key]?.speed,
-                effects[key]?.delay
-              ]
+                effects[key]?.delay,
+              ],
             };
 
             let this_effects_css = InjectCssAnimation(

@@ -15,10 +15,10 @@ function BuildController(data) {
     id: "calls-to-action"
   }), /*#__PURE__*/React.createElement("div", {
     className: "controller__graph"
-  }, next ? /*#__PURE__*/React.createElement(Link, {
-    to: next
-  }, /*#__PURE__*/React.createElement(SvgPlay, null)) : "", prev ? /*#__PURE__*/React.createElement(Link, {
-    to: prev
+  }, next ? /*#__PURE__*/React.createElement("a", {
+    onClick: () => data?.hooks?.hookGoto(next)
+  }, /*#__PURE__*/React.createElement(SvgPlay, null)) : "", prev ? /*#__PURE__*/React.createElement("a", {
+    onClick: () => data?.hooks?.hookGoto(prev)
   }, /*#__PURE__*/React.createElement(SvgRewind, null)) : "")); // can we wrap this in animation?
 
   if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
