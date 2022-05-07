@@ -60,6 +60,7 @@ const lispCallback = (payload, context, hooks = []) => {
       console.log("todo -- add icon to controller:", icon);
       // ...command will now run below
       break;
+
     case "paneHidden":
       // process as "icon" function
       icon = parameter_one;
