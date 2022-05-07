@@ -260,7 +260,7 @@ function SvgPane(layout, viewport) {
     "data-name": "svg__" + layout + "-" + viewport,
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 " + SvgPanes[layout][viewport]["viewBox"][0] + " " + SvgPanes[layout][viewport]["viewBox"][1],
-    className: "svg svg__" + layout + " svg__" + layout + "-" + viewport
+    className: "svg svg__" + layout + " svg__" + layout + "--" + viewport
   }, /*#__PURE__*/React.createElement("title", {
     id: "title"
   }, "decorative"), /*#__PURE__*/React.createElement("desc", {
