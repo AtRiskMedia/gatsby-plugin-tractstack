@@ -7,23 +7,36 @@ function BuildController(data) {
   let next, prev, link, react_fragment, effects_payload;
   if (data?.state?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.state?.storyStep?.storyStepGraph?.next?.field_slug}`;
   if (data?.state?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.state?.storyStep?.storyStepGraph?.previous?.field_slug}`;
-  let controller_pane = SvgPane("pane", data?.state?.viewport?.viewport?.key, true);
+  let controller_pane = SvgPane("mini", data?.state?.viewport?.viewport?.key);
+  /*
+  <div className="controller__graph">
+    {next ? (
+      <a onClick={() => data?.hooks?.hookGoto(next)}>
+        <SvgPlay />
+      </a>
+    ) : (
+      ""
+    )}
+    {prev ? (
+      <a onClick={() => data?.hooks?.hookGoto(prev)}>
+        <SvgRewind />
+      </a>
+    ) : (
+      ""
+    )}
+  </div>
+  */
+
   react_fragment = /*#__PURE__*/React.createElement("div", {
     id: "tractstack-controller",
     className: `controller__view controller__view--${data?.state?.viewport?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {
     id: "calls-to-action"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "controller__graph"
-  }, next ? /*#__PURE__*/React.createElement("a", {
-    onClick: () => data?.hooks?.hookGoto(next)
-  }, /*#__PURE__*/React.createElement(SvgPlay, null)) : "", prev ? /*#__PURE__*/React.createElement("a", {
-    onClick: () => data?.hooks?.hookGoto(prev)
-  }, /*#__PURE__*/React.createElement(SvgRewind, null)) : "")); // can we wrap this in animation?
+  })); // can we wrap this in animation?
 
   if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
-      in: ["fadeInLeft", 2, 1]
+      in: ["fadeIn", 2, 1]
     };
   }
 
@@ -32,12 +45,15 @@ function BuildController(data) {
     key: data?.state?.storyStep?.storyStepGraph?.current?.id,
     className: "controller"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "controller__container"
+    className: "controller__container",
+    id: "tractstack-controller"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--view"
   }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css
-  }, react_fragment)))); //<div className="controller__container--view">{controller_pane}</div>
+  }, react_fragment))), /*#__PURE__*/React.createElement("div", {
+    className: "controller__container--view"
+  }, controller_pane));
 }
 
 export { BuildController };

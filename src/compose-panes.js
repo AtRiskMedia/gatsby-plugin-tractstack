@@ -14,7 +14,6 @@ import {
 } from "./helpers";
 
 function ComposePanes(data) {
-  console.log("ComposePanes", data?.state);
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
 
@@ -189,16 +188,19 @@ function ComposePanes(data) {
         });
 
       // compose this pane
-      let pane_height;
+      let pane_height, height_offset;
       switch (data?.state?.viewport?.viewport?.key) {
         case "mobile":
           pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
+          height_offset = `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`;
           break;
         case "tablet":
           pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`;
+          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`;
           break;
         case "desktop":
           pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
+          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`;
           break;
       }
       // skip if empty pane
@@ -230,13 +232,9 @@ function ComposePanes(data) {
       }
 
       // prepare css for pane
-      css = css + "height:" + pane_height + ";\n";
+      css = `${css} height: ${pane_height};\n margin-bottom: ${height_offset};\n`;
       if (background_colour.length)
-        css =
-          css +
-          " background-color:" +
-          background_colour[0].field_background_colour +
-          ";\n";
+        css = `${css} background-color: ${background_colour[0].field_background_colour};\n`;
 
       return (
         <section key={pane?.id}>
