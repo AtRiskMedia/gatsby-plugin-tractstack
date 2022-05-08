@@ -192,13 +192,13 @@ function ComposePanes(data) {
       let pane_height;
       switch (data?.state?.viewport?.viewport?.key) {
         case "mobile":
-          pane_height = pane?.field_height_ratio_mobile;
+          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
           break;
         case "tablet":
-          pane_height = pane?.field_height_ratio_tablet;
+          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`;
           break;
         case "desktop":
-          pane_height = pane?.field_height_ratio_desktop;
+          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
           break;
       }
       // skip if empty pane
@@ -230,7 +230,7 @@ function ComposePanes(data) {
       }
 
       // prepare css for pane
-      css = css + "height:" + parseInt(pane_height) + "vw;\n";
+      css = css + "height:" + pane_height + ";\n";
       if (background_colour.length)
         css =
           css +
