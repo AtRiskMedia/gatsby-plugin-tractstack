@@ -30,7 +30,7 @@ function BuildController(data) {
 
   if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
-      in: ["fadeIn", 2, 1]
+      in: ["fadeInRight", 2, 1]
     };
   }
 
