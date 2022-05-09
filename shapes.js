@@ -2,7 +2,7 @@ import React from "react";
 
 function TractStackLogo() {
   return /*#__PURE__*/React.createElement("svg", {
-    id: "TractStack Logo",
+    id: "tractstack-logo",
     "data-name": "TractStack Logo",
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 208.28 154.2",
@@ -256,8 +256,8 @@ function SvgPane(layout, viewport) {
     }
   };
   if (SvgPanes[layout]) return /*#__PURE__*/React.createElement("svg", {
-    id: "svg__" + layout + "-" + viewport,
-    "data-name": "svg__" + layout + "-" + viewport,
+    id: "svg__" + layout + "--" + viewport,
+    "data-name": "svg__" + layout + "--" + viewport,
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 " + SvgPanes[layout][viewport]["viewBox"][0] + " " + SvgPanes[layout][viewport]["viewBox"][1],
     className: "svg svg__" + layout + " svg__" + layout + "--" + viewport
@@ -271,58 +271,5 @@ function SvgPane(layout, viewport) {
   return "";
 }
 
-function SvgPlay() {
-  return /*#__PURE__*/React.createElement("svg", {
-    id: "TractStack Play icon",
-    "data-name": "TractStack Play icon",
-    xmlns: "http://www.w3.org/2000/svg",
-    viewBox: "0 0 253.82 253.81",
-    className: "svg"
-  }, /*#__PURE__*/React.createElement("title", {
-    id: "title"
-  }, "Play button"), /*#__PURE__*/React.createElement("desc", {
-    id: "desc"
-  }, "Play button"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
-    d: "M271,280.06c-.06,69.37-57.61,127.33-127,126.84-70.75-.49-127-56.19-126.86-127.21s56.57-126.19,127-126.59C213.59,152.71,271.09,210.75,271,280.06Zm-11,.66c.07-60.63-46.51-115.57-115.14-116.56C85,163.29,29.24,209.74,28.17,279c-.93,60.53,46.18,116,115.24,116.79C204.6,396.52,258.5,348.86,260,280.72Z",
-    transform: "translate(-17.21 -153.1)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "tractstack__svg--button-bg",
-    d: "M260,280.72c-1.48,68.14-55.38,115.8-116.57,115.11C74.35,395.06,27.24,339.57,28.17,279,29.24,209.74,85,163.29,144.84,164.16,213.47,165.15,260.05,220.09,260,280.72Zm-165.21-.79c0,17.17,0,34.34,0,51.51,0,8.4,4.11,10.82,11.46,6.73Q153.17,312.1,200,285.89c5.9-3.3,5.93-8.46,0-11.76q-46.84-26.2-93.75-52.29c-7.63-4.23-11.49-1.8-11.51,7.08C94.74,245.93,94.77,262.93,94.77,279.93Z",
-    transform: "translate(-17.21 -153.1)"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M94.77,279.93c0-17,0-34,0-51,0-8.88,3.88-11.31,11.51-7.08q46.92,26.07,93.75,52.29c5.89,3.3,5.86,8.46,0,11.76q-46.84,26.19-93.75,52.28c-7.35,4.09-11.43,1.67-11.46-6.73C94.73,314.27,94.77,297.1,94.77,279.93Zm92.89.05-80.87-45.13v90.28Z",
-    transform: "translate(-17.21 -153.1)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "tractstack__svg--button-face",
-    d: "M187.66,280l-80.87,45.15V234.85Z",
-    transform: "translate(-17.21 -153.1)"
-  })));
-}
-
-function SvgRewind() {
-  return /*#__PURE__*/React.createElement("svg", {
-    id: "TractStack Rewind icon",
-    "data-name": "TractStack Rewind icon",
-    xmlns: "http://www.w3.org/2000/svg",
-    viewBox: "0 0 256 256",
-    className: "svg"
-  }, /*#__PURE__*/React.createElement("title", {
-    id: "title"
-  }, "Rewind button"), /*#__PURE__*/React.createElement("desc", {
-    id: "desc"
-  }, "Rewind button"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
-    d: "M272,276v8a19.25,19.25,0,0,0-.76,3.37A118.73,118.73,0,0,1,257,338.88c-19.18,36-49.05,57.95-88.9,66.27-6.62,1.39-13.42,1.92-20.14,2.85h-8a18,18,0,0,0-3.35-.76A112.53,112.53,0,0,1,96,398.12c-38.28-16.18-63.42-44.32-74.81-84.27C18.44,304.19,17.68,294,16,284v-8q.95-7.38,1.91-14.77c6.32-48.65,44.8-92.3,92.26-104.1,9.76-2.42,19.88-3.46,29.83-5.13h8c4.92.63,9.83,1.28,14.75,1.89,48.23,6,92.44,45,104.13,92.23C269.3,255.91,270.33,266,272,276ZM144.23,397.72A117.72,117.72,0,0,0,144,162.28c-65.22,0-118.09,53-117.74,118.08S79.28,397.94,144.23,397.72Z",
-    transform: "translate(-16 -152)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "tractstack__svg--button-bg",
-    d: "M144.23,397.72c-64.95.22-117.59-52.15-117.95-117.36S78.8,162.26,144,162.28a117.72,117.72,0,0,1,.21,235.44Zm63.06-72.52V233.79l-70.86,45.8V234.08L65.5,280l71.11,46V279.48Z",
-    transform: "translate(-16 -152)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "tractstack__svg--button-face",
-    d: "M207.29,325.2l-70.68-45.72V326L65.5,280l70.93-45.93v45.51l70.86-45.8Z",
-    transform: "translate(-16 -152)"
-  })));
-}
-
-export { TractStackLogo, SvgPane, SvgPlay, SvgRewind };
+export { TractStackLogo, SvgPane };
 //# sourceMappingURL=shapes.js.map

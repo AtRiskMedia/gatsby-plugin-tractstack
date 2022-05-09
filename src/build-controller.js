@@ -29,14 +29,6 @@ function BuildController(data) {
     )}
   </div>
   */
-  react_fragment = (
-    <div
-      id={"tractstack-controller"}
-      className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
-    >
-      <div id="calls-to-action"></div>
-    </div>
-  );
 
   // can we wrap this in animation?
   if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
@@ -45,17 +37,26 @@ function BuildController(data) {
     };
   }
   let css = InjectCssAnimation(effects_payload, "tractstack-controller");
+  console.log(2, css);
   return (
     <section
       key={data?.state?.storyStep?.storyStepGraph?.current?.id}
       className="controller"
     >
-      <div className="controller__container" id="tractstack-controller">
-        <div className="controller__container--view">
-          <StyledWrapperDiv css={css}>{react_fragment}</StyledWrapperDiv>
+      <StyledWrapperDiv css={css}>
+        <div id="tractstack-controller" className="controller__container">
+          <div
+            className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
+          >
+            <div id="calls-to-action"></div>
+          </div>
+          <div
+            className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
+          >
+            {controller_pane}
+          </div>
         </div>
-      </div>
-      <div className="controller__container--view">{controller_pane}</div>
+      </StyledWrapperDiv>
     </section>
   );
 }
