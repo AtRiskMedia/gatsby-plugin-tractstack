@@ -33,11 +33,10 @@ function BuildController(data) {
   // can we wrap this in animation?
   if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
-      in: ["fadeInRight", 2, 1],
+      in: ["fadeInRight", 2, 1]
     };
   }
   let css = InjectCssAnimation(effects_payload, "tractstack-controller");
-  console.log(2, css);
   return (
     <section
       key={data?.state?.storyStep?.storyStepGraph?.current?.id}
