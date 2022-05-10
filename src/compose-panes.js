@@ -9,7 +9,6 @@ import {
   InjectSvgShape,
   StyledWrapperDiv,
   InjectCssAnimation,
-  lispCallback,
   getVisiblePane,
 } from "./helpers";
 

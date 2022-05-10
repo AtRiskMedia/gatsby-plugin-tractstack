@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { IsVisible } from "./is-visible.js";
 import animateScrollTo from "animated-scroll-to";
-import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, lispCallback, getVisiblePane } from "./helpers";
+import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, getVisiblePane } from "./helpers";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment

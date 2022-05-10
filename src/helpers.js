@@ -44,10 +44,11 @@ const lispCallback = (payload, context, hooks = []) => {
   let icon;
   let lisp_data = payload[Object.keys(payload)[0]];
   let command = lisp_data[0];
-  let parameter_one, parameter_two;
+  let parameter_one, parameter_two, parameter_three;
   if (typeof lisp_data[1] === "object") {
     parameter_one = lisp_data[1][0];
     parameter_two = lisp_data[1][1];
+    parameter_three = lisp_data[1][2];
   }
   // pre-process on context
   switch (context) {
@@ -56,8 +57,16 @@ const lispCallback = (payload, context, hooks = []) => {
       icon = parameter_one;
       command = parameter_two[0];
       parameter_one = parameter_two[1];
+      parameter_two = parameter_three;
+      parameter_three = false;
       // TODO: do something with the icon
-      console.log("todo -- add icon to controller:", icon);
+      console.log(
+        "todo -- add icon to controller:",
+        icon,
+        command,
+        parameter_one,
+        parameter_two
+      );
       // ...command will now run below
       break;
 
@@ -66,8 +75,16 @@ const lispCallback = (payload, context, hooks = []) => {
       icon = parameter_one;
       command = parameter_two[0];
       parameter_one = parameter_two[1];
+      parameter_two = parameter_three;
+      parameter_three = false;
       // TODO: do something with the icon
-      console.log("todo -- remove icon to controller:", icon);
+      console.log(
+        "todo -- remove icon to controller:",
+        icon,
+        command,
+        parameter_one,
+        parameter_two
+      );
       // ...command will now run below
       break;
   }
