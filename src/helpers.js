@@ -261,8 +261,9 @@ const StyledWrapperSection = styled.section`
 `;
 
 const PaneFragment = (id, child, css) => {
+  let this_css = `height:100%; ${css}`;
   return (
-    <StyledWrapperDiv key={id} css={css}>
+    <StyledWrapperDiv key={id} css={this_css}>
       {child}
     </StyledWrapperDiv>
   );
@@ -270,14 +271,16 @@ const PaneFragment = (id, child, css) => {
 
 // pre-rendered svg shapes for each viewport
 // relies on shapes.js
-const InjectSvgShape = (id, shape, viewport, parent_css, zIndex) => {
-  let css = `${parent_css} z-index: ${parseInt(zIndex)};`;
+const InjectSvgShape = (id, shape, viewport, parent_css = "", zIndex) => {
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   let child = SvgPane(shape, viewport);
   return PaneFragment(id, child, css);
 };
 
-const InjectSvg = (id, url, alt_text, parent_css, zIndex) => {
-  let css = `${parent_css} z-index: ${parseInt(zIndex)};`;
+const InjectSvg = (id, url, alt_text, parent_css = "", zIndex) => {
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   let child = <img src={url} alt={alt_text} className="paneFragmentCSS" />;
   return PaneFragment(id, child, css);
 };
@@ -291,8 +294,8 @@ const InjectGatsbyBackgroundImage = (
 ) => {
   const this_imageData = getImage(imageData);
   const bgImage = convertToBgImage(this_imageData);
-
-  let css = `z-index: ${parseInt(zIndex)}; img { ${parent_css} }`;
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} img {${parent_css}}`;
   let child = (
     <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
       <div className="paneFragmentImage">
@@ -311,7 +314,9 @@ const InjectGatsbyBackgroundVideo = (
   child_css = "",
   zIndex
 ) => {
-  let css = `${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
+  if (typeof child_css === "string") css = `${css} ${child_css}`;
   let child = (
     <video
       autoPlay={true}
@@ -343,10 +348,9 @@ const MarkdownParagraph = (
     buttonData,
     hooks
   );
-  let css = `height:100%; ${parent_css} z-index: ${parseInt(
-    zIndex
-  )}; ${child_css}`;
-
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
+  if (typeof child_css === "string") css = `${css} ${child_css}`;
   return PaneFragment(id, paragraph, css);
 };
 
@@ -358,9 +362,9 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   let css = "",
     selector;
   if (paneFragmentId !== "tractstack-controller") {
-    selector = `#${paneFragmentId}.visible`;
+    selector = `div#${paneFragmentId}.visible`;
   } else {
-    selector = "#tractstack-controller";
+    selector = "div#tractstack-controller";
   }
   let animationIn = payload?.in[0],
     animationInSpeed = payload?.in[1],
@@ -368,11 +372,8 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   if (typeof animationIn === "string") {
     css =
       css +
-      `${selector} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` +
-      animationIn +
-      `; -webkit-animation-name: ` +
-      animationIn +
-      `; `;
+      `${selector} { height:100%; opacity: 0; animation-fill-mode: both; ` +
+      `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
     if (typeof animationInSpeed === "number") {
       css =
         css +
@@ -385,7 +386,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     if (typeof animationInDelay === "number") {
       css = css + `animation-delay: ` + animationInDelay + `s; `;
     }
-    css = css + "}\n";
+    css = css + "}";
   }
   return css;
 };

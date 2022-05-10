@@ -232,10 +232,9 @@ function ComposePanes(data) {
       }
 
       // prepare css for pane
-      css = `${css} height: ${pane_height};\n margin-bottom: ${height_offset};\n`;
+      css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
       if (background_colour.length)
-        css = `${css} background-color: ${background_colour[0].field_background_colour};\n`;
-
+        css = `${css} background-color: ${background_colour[0].field_background_colour};`;
       return (
         <section key={pane?.id}>
           <IsVisible id={pane?.id} hooks={data?.hooks}>

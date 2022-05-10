@@ -248,22 +248,25 @@ const StyledWrapperSection = styled.section`
 `;
 
 const PaneFragment = (id, child, css) => {
+  let this_css = `height:100%; ${css}`;
   return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     key: id,
-    css: css
+    css: this_css
   }, child);
 }; // pre-rendered svg shapes for each viewport
 // relies on shapes.js
 
 
-const InjectSvgShape = (id, shape, viewport, parent_css, zIndex) => {
-  let css = `${parent_css} z-index: ${parseInt(zIndex)};`;
+const InjectSvgShape = (id, shape, viewport, parent_css = "", zIndex) => {
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   let child = SvgPane(shape, viewport);
   return PaneFragment(id, child, css);
 };
 
-const InjectSvg = (id, url, alt_text, parent_css, zIndex) => {
-  let css = `${parent_css} z-index: ${parseInt(zIndex)};`;
+const InjectSvg = (id, url, alt_text, parent_css = "", zIndex) => {
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   let child = /*#__PURE__*/React.createElement("img", {
     src: url,
     alt: alt_text,
@@ -275,7 +278,8 @@ const InjectSvg = (id, url, alt_text, parent_css, zIndex) => {
 const InjectGatsbyBackgroundImage = (id, imageData, alt_text, parent_css = "", zIndex) => {
   const this_imageData = getImage(imageData);
   const bgImage = convertToBgImage(this_imageData);
-  let css = `z-index: ${parseInt(zIndex)}; img { ${parent_css} }`;
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} img {${parent_css}}`;
   let child = /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
   }, bgImage, {
@@ -290,7 +294,9 @@ const InjectGatsbyBackgroundImage = (id, imageData, alt_text, parent_css = "", z
 };
 
 const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_css = "", zIndex) => {
-  let css = `${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
+  if (typeof child_css === "string") css = `${css} ${child_css}`;
   let child = /*#__PURE__*/React.createElement("video", {
     autoPlay: true,
     muted: true,
@@ -307,7 +313,9 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_c
 
 const MarkdownParagraph = (id, htmlAst, imageData = [], buttonData = [], parent_css = "", child_css = "", zIndex, hooks = []) => {
   const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData, hooks);
-  let css = `height:100%; ${parent_css} z-index: ${parseInt(zIndex)}; ${child_css}`;
+  let css = `z-index: ${parseInt(zIndex)};`;
+  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
+  if (typeof child_css === "string") css = `${css} ${child_css}`;
   return PaneFragment(id, paragraph, css);
 };
 
@@ -320,9 +328,9 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       selector;
 
   if (paneFragmentId !== "tractstack-controller") {
-    selector = `#${paneFragmentId}.visible`;
+    selector = `div#${paneFragmentId}.visible`;
   } else {
-    selector = "#tractstack-controller";
+    selector = "div#tractstack-controller";
   }
 
   let animationIn = payload?.in[0],
@@ -330,7 +338,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       animationInDelay = payload?.in[2];
 
   if (typeof animationIn === "string") {
-    css = css + `${selector} { height:100%; opacity: 0; animation-fill-mode: both; animation-name: ` + animationIn + `; -webkit-animation-name: ` + animationIn + `; `;
+    css = css + `${selector} { height:100%; opacity: 0; animation-fill-mode: both; ` + `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
 
     if (typeof animationInSpeed === "number") {
       css = css + `animation-duration: ` + animationInSpeed + `s; -webkit-animation-duration: ` + animationInSpeed + `s; `;
@@ -340,7 +348,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       css = css + `animation-delay: ` + animationInDelay + `s; `;
     }
 
-    css = css + "}\n";
+    css = css + "}";
   }
 
   return css;

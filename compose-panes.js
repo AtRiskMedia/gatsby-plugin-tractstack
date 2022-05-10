@@ -149,8 +149,8 @@ function ComposePanes(data) {
     } // prepare css for pane
 
 
-    css = `${css} height: ${pane_height};\n margin-bottom: ${height_offset};\n`;
-    if (background_colour.length) css = `${css} background-color: ${background_colour[0].field_background_colour};\n`;
+    css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
+    if (background_colour.length) css = `${css} background-color: ${background_colour[0].field_background_colour};`;
     return /*#__PURE__*/React.createElement("section", {
       key: pane?.id
     }, /*#__PURE__*/React.createElement(IsVisible, {
