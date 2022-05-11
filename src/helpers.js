@@ -28,7 +28,7 @@ const getScrollbarSize = () => {
     body.appendChild(scrollDiv);
 
     // Collect width & height of scrollbar
-    const calculateValue = (type) =>
+    const calculateValue = type =>
       scrollDiv[`offset${type}`] - scrollDiv[`client${type}`];
     const scrollbarWidth = calculateValue("Width");
 
@@ -95,17 +95,7 @@ const lispCallback = (payload, context = "", hooks = []) => {
       break;
 
     default:
-      console.log(
-        "MISS on helpers.js lispCallback:",
-        context,
-        command,
-        parameter_one,
-        typeof parameter_one,
-        parameter_two,
-        typeof parameter_two,
-        payload,
-        lisp_data
-      );
+      console.log("MISS on helpers.js lispCallback:", context, command);
   }
 };
 
@@ -162,7 +152,7 @@ const HtmlAstToReact = (
             Object.keys(buttonData).length
           ) {
             let key = Object.keys(buttonData).find(
-              (target) => buttonData[target]?.urlTarget === e?.properties?.href
+              target => buttonData[target]?.urlTarget === e?.properties?.href
             );
             is_button = buttonData[key];
           }
@@ -204,7 +194,7 @@ const HtmlAstToReact = (
         if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
           // imageData in this case is an array ... must find correct element
           let this_imageData = imageData.filter(
-            (image) => image.filename === e?.properties?.src
+            image => image.filename === e?.properties?.src
           )[0]?.localFile?.childImageSharp?.gatsbyImageData;
           return (
             <GatsbyImage
@@ -233,9 +223,7 @@ const HtmlAstToReact = (
 
       case "ul":
       case "ol":
-        raw = e?.children.filter(
-          (e) => !(e.type === "text" && e.value === "\n")
-        );
+        raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
         contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
         let list;
         if (e?.tagName === "ol") list = <ol>{contents}</ol>;
@@ -250,9 +238,7 @@ const HtmlAstToReact = (
         return <li key={index}>{contents}</li>;
 
       case "blockquote":
-        raw = e?.children.filter(
-          (e) => !(e.type === "text" && e.value === "\n")
-        );
+        raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
         let contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
         if (typeof e?.children[0]?.value === "string") {
           return <blockquote key={index}>{contents}</blockquote>;
@@ -267,10 +253,10 @@ const HtmlAstToReact = (
 };
 
 const StyledWrapperDiv = styled.div`
-  ${(props) => props.css};
+  ${props => props.css};
 `;
 const StyledWrapperSection = styled.section`
-  ${(props) => props.css};
+  ${props => props.css};
 `;
 
 const PaneFragment = (id, child, css) => {
@@ -368,7 +354,7 @@ const MarkdownParagraph = (
 };
 
 const getStoryStepGraph = (graph, targetId) => {
-  return graph?.edges?.filter((e) => e?.node?.id === targetId)[0];
+  return graph?.edges?.filter(e => e?.node?.id === targetId)[0];
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
@@ -384,20 +370,13 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     animationInDelay = payload?.in[2];
   if (typeof animationIn === "string") {
     css =
-      css +
-      `${selector} { height:100%; opacity: 0; animation-fill-mode: both; ` +
+      `${css} ${selector} { height:100%; opacity: 0; animation-fill-mode: both; ` +
       `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
     if (typeof animationInSpeed === "number") {
-      css =
-        css +
-        `animation-duration: ` +
-        animationInSpeed +
-        `s; -webkit-animation-duration: ` +
-        animationInSpeed +
-        `s; `;
+      css = `${css} animation-duration: ${animationInSpeed}s; -webkit-animation-duration: ${animationInSpeed}s; `;
     }
     if (typeof animationInDelay === "number") {
-      css = css + `animation-delay: ` + animationInDelay + `s; `;
+      css = `${css} animation-delay: ${animationInDelay}s; `;
     }
     css = css + "}";
   }
@@ -417,5 +396,5 @@ export {
   InjectCssAnimation,
   lispCallback,
   getCurrentPane,
-  getScrollbarSize,
+  getScrollbarSize
 };
