@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
 import { IsVisible } from "./is-visible.js";
 import animateScrollTo from "animated-scroll-to";
-import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, getVisiblePane } from "./helpers";
+import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, getCurrentPane } from "./helpers";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // is there a current pane to scroll to?
 
-  let visiblePane = getVisiblePane(data?.state?.viewport?.lastVisiblePane, data?.state?.viewport?.panes);
+  let visiblePane = getCurrentPane(data?.state?.viewport?.currentPane, data?.state?.viewport?.panes);
 
   if (visiblePane) {
     let ref = document.getElementById(visiblePane);
@@ -24,29 +24,24 @@ function ComposePanes(data) {
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.state?.viewport?.viewport?.key) == -1) // already processed background_colour
     .filter(e => e?.internal?.type !== "paragraph__background_colour") // sort by zIndex ***important
     .sort((a, b) => a?.field_zindex > b?.field_zindex ? 1 : -1).map((pane_fragment, index) => {
-      let react_fragment,
-          alt_text,
-          imageData,
-          shape = "",
-          css_styles = "",
-          css_styles_parent = ""; // select css for viewport
+      let react_fragment, alt_text, imageData, shape, css_styles, css_styles_parent; // select css for viewport
 
       switch (data?.state?.viewport?.viewport?.key) {
         case "mobile":
-          css_styles = pane_fragment?.field_css_styles_mobile;
-          css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
+          css_styles = pane_fragment?.field_css_styles_mobile || "";
+          css_styles_parent = pane_fragment?.field_css_styles_parent_mobile || "";
           if (pane_fragment?.internal?.type === "paragraph__background_pane") shape = pane_fragment?.field_shape_mobile;
           break;
 
         case "tablet":
-          css_styles = pane_fragment?.field_css_styles_tablet;
-          css_styles_parent = pane_fragment?.field_css_styles_parent_tablet;
+          css_styles = pane_fragment?.field_css_styles_tablet || "";
+          css_styles_parent = pane_fragment?.field_css_styles_parent_tablet || "";
           if (pane_fragment?.internal?.type === "paragraph__background_pane") shape = pane_fragment?.field_shape_tablet;
           break;
 
         case "desktop":
-          css_styles = pane_fragment?.field_css_styles_desktop;
-          css_styles_parent = pane_fragment?.field_css_styles_parent_desktop;
+          css_styles = pane_fragment?.field_css_styles_desktop || "";
+          css_styles_parent = pane_fragment?.field_css_styles_parent_desktop || "";
           if (pane_fragment?.internal?.type === "paragraph__background_pane") shape = pane_fragment?.field_shape_desktop;
           break;
       } // render this paneFragment

@@ -261,9 +261,7 @@ function SvgPane(layout, viewport) {
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 " + SvgPanes[layout][viewport]["viewBox"][0] + " " + SvgPanes[layout][viewport]["viewBox"][1],
     className: "svg svg__" + layout + " svg__" + layout + "--" + viewport
-  }, /*#__PURE__*/React.createElement("title", {
-    id: "title"
-  }, "decorative"), /*#__PURE__*/React.createElement("desc", {
+  }, /*#__PURE__*/React.createElement("desc", {
     id: "desc"
   }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
     d: SvgPanes[layout][viewport]["path"]

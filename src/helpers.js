@@ -8,10 +8,10 @@ import BackgroundImage from "gatsby-background-image";
 import { SvgPane } from "./shapes";
 import { lispLexer } from "./lexer";
 
-const getVisiblePane = (paneId = "", panes = []) => {
-  if (!paneId) return null;
+const getCurrentPane = (paneId = "", panes = []) => {
+  if (!paneId) return panes[0];
   // return first element in panes
-  return panes[0];
+  return paneId;
 };
 
 // from https://tobbelindstrom.com/blog/measure-scrollbar-width-and-height/
@@ -40,67 +40,58 @@ const getScrollbarSize = () => {
   return 12;
 };
 
-const lispCallback = (payload, context, hooks = []) => {
+const lispCallback = (payload, context = "", hooks = []) => {
   let icon;
   let lisp_data = payload[Object.keys(payload)[0]];
-  let command = lisp_data[0];
+  let command = lisp_data[0] || false;
   let parameter_one, parameter_two, parameter_three;
   if (typeof lisp_data[1] === "object") {
-    parameter_one = lisp_data[1][0];
-    parameter_two = lisp_data[1][1];
-    parameter_three = lisp_data[1][2];
-  }
-  // pre-process on context
-  switch (context) {
-    case "paneVisible":
-      // process as "icon" function
-      icon = parameter_one;
-      command = parameter_two[0];
-      parameter_one = parameter_two[1];
-      parameter_two = parameter_three;
-      parameter_three = false;
-      // TODO: do something with the icon
-      console.log(
-        "todo -- add icon to controller:",
-        icon,
-        command,
-        parameter_one,
-        parameter_two
-      );
-      // ...command will now run below
-      break;
-
-    case "paneHidden":
-      // process as "icon" function
-      icon = parameter_one;
-      command = parameter_two[0];
-      parameter_one = parameter_two[1];
-      parameter_two = parameter_three;
-      parameter_three = false;
-      // TODO: do something with the icon
-      console.log(
-        "todo -- remove icon to controller:",
-        icon,
-        command,
-        parameter_one,
-        parameter_two
-      );
-      // ...command will now run below
-      break;
+    parameter_one = lisp_data[1][0] || false;
+    parameter_two = lisp_data[1][1] || false;
+    parameter_three = lisp_data[1][2] || false;
   }
   // now process the command
   switch (command) {
+    case "icon":
+      // pre-process on context
+      switch (context) {
+        case "paneVisible":
+          // process as "icon" function
+          icon = parameter_one;
+          command = parameter_two[0];
+          parameter_one = parameter_two[1];
+          parameter_two = parameter_three;
+          parameter_three = false;
+          console.log(`todo: add ${icon} icon to controller`);
+          // TODO: do something with the icon
+          break;
+
+        case "paneHidden":
+          // process as "icon" function
+          icon = parameter_one;
+          command = parameter_two[0];
+          parameter_one = parameter_two[1];
+          parameter_two = parameter_three;
+          parameter_three = false;
+          console.log(`todo: remove ${icon} icon to controller`);
+          // TODO: do something with the icon
+          break;
+      }
+      break;
+
     case "alert":
       alert(parameter_one);
       break;
 
     case "goto":
-      // calls hooks.hookGoto for gatsby navigate
+      // calls hooks.hookGotoStoryFragment for gatsby navigate
       if (
         parameter_one === "storyFragment" &&
         typeof parameter_two === "string"
       )
-        hooks.hookGoto(`/${parameter_two}`);
+        hooks.hookGotoStoryFragment(`/${parameter_two}`);
+      if (parameter_one === "pane" && typeof parameter_two === "string")
+        hooks.hookSetCurrentPane(parameter_two);
       break;
 
     default:
@@ -109,7 +100,9 @@ const lispCallback = (payload, context, hooks = []) => {
         context,
         command,
         parameter_one,
+        typeof parameter_one,
         parameter_two,
+        typeof parameter_two,
         payload,
         lisp_data
       );
@@ -194,7 +187,10 @@ const HtmlAstToReact = (
           // else, treat at internal link
           // ...TODO: add check here and use a href for external links
           return (
-            <a onClick={() => hooks?.hookGoto(e?.properties?.href)} key={index}>
+            <a
+              onClick={() => hooks?.hookGotoStoryFragment(e?.properties?.href)}
+              key={index}
+            >
               {e?.children[0]?.value}
             </a>
           );
@@ -420,6 +416,6 @@ export {
   getStoryStepGraph,
   InjectCssAnimation,
   lispCallback,
-  getVisiblePane,
+  getCurrentPane,
   getScrollbarSize,
 };

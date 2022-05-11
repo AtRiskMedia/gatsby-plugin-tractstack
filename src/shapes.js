@@ -276,9 +276,7 @@ function SvgPane(layout, viewport) {
         }
         className={"svg svg__" + layout + " svg__" + layout + "--" + viewport}
       >
-        <title id="title">decorative</title>
         <desc id="desc">decorative background</desc>
-
         <g>
           <path d={SvgPanes[layout][viewport]["path"]} />
         </g>

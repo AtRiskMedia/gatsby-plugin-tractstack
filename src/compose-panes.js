@@ -9,7 +9,7 @@ import {
   InjectSvgShape,
   StyledWrapperDiv,
   InjectCssAnimation,
-  getVisiblePane,
+  getCurrentPane,
 } from "./helpers";
 
 function ComposePanes(data) {
@@ -17,8 +17,8 @@ function ComposePanes(data) {
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
 
   // is there a current pane to scroll to?
-  let visiblePane = getVisiblePane(
-    data?.state?.viewport?.lastVisiblePane,
+  let visiblePane = getCurrentPane(
+    data?.state?.viewport?.currentPane,
     data?.state?.viewport?.panes
   );
   if (visiblePane) {
@@ -53,32 +53,34 @@ function ComposePanes(data) {
           let react_fragment,
             alt_text,
             imageData,
-            shape = "",
-            css_styles = "",
-            css_styles_parent = "";
+            shape,
+            css_styles,
+            css_styles_parent;
 
           // select css for viewport
           switch (data?.state?.viewport?.viewport?.key) {
             case "mobile":
-              css_styles = pane_fragment?.field_css_styles_mobile;
-              css_styles_parent = pane_fragment?.field_css_styles_parent_mobile;
+              css_styles = pane_fragment?.field_css_styles_mobile || "";
+              css_styles_parent =
+                pane_fragment?.field_css_styles_parent_mobile || "";
               if (
                 pane_fragment?.internal?.type === "paragraph__background_pane"
               )
                 shape = pane_fragment?.field_shape_mobile;
               break;
             case "tablet":
-              css_styles = pane_fragment?.field_css_styles_tablet;
-              css_styles_parent = pane_fragment?.field_css_styles_parent_tablet;
+              css_styles = pane_fragment?.field_css_styles_tablet || "";
+              css_styles_parent =
+                pane_fragment?.field_css_styles_parent_tablet || "";
               if (
                 pane_fragment?.internal?.type === "paragraph__background_pane"
               )
                 shape = pane_fragment?.field_shape_tablet;
               break;
             case "desktop":
-              css_styles = pane_fragment?.field_css_styles_desktop;
+              css_styles = pane_fragment?.field_css_styles_desktop || "";
               css_styles_parent =
-                pane_fragment?.field_css_styles_parent_desktop;
+                pane_fragment?.field_css_styles_parent_desktop || "";
               if (
                 pane_fragment?.internal?.type === "paragraph__background_pane"
               )
@@ -220,7 +222,6 @@ function ComposePanes(data) {
                 effects[key]?.delay,
               ],
             };
-
             let this_effects_css = InjectCssAnimation(
               effects_payload,
               effects[key]?.paneFragment

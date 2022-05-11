@@ -14,14 +14,14 @@ function BuildController(data) {
   /*
   <div className="controller__graph">
     {next ? (
-      <a onClick={() => data?.hooks?.hookGoto(next)}>
+      <a onClick={() => data?.hooks?.hookGotoStoryFragment(next)}>
         <SvgPlay />
       </a>
     ) : (
       ""
     )}
     {prev ? (
-      <a onClick={() => data?.hooks?.hookGoto(prev)}>
+      <a onClick={() => data?.hooks?.hookGotoStoryFragment(prev)}>
         <SvgRewind />
       </a>
     ) : (
