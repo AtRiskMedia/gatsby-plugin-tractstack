@@ -24,7 +24,7 @@ function ComposePanes(data) {
     // check for background colour
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // compose this pane
 
-    let pane_height, height_offset, this_selector;
+    let pane_height, height_offset, this_selector, shape;
 
     switch (data?.state?.viewport?.viewport?.key) {
       case "mobile":
@@ -45,9 +45,7 @@ function ComposePanes(data) {
 
 
     imageMaskShape = pane?.relationships?.field_pane_fragments.map(e => {
-      let imageMaskShapeSelector;
-      if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
-      let this_pane;
+      let imageMaskShapeSelector, this_pane;
 
       switch (data?.state?.viewport?.viewport?.key) {
         case "mobile":
@@ -63,12 +61,38 @@ function ComposePanes(data) {
           break;
       }
 
-      let shape = SvgPane(this_pane, data?.state?.viewport?.viewport?.key);
+      if (typeof this_pane === "string" && this_pane !== "none") {
+        shape = SvgPane(this_pane, data?.state?.viewport?.viewport?.key);
+
+        switch (e?.internal?.type) {
+          case "paragraph__background_video":
+            imageMaskShapeSelector = ".paneFragmentVideo";
+            break;
+
+          case "paragraph__background_image":
+            imageMaskShapeSelector = ".paneFragmentImage";
+            break;
+
+          case "paragraph__svg":
+            imageMaskShapeSelector = ".paneFragmentSvg";
+            break;
+
+          case "paragraph__markdown":
+            imageMaskShapeSelector = ".paneFragmentParagraph";
+            break;
+
+          default:
+            console.log("compose-panes.js > imageMaskShape: miss on", e?.internal?.type);
+        }
+      }
+
+      if (typeof shape === "undefined") return null;
       return {
         selector: imageMaskShapeSelector,
-        shape: shape
+        shape: shape,
+        paneFragment: e?.id
       };
-    }); // now compose the paneFragments for this pane
+    }).filter(Boolean); // now compose the paneFragments for this pane
 
     let composedPaneFragments = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.state?.viewport?.viewport?.key) == -1) // already processed background_colour

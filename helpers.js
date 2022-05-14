@@ -276,7 +276,7 @@ const InjectSvg = (id, url, alt_text, parent_css = "", zIndex) => {
   let child = /*#__PURE__*/React.createElement("img", {
     src: url,
     alt: alt_text,
-    className: "paneFragmentCSS"
+    className: "paneFragmentSvg"
   });
   return PaneFragment(id, child, css);
 };
@@ -286,16 +286,16 @@ const InjectGatsbyBackgroundImage = (id, imageData, alt_text, parent_css = "", z
   const bgImage = convertToBgImage(this_imageData);
   let css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} img {${parent_css}}`;
-  let child = /*#__PURE__*/React.createElement(BackgroundImage, _extends({
+  let child = /*#__PURE__*/React.createElement("div", {
+    className: "paneFragmentImage"
+  }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
   }, bgImage, {
     preserveStackingContext: true
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "paneFragmentImage"
-  }, /*#__PURE__*/React.createElement(GatsbyImage, {
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
     image: this_imageData,
     alt: alt_text
-  })));
+  }))));
   return PaneFragment(id, child, css);
 };
 
@@ -321,7 +321,10 @@ const MarkdownParagraph = (id, htmlAst, imageData = {}, buttonData = {}, maskDat
   let css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   if (typeof child_css === "string") css = `${css} ${child_css}`;
-  return PaneFragment(id, paragraph, css);
+  let composed = PaneFragment(id, paragraph, css);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "paneFragmentParagraph"
+  }, composed);
 };
 
 const getStoryStepGraph = (graph, targetId) => {

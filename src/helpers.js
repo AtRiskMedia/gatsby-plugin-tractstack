@@ -290,7 +290,7 @@ const InjectSvgShape = (id, shape, viewport, parent_css = "", zIndex) => {
 const InjectSvg = (id, url, alt_text, parent_css = "", zIndex) => {
   let css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} ${parent_css}`;
-  let child = <img src={url} alt={alt_text} className="paneFragmentCSS" />;
+  let child = <img src={url} alt={alt_text} className="paneFragmentSvg" />;
   return PaneFragment(id, child, css);
 };
 
@@ -306,11 +306,13 @@ const InjectGatsbyBackgroundImage = (
   let css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} img {${parent_css}}`;
   let child = (
-    <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
-      <div className="paneFragmentImage">
-        <GatsbyImage image={this_imageData} alt={alt_text} />
-      </div>
-    </BackgroundImage>
+    <div className="paneFragmentImage">
+      <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
+        <div>
+          <GatsbyImage image={this_imageData} alt={alt_text} />
+        </div>
+      </BackgroundImage>
+    </div>
   );
   return PaneFragment(id, child, css);
 };
@@ -361,7 +363,8 @@ const MarkdownParagraph = (
   let css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   if (typeof child_css === "string") css = `${css} ${child_css}`;
-  return PaneFragment(id, paragraph, css);
+  let composed = PaneFragment(id, paragraph, css);
+  return <div className="paneFragmentParagraph">{composed}</div>;
 };
 
 const getStoryStepGraph = (graph, targetId) => {
