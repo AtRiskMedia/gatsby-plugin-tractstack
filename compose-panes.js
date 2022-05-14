@@ -34,7 +34,7 @@ function ComposePanes(data) {
           let imageMaskShapeSelector;
           if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
           return {
-            selector: `div#${e?.id}`,
+            selector: imageMaskShapeSelector,
             shape: SvgPane(e?.field_image_mask_shape_mobile, data?.state?.viewport?.viewport?.key)
           };
         });
@@ -61,7 +61,7 @@ function ComposePanes(data) {
           if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
           console.log(imageMaskShapeSelector);
           return {
-            selector: `div#${e?.id}`,
+            selector: imageMaskShapeSelector,
             shape: SvgPane(e?.field_image_mask_shape_desktop, data?.state?.viewport?.viewport?.key)
           };
         });
