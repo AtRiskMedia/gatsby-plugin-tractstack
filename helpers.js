@@ -91,11 +91,11 @@ const lispCallback = (payload, context = "", hooks = []) => {
       break;
 
     default:
-      console.log("MISS on helpers.js lispCallback:", context, command, parameter_one, typeof parameter_one, parameter_two, typeof parameter_two, payload, lisp_data);
+      console.log("MISS on helpers.js lispCallback:", context, command);
   }
 };
 
-const HtmlAstToReact = (children, imageData = [], buttonData = [], hooks = []) => {
+const HtmlAstToReact = (children, imageData = [], buttonData = [], maskData = [], hooks = []) => {
   // recursive function
   // breaks gatsby images free of enclosing p tag
   let contents, raw;
@@ -181,13 +181,31 @@ const HtmlAstToReact = (children, imageData = [], buttonData = [], hooks = []) =
         let extcheck = e?.properties?.src?.match(pass);
 
         if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
-          // imageData in this case is an array ... must find correct element
+          // imageData in this case is an array ... assumes image is first element
           let this_imageData = imageData.filter(image => image.filename === e?.properties?.src)[0]?.localFile?.childImageSharp?.gatsbyImageData;
-          return /*#__PURE__*/React.createElement(GatsbyImage, {
+          let image = /*#__PURE__*/React.createElement(GatsbyImage, {
             key: index,
             alt: e?.properties?.alt,
             image: this_imageData
           });
+          /*
+          if (
+            typeof maskData.imageMaskShape === "object" &&
+            maskData.imageMaskShape
+          ) {
+            maskData.imageMaskShape.map(e => {
+              let this_css = `clip-path:url(#${e?.paneFragment});`;
+              image = (
+                <div key={e?.id} style={{ this_css }}>
+                  {image}
+                </div>
+              );
+            });
+          }
+          //in css paneFragment__mask;
+          */
+
+          return image;
         }
 
         break;
@@ -195,7 +213,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = [], hooks = []) =
       case "p":
         contents = e?.children?.map((p, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([p], imageData, buttonData, hooks);
+          return HtmlAstToReact([p], imageData, buttonData, maskData, hooks);
         }); // is this an image?
 
         if (contents.length === 1 && contents[0][0].props?.image) {
@@ -211,7 +229,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = [], hooks = []) =
       case "ul":
       case "ol":
         raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
+        contents = HtmlAstToReact(raw, imageData, buttonData, maskData, hooks);
         let list;
         if (e?.tagName === "ol") list = /*#__PURE__*/React.createElement("ol", null, contents);
         if (e?.tagName === "ul") list = /*#__PURE__*/React.createElement("ul", null, contents);
@@ -222,7 +240,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = [], hooks = []) =
       case "li":
         contents = e?.children?.map((li, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([li], imageData, buttonData, hooks);
+          return HtmlAstToReact([li], imageData, buttonData, maskData, hooks);
         });
         return /*#__PURE__*/React.createElement("li", {
           key: index
@@ -230,7 +248,7 @@ const HtmlAstToReact = (children, imageData = [], buttonData = [], hooks = []) =
 
       case "blockquote":
         raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        let contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
+        let contents = HtmlAstToReact(raw, imageData, buttonData, maskData, hooks);
 
         if (typeof e?.children[0]?.value === "string") {
           return /*#__PURE__*/React.createElement("blockquote", {
@@ -318,8 +336,8 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_c
   return PaneFragment(id, child, css);
 };
 
-const MarkdownParagraph = (id, htmlAst, imageData = [], buttonData = [], parent_css = "", child_css = "", zIndex, hooks = []) => {
-  const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData, hooks);
+const MarkdownParagraph = (id, htmlAst, imageData = {}, buttonData = {}, maskData = {}, parent_css = "", child_css = "", zIndex, hooks = []) => {
+  const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData, maskData, hooks);
   let css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   if (typeof child_css === "string") css = `${css} ${child_css}`;
@@ -345,14 +363,14 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       animationInDelay = payload?.in[2];
 
   if (typeof animationIn === "string") {
-    css = css + `${selector} { height:100%; opacity: 0; animation-fill-mode: both; ` + `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
+    css = `${css} ${selector} { height:100%; opacity: 0; animation-fill-mode: both; ` + `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
 
     if (typeof animationInSpeed === "number") {
-      css = css + `animation-duration: ` + animationInSpeed + `s; -webkit-animation-duration: ` + animationInSpeed + `s; `;
+      css = `${css} animation-duration: ${animationInSpeed}s; -webkit-animation-duration: ${animationInSpeed}s; `;
     }
 
     if (typeof animationInDelay === "number") {
-      css = css + `animation-delay: ` + animationInDelay + `s; `;
+      css = `${css} animation-delay: ${animationInDelay}s; `;
     }
 
     css = css + "}";
@@ -361,5 +379,9 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize };
+const TextShapeOutside = (shape, viewport, uuid) => {
+  return SvgPane(shape, viewport, uuid, "shape-outside");
+};
+
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize };
 //# sourceMappingURL=helpers.js.map

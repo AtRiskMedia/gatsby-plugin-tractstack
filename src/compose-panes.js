@@ -1,16 +1,20 @@
 import React, { useRef } from "react";
-import { IsVisible } from "./is-visible.js";
+import { renderToStaticMarkup } from "react-dom/server";
 import animateScrollTo from "animated-scroll-to";
+import { v4 as uuidv4 } from "uuid";
+import { IsVisible } from "./is-visible.js";
 import {
   MarkdownParagraph,
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
   InjectSvgShape,
+  TextShapeOutside,
   StyledWrapperDiv,
   InjectCssAnimation,
   getCurrentPane,
 } from "./helpers";
+import { SvgPane } from "./shapes";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
@@ -27,16 +31,80 @@ function ComposePanes(data) {
   }
 
   // loop through the panes in view and render each pane fragment
-  let css = "";
+  let css = "",
+    imageMaskShape,
+    textShapeOutside;
+
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
       // check for background colour
       let background_colour = pane?.relationships?.field_pane_fragments.filter(
         (e) => e?.internal?.type === "paragraph__background_colour"
       );
+      // compose this pane
+      let pane_height, height_offset, this_id;
+      switch (data?.state?.viewport?.viewport?.key) {
+        case "mobile":
+          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
+          height_offset = `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`;
+          this_id = uuidv4();
+          imageMaskShape = pane?.relationships?.field_pane_fragments
+            .filter((e) => e?.field_image_mask_shape_mobile)
+            .map((e) => {
+              return {
+                id: this_id,
+                name: e?.field_image_mask_shape_mobile,
+                paneFragment: e?.id,
+                shape: SvgPane(
+                  e?.field_image_mask_shape_mobile,
+                  data?.state?.viewport?.viewport?.key,
+                  this_id
+                ),
+              };
+            });
+          break;
+        case "tablet":
+          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`;
+          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`;
+          this_id = uuidv4();
+          imageMaskShape = pane?.relationships?.field_pane_fragments
+            .filter((e) => e?.field_image_mask_shape_tablet)
+            .map((e) => {
+              return {
+                id: this_id,
+                name: e?.field_image_mask_shape_tablet,
+                paneFragment: e?.id,
+                shape: SvgPane(
+                  e?.field_image_mask_shape_tablet,
+                  data?.state?.viewport?.viewport?.key,
+                  this_id
+                ),
+              };
+            });
+          break;
+        case "desktop":
+          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
+          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`;
+          this_id = uuidv4();
+          imageMaskShape = pane?.relationships?.field_pane_fragments
+            .filter((e) => e?.field_image_mask_shape_desktop)
+            .map((e) => {
+              return {
+                id: this_id,
+                name: e?.field_image_mask_shape_desktop,
+                paneFragment: e?.id,
+                shape: SvgPane(
+                  e?.field_image_mask_shape_desktop,
+                  data?.state?.viewport?.viewport?.key,
+                  this_id
+                ),
+              };
+            });
+          break;
+      }
 
       // now compose the paneFragments for this pane
-      let composedPane = pane?.relationships?.field_pane_fragments
+      let composedPaneFragments = pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
         .filter(
           (e) =>
@@ -67,6 +135,13 @@ function ComposePanes(data) {
                 pane_fragment?.internal?.type === "paragraph__background_pane"
               )
                 shape = pane_fragment?.field_shape_mobile;
+              if (pane_fragment?.field_text_shape_outside_mobile) {
+                textShapeOutside = TextShapeOutside(
+                  pane_fragment?.field_text_shape_outside_mobile,
+                  data?.state?.viewport?.viewport?.key,
+                  uuidv4()
+                );
+              }
               break;
             case "tablet":
               css_styles = pane_fragment?.field_css_styles_tablet || "";
@@ -76,6 +151,13 @@ function ComposePanes(data) {
                 pane_fragment?.internal?.type === "paragraph__background_pane"
               )
                 shape = pane_fragment?.field_shape_tablet;
+              if (pane_fragment?.field_text_shape_outside_tablet) {
+                textShapeOutside = TextShapeOutside(
+                  pane_fragment?.field_text_shape_outside_tablet,
+                  data?.state?.viewport?.viewport?.key,
+                  uuidv4()
+                );
+              }
               break;
             case "desktop":
               css_styles = pane_fragment?.field_css_styles_desktop || "";
@@ -85,6 +167,13 @@ function ComposePanes(data) {
                 pane_fragment?.internal?.type === "paragraph__background_pane"
               )
                 shape = pane_fragment?.field_shape_desktop;
+              if (pane_fragment?.field_text_shape_outside_desktop) {
+                textShapeOutside = TextShapeOutside(
+                  pane_fragment?.field_text_shape_outside_desktop,
+                  data?.state?.viewport?.viewport?.key,
+                  uuidv4()
+                );
+              }
               break;
           }
 
@@ -114,6 +203,10 @@ function ComposePanes(data) {
                 child,
                 pane_fragment?.relationships?.field_image,
                 buttonData,
+                {
+                  imageMaskShape: imageMaskShape,
+                  textShapeOutside: textShapeOutside,
+                },
                 css_styles_parent,
                 css_styles,
                 pane_fragment?.field_zindex,
@@ -188,24 +281,26 @@ function ComposePanes(data) {
           );
         });
 
-      // compose this pane
-      let pane_height, height_offset;
-      switch (data?.state?.viewport?.viewport?.key) {
-        case "mobile":
-          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
-          height_offset = `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`;
-          break;
-        case "tablet":
-          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`;
-          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`;
-          break;
-        case "desktop":
-          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
-          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`;
-          break;
-      }
       // skip if empty pane
-      if (Object.keys(composedPane).length === 0) return;
+      if (Object.keys(composedPaneFragments).length === 0) return;
+
+      // prepare css for pane
+      css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
+      if (background_colour.length)
+        css = `${css} background-color: ${background_colour[0].field_background_colour};`;
+
+      // inject imageMaskShape(s) (if available)
+      imageMaskShape.map((e) => {
+        let svgString = renderToStaticMarkup(e?.shape);
+        let b64 = window.btoa(svgString);
+        let dataUri = `data:image/svg+xml;base64,${b64}`;
+        css = `${css} #${e?.paneFragment} {
+          -webkit-mask-image: url("${dataUri}");
+            mask-image: url("${dataUri}");
+            mask-repeat: no-repeat;
+            -webkit-mask-size: 100% AUTO;
+            mask-size: 100% AUTO; }`;
+      });
 
       // may we wrap this in animation?
       let effects_payload = {};
@@ -214,7 +309,6 @@ function ComposePanes(data) {
         let effects_payload;
         for (const key in effects) {
           if (effects[key]?.pane === pane?.id) {
-            // inject css animation for each
             effects_payload = {
               in: [
                 effects[key]?.function,
@@ -230,21 +324,14 @@ function ComposePanes(data) {
           }
         }
       }
-
-      // prepare css for pane
-      css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
-      if (background_colour.length)
-        css = `${css} background-color: ${background_colour[0].field_background_colour};`;
       return (
         <section key={pane?.id}>
           <IsVisible id={pane?.id} hooks={data?.hooks}>
             <StyledWrapperDiv
-              className={
-                "pane pane__view--" + data?.state?.viewport?.viewport?.key
-              }
+              className={`pane pane__view pane__view--${data?.state?.viewport?.viewport?.key}`}
               css={css}
             >
-              {composedPane}
+              {composedPaneFragments}
             </StyledWrapperDiv>
           </IsVisible>
         </section>

@@ -28,7 +28,7 @@ const getScrollbarSize = () => {
     body.appendChild(scrollDiv);
 
     // Collect width & height of scrollbar
-    const calculateValue = type =>
+    const calculateValue = (type) =>
       scrollDiv[`offset${type}`] - scrollDiv[`client${type}`];
     const scrollbarWidth = calculateValue("Width");
 
@@ -103,6 +103,7 @@ const HtmlAstToReact = (
   children,
   imageData = [],
   buttonData = [],
+  maskData = [],
   hooks = []
 ) => {
   // recursive function
@@ -152,7 +153,7 @@ const HtmlAstToReact = (
             Object.keys(buttonData).length
           ) {
             let key = Object.keys(buttonData).find(
-              target => buttonData[target]?.urlTarget === e?.properties?.href
+              (target) => buttonData[target]?.urlTarget === e?.properties?.href
             );
             is_button = buttonData[key];
           }
@@ -192,24 +193,41 @@ const HtmlAstToReact = (
         let pass = /\.[A-Za-z0-9]+$/;
         let extcheck = e?.properties?.src?.match(pass);
         if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
-          // imageData in this case is an array ... must find correct element
+          // imageData in this case is an array ... assumes image is first element
           let this_imageData = imageData.filter(
-            image => image.filename === e?.properties?.src
+            (image) => image.filename === e?.properties?.src
           )[0]?.localFile?.childImageSharp?.gatsbyImageData;
-          return (
+          let image = (
             <GatsbyImage
               key={index}
               alt={e?.properties?.alt}
               image={this_imageData}
             />
           );
+          /*
+          if (
+            typeof maskData.imageMaskShape === "object" &&
+            maskData.imageMaskShape
+          ) {
+            maskData.imageMaskShape.map(e => {
+              let this_css = `clip-path:url(#${e?.paneFragment});`;
+              image = (
+                <div key={e?.id} style={{ this_css }}>
+                  {image}
+                </div>
+              );
+            });
+          }
+          //in css paneFragment__mask;
+          */
+          return image;
         }
         break;
 
       case "p":
         contents = e?.children?.map((p, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([p], imageData, buttonData, hooks);
+          return HtmlAstToReact([p], imageData, buttonData, maskData, hooks);
         });
         // is this an image?
         if (contents.length === 1 && contents[0][0].props?.image) {
@@ -223,8 +241,10 @@ const HtmlAstToReact = (
 
       case "ul":
       case "ol":
-        raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
+        raw = e?.children.filter(
+          (e) => !(e.type === "text" && e.value === "\n")
+        );
+        contents = HtmlAstToReact(raw, imageData, buttonData, maskData, hooks);
         let list;
         if (e?.tagName === "ol") list = <ol>{contents}</ol>;
         if (e?.tagName === "ul") list = <ul>{contents}</ul>;
@@ -233,13 +253,21 @@ const HtmlAstToReact = (
       case "li":
         contents = e?.children?.map((li, i) => {
           // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([li], imageData, buttonData, hooks);
+          return HtmlAstToReact([li], imageData, buttonData, maskData, hooks);
         });
         return <li key={index}>{contents}</li>;
 
       case "blockquote":
-        raw = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        let contents = HtmlAstToReact(raw, imageData, buttonData, hooks);
+        raw = e?.children.filter(
+          (e) => !(e.type === "text" && e.value === "\n")
+        );
+        let contents = HtmlAstToReact(
+          raw,
+          imageData,
+          buttonData,
+          maskData,
+          hooks
+        );
         if (typeof e?.children[0]?.value === "string") {
           return <blockquote key={index}>{contents}</blockquote>;
         }
@@ -253,10 +281,10 @@ const HtmlAstToReact = (
 };
 
 const StyledWrapperDiv = styled.div`
-  ${props => props.css};
+  ${(props) => props.css};
 `;
 const StyledWrapperSection = styled.section`
-  ${props => props.css};
+  ${(props) => props.css};
 `;
 
 const PaneFragment = (id, child, css) => {
@@ -334,8 +362,9 @@ const InjectGatsbyBackgroundVideo = (
 const MarkdownParagraph = (
   id,
   htmlAst,
-  imageData = [],
-  buttonData = [],
+  imageData = {},
+  buttonData = {},
+  maskData = {},
   parent_css = "",
   child_css = "",
   zIndex,
@@ -345,6 +374,7 @@ const MarkdownParagraph = (
     htmlAst?.children,
     imageData,
     buttonData,
+    maskData,
     hooks
   );
   let css = `z-index: ${parseInt(zIndex)};`;
@@ -354,7 +384,7 @@ const MarkdownParagraph = (
 };
 
 const getStoryStepGraph = (graph, targetId) => {
-  return graph?.edges?.filter(e => e?.node?.id === targetId)[0];
+  return graph?.edges?.filter((e) => e?.node?.id === targetId)[0];
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
@@ -383,12 +413,17 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
+const TextShapeOutside = (shape, viewport, uuid) => {
+  return SvgPane(shape, viewport, uuid, "shape-outside");
+};
+
 export {
   MarkdownParagraph,
   InjectGatsbyBackgroundImage,
   InjectGatsbyBackgroundVideo,
   InjectSvg,
   InjectSvgShape,
+  TextShapeOutside,
   StyledWrapperDiv,
   StyledWrapperSection,
   PaneFragment,
@@ -396,5 +431,5 @@ export {
   InjectCssAnimation,
   lispCallback,
   getCurrentPane,
-  getScrollbarSize
+  getScrollbarSize,
 };
