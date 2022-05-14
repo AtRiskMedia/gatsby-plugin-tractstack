@@ -24,50 +24,51 @@ function ComposePanes(data) {
     // check for background colour
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // compose this pane
 
-    let pane_height, height_offset;
+    let pane_height, height_offset, this_selector;
 
     switch (data?.state?.viewport?.viewport?.key) {
       case "mobile":
         pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
         height_offset = `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`;
-        imageMaskShape = pane?.relationships?.field_pane_fragments.filter(e => e?.field_image_mask_shape_mobile).map(e => {
-          let imageMaskShapeSelector;
-          if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
-          return {
-            selector: imageMaskShapeSelector,
-            shape: SvgPane(e?.field_image_mask_shape_mobile, data?.state?.viewport?.viewport?.key)
-          };
-        });
         break;
 
       case "tablet":
         pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`;
         height_offset = `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`;
-        imageMaskShape = pane?.relationships?.field_pane_fragments.filter(e => e?.field_image_mask_shape_tablet).map(e => {
-          let imageMaskShapeSelector;
-          if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
-          return {
-            selector: imageMaskShapeSelector,
-            shape: SvgPane(e?.field_image_mask_shape_tablet, data?.state?.viewport?.viewport?.key)
-          };
-        });
         break;
 
       case "desktop":
         pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
         height_offset = `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`;
-        imageMaskShape = pane?.relationships?.field_pane_fragments.filter(e => e?.field_image_mask_shape_desktop).map(e => {
-          let imageMaskShapeSelector;
-          if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
-          console.log(imageMaskShapeSelector);
-          return {
-            selector: imageMaskShapeSelector,
-            shape: SvgPane(e?.field_image_mask_shape_desktop, data?.state?.viewport?.viewport?.key)
-          };
-        });
         break;
-    } // now compose the paneFragments for this pane
+    } // generate imageMaskShape(s)
 
+
+    imageMaskShape = pane?.relationships?.field_pane_fragments.map(e => {
+      let imageMaskShapeSelector;
+      if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
+      let this_pane;
+
+      switch (data?.state?.viewport?.viewport?.key) {
+        case "mobile":
+          this_pane = e?.field_image_mask_shape_mobile;
+          break;
+
+        case "tablet":
+          this_pane = e?.field_image_mask_shape_tablet;
+          break;
+
+        case "desktop":
+          this_pane = e?.field_image_mask_shape_desktop;
+          break;
+      }
+
+      let shape = SvgPane(this_pane, data?.state?.viewport?.viewport?.key);
+      return {
+        selector: imageMaskShapeSelector,
+        shape: shape
+      };
+    }); // now compose the paneFragments for this pane
 
     let composedPaneFragments = pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.state?.viewport?.viewport?.key) == -1) // already processed background_colour
