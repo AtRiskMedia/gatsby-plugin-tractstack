@@ -204,22 +204,6 @@ const HtmlAstToReact = (
               image={this_imageData}
             />
           );
-          /*
-          if (
-            typeof maskData.imageMaskShape === "object" &&
-            maskData.imageMaskShape
-          ) {
-            maskData.imageMaskShape.map(e => {
-              let this_css = `clip-path:url(#${e?.paneFragment});`;
-              image = (
-                <div key={e?.id} style={{ this_css }}>
-                  {image}
-                </div>
-              );
-            });
-          }
-          //in css paneFragment__mask;
-          */
           return image;
         }
         break;
@@ -349,7 +333,6 @@ const InjectGatsbyBackgroundVideo = (
       autoPlay={true}
       muted
       loop
-      id={id}
       title={alt_text}
       className="paneFragmentVideo"
     >
@@ -413,8 +396,8 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
-const TextShapeOutside = (shape, viewport, uuid) => {
-  return SvgPane(shape, viewport, uuid, "shape-outside");
+const TextShapeOutside = (shape, viewport) => {
+  return SvgPane(shape, viewport, "shape-outside");
 };
 
 export {

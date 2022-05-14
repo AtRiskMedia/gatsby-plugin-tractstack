@@ -188,23 +188,6 @@ const HtmlAstToReact = (children, imageData = [], buttonData = [], maskData = []
             alt: e?.properties?.alt,
             image: this_imageData
           });
-          /*
-          if (
-            typeof maskData.imageMaskShape === "object" &&
-            maskData.imageMaskShape
-          ) {
-            maskData.imageMaskShape.map(e => {
-              let this_css = `clip-path:url(#${e?.paneFragment});`;
-              image = (
-                <div key={e?.id} style={{ this_css }}>
-                  {image}
-                </div>
-              );
-            });
-          }
-          //in css paneFragment__mask;
-          */
-
           return image;
         }
 
@@ -326,7 +309,6 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_c
     autoPlay: true,
     muted: true,
     loop: true,
-    id: id,
     title: alt_text,
     className: "paneFragmentVideo"
   }, /*#__PURE__*/React.createElement("source", {
@@ -379,8 +361,8 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
-const TextShapeOutside = (shape, viewport, uuid) => {
-  return SvgPane(shape, viewport, uuid, "shape-outside");
+const TextShapeOutside = (shape, viewport) => {
+  return SvgPane(shape, viewport, "shape-outside");
 };
 
 export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize };

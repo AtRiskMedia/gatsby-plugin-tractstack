@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import animateScrollTo from "animated-scroll-to";
-import { v4 as uuidv4 } from "uuid";
 import { IsVisible } from "./is-visible.js";
 import {
   MarkdownParagraph,
@@ -42,23 +41,19 @@ function ComposePanes(data) {
         (e) => e?.internal?.type === "paragraph__background_colour"
       );
       // compose this pane
-      let pane_height, height_offset, this_id;
+      let pane_height, height_offset;
       switch (data?.state?.viewport?.viewport?.key) {
         case "mobile":
           pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
           height_offset = `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`;
-          this_id = uuidv4();
           imageMaskShape = pane?.relationships?.field_pane_fragments
             .filter((e) => e?.field_image_mask_shape_mobile)
             .map((e) => {
               return {
-                id: this_id,
-                name: e?.field_image_mask_shape_mobile,
-                paneFragment: e?.id,
+                selector: `div#${e?.id}`,
                 shape: SvgPane(
                   e?.field_image_mask_shape_mobile,
-                  data?.state?.viewport?.viewport?.key,
-                  this_id
+                  data?.state?.viewport?.viewport?.key
                 ),
               };
             });
@@ -66,18 +61,18 @@ function ComposePanes(data) {
         case "tablet":
           pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`;
           height_offset = `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`;
-          this_id = uuidv4();
           imageMaskShape = pane?.relationships?.field_pane_fragments
             .filter((e) => e?.field_image_mask_shape_tablet)
             .map((e) => {
+              let imageMaskShapeSelector;
+              if (e?.internal?.type === "paragraph__background_video")
+                imageMaskShapeSelector = ".paneFragmentVideo";
+              else imageMaskShapeSelector = `div#${e?.id}`;
               return {
-                id: this_id,
-                name: e?.field_image_mask_shape_tablet,
-                paneFragment: e?.id,
+                selector: imageMaskShapeSelector,
                 shape: SvgPane(
                   e?.field_image_mask_shape_tablet,
-                  data?.state?.viewport?.viewport?.key,
-                  this_id
+                  data?.state?.viewport?.viewport?.key
                 ),
               };
             });
@@ -85,18 +80,14 @@ function ComposePanes(data) {
         case "desktop":
           pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
           height_offset = `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`;
-          this_id = uuidv4();
           imageMaskShape = pane?.relationships?.field_pane_fragments
             .filter((e) => e?.field_image_mask_shape_desktop)
             .map((e) => {
               return {
-                id: this_id,
-                name: e?.field_image_mask_shape_desktop,
-                paneFragment: e?.id,
+                selector: `div#${e?.id}`,
                 shape: SvgPane(
                   e?.field_image_mask_shape_desktop,
-                  data?.state?.viewport?.viewport?.key,
-                  this_id
+                  data?.state?.viewport?.viewport?.key
                 ),
               };
             });
@@ -138,8 +129,7 @@ function ComposePanes(data) {
               if (pane_fragment?.field_text_shape_outside_mobile) {
                 textShapeOutside = TextShapeOutside(
                   pane_fragment?.field_text_shape_outside_mobile,
-                  data?.state?.viewport?.viewport?.key,
-                  uuidv4()
+                  data?.state?.viewport?.viewport?.key
                 );
               }
               break;
@@ -154,8 +144,7 @@ function ComposePanes(data) {
               if (pane_fragment?.field_text_shape_outside_tablet) {
                 textShapeOutside = TextShapeOutside(
                   pane_fragment?.field_text_shape_outside_tablet,
-                  data?.state?.viewport?.viewport?.key,
-                  uuidv4()
+                  data?.state?.viewport?.viewport?.key
                 );
               }
               break;
@@ -170,8 +159,7 @@ function ComposePanes(data) {
               if (pane_fragment?.field_text_shape_outside_desktop) {
                 textShapeOutside = TextShapeOutside(
                   pane_fragment?.field_text_shape_outside_desktop,
-                  data?.state?.viewport?.viewport?.key,
-                  uuidv4()
+                  data?.state?.viewport?.viewport?.key
                 );
               }
               break;
@@ -204,7 +192,6 @@ function ComposePanes(data) {
                 pane_fragment?.relationships?.field_image,
                 buttonData,
                 {
-                  imageMaskShape: imageMaskShape,
                   textShapeOutside: textShapeOutside,
                 },
                 css_styles_parent,
@@ -291,15 +278,14 @@ function ComposePanes(data) {
 
       // inject imageMaskShape(s) (if available)
       imageMaskShape.map((e) => {
-        let svgString = renderToStaticMarkup(e?.shape);
-        let b64 = window.btoa(svgString);
-        let dataUri = `data:image/svg+xml;base64,${b64}`;
-        css = `${css} #${e?.paneFragment} {
-          -webkit-mask-image: url("${dataUri}");
-            mask-image: url("${dataUri}");
-            mask-repeat: no-repeat;
-            -webkit-mask-size: 100% AUTO;
-            mask-size: 100% AUTO; }`;
+        if (typeof e?.shape === "object") {
+          let svgString = renderToStaticMarkup(e?.shape);
+          let b64 = window.btoa(svgString);
+          let dataUri = `data:image/svg+xml;base64,${b64}`;
+          css =
+            `${css} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+            ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+        }
       });
 
       // may we wrap this in animation?
@@ -324,6 +310,7 @@ function ComposePanes(data) {
           }
         }
       }
+      console.log(css);
       return (
         <section key={pane?.id}>
           <IsVisible id={pane?.id} hooks={data?.hooks}>

@@ -18,7 +18,7 @@ function TractStackLogo() {
   })));
 }
 
-function SvgPane(layout, viewport, uuid, mode = false) {
+function SvgPane(layout, viewport, mode = false) {
   const SvgPanes = {
     mini: {
       mobile: {
@@ -230,7 +230,6 @@ function SvgPane(layout, viewport, uuid, mode = false) {
     let this_className = `svg svg__${layout} svg__${layout}--${viewport}`;
     return /*#__PURE__*/React.createElement("svg", {
       id: `svg__${layout}--${viewport}`,
-      key: uuid,
       "data-name": `svg__${layout}--${viewport}`,
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: `0 0 ${SvgPanes[layout][viewport]["viewBox"][0]} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
