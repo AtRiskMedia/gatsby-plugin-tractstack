@@ -261,9 +261,7 @@ const PaneFragment = (id, child, css) => {
     key: id,
     css: this_css
   }, child);
-}; // pre-rendered svg shapes for each viewport
-// relies on shapes.js
-
+};
 
 const InjectSvgShape = (id, shape, viewport, parent_css = "", zIndex) => {
   let css = `z-index: ${parseInt(zIndex)};`;

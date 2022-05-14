@@ -228,7 +228,7 @@ function SvgPane(layout, viewport, mode = false) {
 
   if (SvgPanes[layout]) {
     let this_className = `svg svg__${layout} svg__${layout}--${viewport}`;
-    return /*#__PURE__*/React.createElement("svg", {
+    if (SvgPanes[layout] && SvgPanes[layout][viewport] && SvgPanes[layout][viewport]["viewBox"]) return /*#__PURE__*/React.createElement("svg", {
       id: `svg__${layout}--${viewport}`,
       "data-name": `svg__${layout}--${viewport}`,
       xmlns: "http://www.w3.org/2000/svg",

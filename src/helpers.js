@@ -280,8 +280,6 @@ const PaneFragment = (id, child, css) => {
   );
 };
 
-// pre-rendered svg shapes for each viewport
-// relies on shapes.js
 const InjectSvgShape = (id, shape, viewport, parent_css = "", zIndex) => {
   let css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} ${parent_css}`;

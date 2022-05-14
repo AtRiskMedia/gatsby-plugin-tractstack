@@ -234,20 +234,25 @@ function SvgPane(layout, viewport, mode = false) {
 
   if (SvgPanes[layout]) {
     let this_className = `svg svg__${layout} svg__${layout}--${viewport}`;
-    return (
-      <svg
-        id={`svg__${layout}--${viewport}`}
-        data-name={`svg__${layout}--${viewport}`}
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox={`0 0 ${SvgPanes[layout][viewport]["viewBox"][0]} ${SvgPanes[layout][viewport]["viewBox"][1]}`}
-        className={this_className}
-      >
-        <desc id="desc">decorative background</desc>
-        <g>
-          <path d={SvgPanes[layout][viewport]["path"]} />
-        </g>
-      </svg>
-    );
+    if (
+      SvgPanes[layout] &&
+      SvgPanes[layout][viewport] &&
+      SvgPanes[layout][viewport]["viewBox"]
+    )
+      return (
+        <svg
+          id={`svg__${layout}--${viewport}`}
+          data-name={`svg__${layout}--${viewport}`}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox={`0 0 ${SvgPanes[layout][viewport]["viewBox"][0]} ${SvgPanes[layout][viewport]["viewBox"][1]}`}
+          className={this_className}
+        >
+          <desc id="desc">decorative background</desc>
+          <g>
+            <path d={SvgPanes[layout][viewport]["path"]} />
+          </g>
+        </svg>
+      );
     return "";
   }
 }

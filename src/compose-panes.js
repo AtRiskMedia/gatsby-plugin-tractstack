@@ -49,6 +49,10 @@ function ComposePanes(data) {
           imageMaskShape = pane?.relationships?.field_pane_fragments
             .filter((e) => e?.field_image_mask_shape_mobile)
             .map((e) => {
+              let imageMaskShapeSelector;
+              if (e?.internal?.type === "paragraph__background_video")
+                imageMaskShapeSelector = ".paneFragmentVideo";
+              else imageMaskShapeSelector = `div#${e?.id}`;
               return {
                 selector: `div#${e?.id}`,
                 shape: SvgPane(
@@ -83,6 +87,11 @@ function ComposePanes(data) {
           imageMaskShape = pane?.relationships?.field_pane_fragments
             .filter((e) => e?.field_image_mask_shape_desktop)
             .map((e) => {
+              let imageMaskShapeSelector;
+              if (e?.internal?.type === "paragraph__background_video")
+                imageMaskShapeSelector = ".paneFragmentVideo";
+              else imageMaskShapeSelector = `div#${e?.id}`;
+              console.log(imageMaskShapeSelector);
               return {
                 selector: `div#${e?.id}`,
                 shape: SvgPane(
@@ -310,7 +319,6 @@ function ComposePanes(data) {
           }
         }
       }
-      console.log(css);
       return (
         <section key={pane?.id}>
           <IsVisible id={pane?.id} hooks={data?.hooks}>

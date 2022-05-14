@@ -31,6 +31,8 @@ function ComposePanes(data) {
         pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
         height_offset = `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`;
         imageMaskShape = pane?.relationships?.field_pane_fragments.filter(e => e?.field_image_mask_shape_mobile).map(e => {
+          let imageMaskShapeSelector;
+          if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
           return {
             selector: `div#${e?.id}`,
             shape: SvgPane(e?.field_image_mask_shape_mobile, data?.state?.viewport?.viewport?.key)
@@ -55,6 +57,9 @@ function ComposePanes(data) {
         pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
         height_offset = `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`;
         imageMaskShape = pane?.relationships?.field_pane_fragments.filter(e => e?.field_image_mask_shape_desktop).map(e => {
+          let imageMaskShapeSelector;
+          if (e?.internal?.type === "paragraph__background_video") imageMaskShapeSelector = ".paneFragmentVideo";else imageMaskShapeSelector = `div#${e?.id}`;
+          console.log(imageMaskShapeSelector);
           return {
             selector: `div#${e?.id}`,
             shape: SvgPane(e?.field_image_mask_shape_desktop, data?.state?.viewport?.viewport?.key)
@@ -195,7 +200,6 @@ function ComposePanes(data) {
       }
     }
 
-    console.log(css);
     return /*#__PURE__*/React.createElement("section", {
       key: pane?.id
     }, /*#__PURE__*/React.createElement(IsVisible, {
