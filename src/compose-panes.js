@@ -12,6 +12,7 @@ import {
   StyledWrapperDiv,
   InjectCssAnimation,
   getCurrentPane,
+  thisViewportValue,
 } from "./helpers";
 import { SvgPane } from "./shapes";
 
@@ -41,37 +42,35 @@ function ComposePanes(data) {
         (e) => e?.internal?.type === "paragraph__background_colour"
       );
       // compose this pane
-      let pane_height, height_offset, this_selector, shape;
-      switch (data?.state?.viewport?.viewport?.key) {
-        case "mobile":
-          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`;
-          height_offset = `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`;
-          break;
-        case "tablet":
-          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`;
-          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`;
-          break;
-        case "desktop":
-          pane_height = `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`;
-          height_offset = `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`;
-          break;
-      }
+      let this_selector, shape;
+      let pane_height = thisViewportValue(
+        data?.state?.viewport?.viewport?.key,
+        {
+          mobile: `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`,
+          tablet: `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`,
+          desktop: `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`,
+        }
+      );
+      let height_offset = thisViewportValue(
+        data?.state?.viewport?.viewport?.key,
+        {
+          mobile: `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`,
+          tablet: `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`,
+          desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`,
+        }
+      );
       // generate imageMaskShape(s)
       imageMaskShape = pane?.relationships?.field_pane_fragments
         .map((e) => {
-          let imageMaskShapeSelector, this_pane;
-          switch (data?.state?.viewport?.viewport?.key) {
-            case "mobile":
-              this_pane = e?.field_image_mask_shape_mobile;
-              break;
-            case "tablet":
-              this_pane = e?.field_image_mask_shape_tablet;
-              break;
-            case "desktop":
-              this_pane = e?.field_image_mask_shape_desktop;
-              break;
-          }
-
+          let imageMaskShapeSelector;
+          let this_pane = thisViewportValue(
+            data?.state?.viewport?.viewport?.key,
+            {
+              mobile: e?.field_image_mask_shape_mobile,
+              tablet: e?.field_image_mask_shape_tablet,
+              desktop: e?.field_image_mask_shape_desktop,
+            }
+          );
           if (typeof this_pane === "string" && this_pane !== "none") {
             shape = SvgPane(this_pane, data?.state?.viewport?.viewport?.key);
             switch (e?.internal?.type) {
@@ -84,7 +83,6 @@ function ComposePanes(data) {
               case "paragraph__svg":
                 imageMaskShapeSelector = ".paneFragmentSvg";
                 break;
-
               case "paragraph__markdown":
                 imageMaskShapeSelector = ".paneFragmentParagraph";
                 break;
@@ -127,53 +125,38 @@ function ComposePanes(data) {
             css_styles_parent;
 
           // select css for viewport
-          switch (data?.state?.viewport?.viewport?.key) {
-            case "mobile":
-              css_styles = pane_fragment?.field_css_styles_mobile || "";
-              css_styles_parent =
-                pane_fragment?.field_css_styles_parent_mobile || "";
-              if (
-                pane_fragment?.internal?.type === "paragraph__background_pane"
-              )
-                shape = pane_fragment?.field_shape_mobile;
-              if (pane_fragment?.field_text_shape_outside_mobile) {
-                textShapeOutside = TextShapeOutside(
-                  pane_fragment?.field_text_shape_outside_mobile,
-                  data?.state?.viewport?.viewport?.key
-                );
-              }
-              break;
-            case "tablet":
-              css_styles = pane_fragment?.field_css_styles_tablet || "";
-              css_styles_parent =
-                pane_fragment?.field_css_styles_parent_tablet || "";
-              if (
-                pane_fragment?.internal?.type === "paragraph__background_pane"
-              )
-                shape = pane_fragment?.field_shape_tablet;
-              if (pane_fragment?.field_text_shape_outside_tablet) {
-                textShapeOutside = TextShapeOutside(
-                  pane_fragment?.field_text_shape_outside_tablet,
-                  data?.state?.viewport?.viewport?.key
-                );
-              }
-              break;
-            case "desktop":
-              css_styles = pane_fragment?.field_css_styles_desktop || "";
-              css_styles_parent =
-                pane_fragment?.field_css_styles_parent_desktop || "";
-              if (
-                pane_fragment?.internal?.type === "paragraph__background_pane"
-              )
-                shape = pane_fragment?.field_shape_desktop;
-              if (pane_fragment?.field_text_shape_outside_desktop) {
-                textShapeOutside = TextShapeOutside(
-                  pane_fragment?.field_text_shape_outside_desktop,
-                  data?.state?.viewport?.viewport?.key
-                );
-              }
-              break;
-          }
+          css_styles = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+            mobile: pane_fragment?.field_css_styles_mobile || "",
+            tablet: pane_fragment?.field_css_styles_tablet || "",
+            desktop: pane_fragment?.field_css_styles_desktop || "",
+          });
+          css_styles_parent = thisViewportValue(
+            data?.state?.viewport?.viewport?.key,
+            {
+              mobile: pane_fragment?.field_css_styles_parent_mobile || "",
+              tablet: pane_fragment?.field_css_styles_parent_tablet || "",
+              desktop: pane_fragment?.field_css_styles_parent_desktop || "",
+            }
+          );
+          if (pane_fragment?.internal?.type === "paragraph__background_pane")
+            shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+              mobile: pane_fragment?.field_shape_mobile,
+              tablet: pane_fragment?.field_shape_tablet,
+              desktop: pane_fragment?.field_shape_desktop,
+            });
+          let has_shape_outside = thisViewportValue(
+            data?.state?.viewport?.viewport?.key,
+            {
+              mobile: pane_fragment?.field_text_shape_outside_mobile,
+              tablet: pane_fragment?.field_text_shape_outside_tablet,
+              desktop: pane_fragment?.field_text_shape_outside_desktop,
+            }
+          );
+          if (has_shape_outside)
+            textShapeOutside = TextShapeOutside(
+              has_shape_outside,
+              data?.state?.viewport?.viewport?.key
+            );
 
           // render this paneFragment
           switch (pane_fragment?.internal?.type) {

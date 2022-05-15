@@ -366,5 +366,9 @@ const TextShapeOutside = (shape, viewport) => {
   return SvgPane(shape, viewport, "shape-outside");
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize };
+const thisViewportValue = (viewport, value) => {
+  return value[viewport];
+};
+
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue };
 //# sourceMappingURL=helpers.js.map

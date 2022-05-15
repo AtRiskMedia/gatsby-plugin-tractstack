@@ -401,6 +401,10 @@ const TextShapeOutside = (shape, viewport) => {
   return SvgPane(shape, viewport, "shape-outside");
 };
 
+const thisViewportValue = (viewport, value) => {
+  return value[viewport];
+};
+
 export {
   MarkdownParagraph,
   InjectGatsbyBackgroundImage,
@@ -416,4 +420,5 @@ export {
   lispCallback,
   getCurrentPane,
   getScrollbarSize,
+  thisViewportValue,
 };
