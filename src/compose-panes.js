@@ -8,7 +8,6 @@ import {
   InjectGatsbyBackgroundVideo,
   InjectSvg,
   InjectSvgShape,
-  TextShapeOutside,
   StyledWrapperDiv,
   InjectCssAnimation,
   getCurrentPane,
@@ -31,12 +30,11 @@ function ComposePanes(data) {
   }
 
   // loop through the panes in view and render each pane fragment
-  let css = "",
-    imageMaskShape,
-    textShapeOutside;
-
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
+      let css = "",
+        imageMaskShapes = {},
+        textShapeOutsides = {};
       // check for background colour
       let background_colour = pane?.relationships?.field_pane_fragments.filter(
         (e) => e?.internal?.type === "paragraph__background_colour"
@@ -60,7 +58,7 @@ function ComposePanes(data) {
         }
       );
       // generate imageMaskShape(s)
-      imageMaskShape = pane?.relationships?.field_pane_fragments
+      imageMaskShapes = pane?.relationships?.field_pane_fragments
         .map((e) => {
           let imageMaskShapeSelector;
           let this_pane = thisViewportValue(
@@ -88,7 +86,7 @@ function ComposePanes(data) {
                 break;
               default:
                 console.log(
-                  "compose-panes.js > imageMaskShape: miss on",
+                  "compose-panes.js > imageMaskShapes: miss on",
                   e?.internal?.type
                 );
             }
@@ -121,6 +119,7 @@ function ComposePanes(data) {
             alt_text,
             imageData,
             shape,
+            maskData,
             css_styles,
             css_styles_parent;
 
@@ -152,11 +151,22 @@ function ComposePanes(data) {
               desktop: pane_fragment?.field_text_shape_outside_desktop,
             }
           );
-          if (has_shape_outside)
-            textShapeOutside = TextShapeOutside(
+          if (has_shape_outside && has_shape_outside !== "none") {
+            let textShapeOutside = SvgPane(
               has_shape_outside,
-              data?.state?.viewport?.viewport?.key
+              data?.state?.viewport?.viewport?.key,
+              "shape-outside"
             );
+            if (textShapeOutside)
+              maskData = {
+                textShapeOutside: textShapeOutside,
+              };
+            // store and inject into pane
+            textShapeOutsides[Object.keys(textShapeOutsides).length] = {
+              left: textShapeOutside?.left_mask,
+              right: textShapeOutside?.right_mask,
+            };
+          }
 
           // render this paneFragment
           switch (pane_fragment?.internal?.type) {
@@ -184,9 +194,7 @@ function ComposePanes(data) {
                 child,
                 pane_fragment?.relationships?.field_image,
                 buttonData,
-                {
-                  textShapeOutside: textShapeOutside,
-                },
+                maskData,
                 css_styles_parent,
                 css_styles,
                 pane_fragment?.field_zindex,
@@ -270,17 +278,28 @@ function ComposePanes(data) {
         css = `${css} background-color: ${background_colour[0].field_background_colour};`;
 
       // inject imageMaskShape(s) (if available)
-      imageMaskShape.map((e) => {
-        if (typeof e?.shape === "object") {
-          let svgString = renderToStaticMarkup(e?.shape);
-          let b64 = window.btoa(svgString);
-          let dataUri = `data:image/svg+xml;base64,${b64}`;
-          css =
-            `${css} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
-            ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
-        }
-      });
-
+      if (Object.keys(imageMaskShapes).length)
+        imageMaskShapes.map((e) => {
+          if (typeof e?.shape === "object") {
+            let svgString = renderToStaticMarkup(e?.shape);
+            let b64 = window.btoa(svgString);
+            let dataUri = `data:image/svg+xml;base64,${b64}`;
+            css =
+              `${css} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+              ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+          }
+        });
+      // inject textShapeOutside(s) (if available)
+      if (Object.keys(textShapeOutsides).length)
+        Object.keys(textShapeOutsides).map((i) => {
+          console.log(textShapeOutsides[i]);
+          css = `${css} .paneFragmentParagraph { .left-mask {float:left;shape-outside:url(${textShapeOutsides[i]?.left})} .right-mask {float:right;shape-outside:url(${textShapeOutsides[i]?.right})} }`;
+        });
+      /*
+        textShapeOutsides.map(e => {
+          console.log(1, e);
+        });
+        */
       // may we wrap this in animation?
       let effects_payload = {};
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {

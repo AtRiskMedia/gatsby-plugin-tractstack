@@ -318,10 +318,19 @@ const InjectGatsbyBackgroundVideo = (id, url, alt_text, parent_css = "", child_c
 
 const MarkdownParagraph = (id, htmlAst, imageData = {}, buttonData = {}, maskData = {}, parent_css = "", child_css = "", zIndex, hooks = []) => {
   const paragraph = HtmlAstToReact(htmlAst?.children, imageData, buttonData, maskData, hooks);
-  let css = `z-index: ${parseInt(zIndex)};`;
+  let has_shape_outside,
+      css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   if (typeof child_css === "string") css = `${css} ${child_css}`;
-  let composed = PaneFragment(id, paragraph, css);
+  let composed = PaneFragment(id, paragraph, css); // inject textShapeOutside(s) (if available)
+
+  if (Object.keys(maskData).length && typeof maskData?.textShapeOutside?.left_mask === "string" && typeof maskData?.textShapeOutside?.right_mask === "string") {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "paneFragmentParagraph"
+    }, maskData?.textShapeOutside?.left, maskData?.textShapeOutside?.right, composed);
+  } // else render paragraph with shapeOutside
+
+
   return /*#__PURE__*/React.createElement("div", {
     className: "paneFragmentParagraph"
   }, composed);
@@ -370,5 +379,10 @@ const thisViewportValue = (viewport, value) => {
   return value[viewport];
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue };
+const viewportWidth = {
+  mobile: 600,
+  tablet: 1080,
+  desktop: 1920
+};
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
 //# sourceMappingURL=helpers.js.map

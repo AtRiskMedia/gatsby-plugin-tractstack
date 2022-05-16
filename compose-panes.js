@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import animateScrollTo from "animated-scroll-to";
 import { IsVisible } from "./is-visible.js";
-import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, InjectCssAnimation, getCurrentPane, thisViewportValue } from "./helpers";
+import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, StyledWrapperDiv, InjectCssAnimation, getCurrentPane, thisViewportValue } from "./helpers";
 import { SvgPane } from "./shapes";
 
 function ComposePanes(data) {
@@ -17,11 +17,11 @@ function ComposePanes(data) {
   } // loop through the panes in view and render each pane fragment
 
 
-  let css = "",
-      imageMaskShape,
-      textShapeOutside;
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
-    // check for background colour
+    let css = "",
+        imageMaskShapes = {},
+        textShapeOutsides = {}; // check for background colour
+
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // compose this pane
 
     let this_selector, shape;
@@ -36,7 +36,7 @@ function ComposePanes(data) {
       desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`
     }); // generate imageMaskShape(s)
 
-    imageMaskShape = pane?.relationships?.field_pane_fragments.map(e => {
+    imageMaskShapes = pane?.relationships?.field_pane_fragments.map(e => {
       let imageMaskShapeSelector;
       let this_pane = thisViewportValue(data?.state?.viewport?.viewport?.key, {
         mobile: e?.field_image_mask_shape_mobile,
@@ -65,7 +65,7 @@ function ComposePanes(data) {
             break;
 
           default:
-            console.log("compose-panes.js > imageMaskShape: miss on", e?.internal?.type);
+            console.log("compose-panes.js > imageMaskShapes: miss on", e?.internal?.type);
         }
       }
 
@@ -81,7 +81,7 @@ function ComposePanes(data) {
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.state?.viewport?.viewport?.key) == -1) // already processed background_colour
     .filter(e => e?.internal?.type !== "paragraph__background_colour") // sort by zIndex ***important
     .sort((a, b) => a?.field_zindex > b?.field_zindex ? 1 : -1).map((pane_fragment, index) => {
-      let react_fragment, alt_text, imageData, shape, css_styles, css_styles_parent; // select css for viewport
+      let react_fragment, alt_text, imageData, shape, maskData, css_styles, css_styles_parent; // select css for viewport
 
       css_styles = thisViewportValue(data?.state?.viewport?.viewport?.key, {
         mobile: pane_fragment?.field_css_styles_mobile || "",
@@ -103,7 +103,19 @@ function ComposePanes(data) {
         tablet: pane_fragment?.field_text_shape_outside_tablet,
         desktop: pane_fragment?.field_text_shape_outside_desktop
       });
-      if (has_shape_outside) textShapeOutside = TextShapeOutside(has_shape_outside, data?.state?.viewport?.viewport?.key); // render this paneFragment
+
+      if (has_shape_outside && has_shape_outside !== "none") {
+        let textShapeOutside = SvgPane(has_shape_outside, data?.state?.viewport?.viewport?.key, "shape-outside");
+        if (textShapeOutside) maskData = {
+          textShapeOutside: textShapeOutside
+        }; // store and inject into pane
+
+        textShapeOutsides[Object.keys(textShapeOutsides).length] = {
+          left: textShapeOutside?.left_mask,
+          right: textShapeOutside?.right_mask
+        };
+      } // render this paneFragment
+
 
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
@@ -122,9 +134,7 @@ function ComposePanes(data) {
             }
           }
 
-          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, buttonData, {
-            textShapeOutside: textShapeOutside
-          }, css_styles_parent, css_styles, pane_fragment?.field_zindex, data?.hooks);
+          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, buttonData, maskData, css_styles_parent, css_styles, pane_fragment?.field_zindex, data?.hooks);
           break;
 
         case "paragraph__background_pane":
@@ -168,14 +178,25 @@ function ComposePanes(data) {
     css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
     if (background_colour.length) css = `${css} background-color: ${background_colour[0].field_background_colour};`; // inject imageMaskShape(s) (if available)
 
-    imageMaskShape.map(e => {
+    if (Object.keys(imageMaskShapes).length) imageMaskShapes.map(e => {
       if (typeof e?.shape === "object") {
         let svgString = renderToStaticMarkup(e?.shape);
         let b64 = window.btoa(svgString);
         let dataUri = `data:image/svg+xml;base64,${b64}`;
         css = `${css} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
       }
-    }); // may we wrap this in animation?
+    }); // inject textShapeOutside(s) (if available)
+
+    if (Object.keys(textShapeOutsides).length) Object.keys(textShapeOutsides).map(i => {
+      console.log(textShapeOutsides[i]);
+      css = `${css} .paneFragmentParagraph { .left-mask {float:left;shape-outside:url(${textShapeOutsides[i]?.left})} .right-mask {float:right;shape-outside:url(${textShapeOutsides[i]?.right})} }`;
+    });
+    /*
+      textShapeOutsides.map(e => {
+        console.log(1, e);
+      });
+      */
+    // may we wrap this in animation?
 
     let effects_payload = {};
 

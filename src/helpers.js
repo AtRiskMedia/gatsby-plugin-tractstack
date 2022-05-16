@@ -360,10 +360,26 @@ const MarkdownParagraph = (
     maskData,
     hooks
   );
-  let css = `z-index: ${parseInt(zIndex)};`;
+  let has_shape_outside,
+    css = `z-index: ${parseInt(zIndex)};`;
   if (typeof parent_css === "string") css = `${css} ${parent_css}`;
   if (typeof child_css === "string") css = `${css} ${child_css}`;
   let composed = PaneFragment(id, paragraph, css);
+  // inject textShapeOutside(s) (if available)
+  if (
+    Object.keys(maskData).length &&
+    typeof maskData?.textShapeOutside?.left_mask === "string" &&
+    typeof maskData?.textShapeOutside?.right_mask === "string"
+  ) {
+    return (
+      <div className="paneFragmentParagraph">
+        {maskData?.textShapeOutside?.left}
+        {maskData?.textShapeOutside?.right}
+        {composed}
+      </div>
+    );
+  }
+  // else render paragraph with shapeOutside
   return <div className="paneFragmentParagraph">{composed}</div>;
 };
 
@@ -405,6 +421,12 @@ const thisViewportValue = (viewport, value) => {
   return value[viewport];
 };
 
+const viewportWidth = {
+  mobile: 600,
+  tablet: 1080,
+  desktop: 1920,
+};
+
 export {
   MarkdownParagraph,
   InjectGatsbyBackgroundImage,
@@ -421,4 +443,5 @@ export {
   getCurrentPane,
   getScrollbarSize,
   thisViewportValue,
+  viewportWidth,
 };
