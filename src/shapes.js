@@ -327,11 +327,79 @@ function SvgPane(layout, viewport, mode = false) {
           </g>
         </svg>
       );
+
+      let left_mask = (
+        <svg
+          id={`svg-shape-outside-mask__${layout}-left--${viewport}`}
+          data-name={`svg-shape-outside-mask__${layout}-left--${viewport}`}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox={`0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${
+            SvgPanes[layout][viewport]["viewBox"][1]
+          }`}
+          className={`${this_className} left`}
+        >
+          <desc id="desc">decorative background</desc>
+          <mask id={`svg__${layout}-left--${viewport}`}>
+            <rect
+              fill="white"
+              width={SvgPanes[layout][viewport]["cut"]}
+              height={SvgPanes[layout][viewport]["viewBox"][1]}
+            ></rect>
+            <g>
+              <path d={SvgPanes[layout][viewport]["path"]} />
+            </g>
+          </mask>
+          <rect
+            mask={`url(#svg__${layout}-left--${viewport})`}
+            width={SvgPanes[layout][viewport]["cut"]}
+            height={SvgPanes[layout][viewport]["viewBox"][1]}
+          ></rect>
+        </svg>
+      );
+      let right_mask = (
+        <svg
+          id={`svg-shape-outside-mask__${layout}-right--${viewport}`}
+          data-name={`svg-shape-outside-mask__${layout}-right--${viewport}`}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox={`${parseInt(SvgPanes[layout][viewport]["cut"])} 0 ${parseInt(
+            SvgPanes[layout][viewport]["viewBox"][0]
+          )} ${SvgPanes[layout][viewport]["viewBox"][1]}`}
+          className={`${this_className} right`}
+        >
+          <desc id="desc">decorative background</desc>
+          <mask id={`svg__${layout}-right--${viewport}`}>
+            <rect
+              fill="white"
+              width={parseInt(
+                SvgPanes[layout][viewport]["viewBox"][0] -
+                  SvgPanes[layout][viewport]["cut"]
+              )}
+              height={SvgPanes[layout][viewport]["viewBox"][1]}
+            ></rect>
+            <g
+              transform={`translate(${parseInt(
+                -SvgPanes[layout][viewport]["cut"]
+              )} 0)`}
+            >
+              <path d={SvgPanes[layout][viewport]["path"]} />
+            </g>
+          </mask>
+          <rect
+            mask={`url(#svg__${layout}-right--${viewport})`}
+            width={parseInt(
+              SvgPanes[layout][viewport]["viewBox"][0] -
+                SvgPanes[layout][viewport]["cut"]
+            )}
+            height={SvgPanes[layout][viewport]["viewBox"][1]}
+          ></rect>
+        </svg>
+      );
+
       // render to base64
-      let svgStringLeft = renderToStaticMarkup(left);
+      let svgStringLeft = renderToStaticMarkup(left_mask);
       let b64Left = window.btoa(svgStringLeft);
       let dataUriLeft = `data:image/svg+xml;base64,${b64Left}`;
-      let svgStringRight = renderToStaticMarkup(right);
+      let svgStringRight = renderToStaticMarkup(right_mask);
       let b64Right = window.btoa(svgStringRight);
       let dataUriRight = `data:image/svg+xml;base64,${b64Right}`;
       // return shape-outside
