@@ -196,12 +196,13 @@ const HtmlAstToReact = (
           // imageData in this case is an array ... assumes image is first element
           let this_imageData = imageData.filter(
             (image) => image.filename === e?.properties?.src
-          )[0]?.localFile?.childImageSharp?.gatsbyImageData;
+          )[0]?.data?.childImageSharp?.gatsbyImageData;
           let image = (
             <GatsbyImage
               key={index}
               alt={e?.properties?.alt}
               image={this_imageData}
+              objectFit="contain"
             />
           );
           return image;

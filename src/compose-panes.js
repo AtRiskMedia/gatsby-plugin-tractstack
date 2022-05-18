@@ -117,7 +117,7 @@ function ComposePanes(data) {
         .map((pane_fragment, index) => {
           let react_fragment,
             alt_text,
-            imageData,
+            imageData = [],
             shape,
             maskData,
             css_styles,
@@ -167,6 +167,23 @@ function ComposePanes(data) {
               right: textShapeOutside?.right_mask,
             };
           }
+          // prepare any images from this paneFragment
+          pane_fragment?.relationships?.field_image.map((e) => {
+            let this_image = thisViewportValue(
+              data?.state?.viewport?.viewport?.key,
+              {
+                mobile: e?.mobile,
+                tablet: e?.tablet,
+                desktop: e?.desktop,
+              }
+            );
+            if (this_image)
+              imageData.push({
+                id: e?.id,
+                filename: e?.filename,
+                data: this_image,
+              });
+          });
 
           // render this paneFragment
           switch (pane_fragment?.internal?.type) {
@@ -192,7 +209,7 @@ function ComposePanes(data) {
               react_fragment = MarkdownParagraph(
                 pane_fragment?.id,
                 child,
-                pane_fragment?.relationships?.field_image,
+                imageData,
                 buttonData,
                 maskData,
                 css_styles_parent,
@@ -271,12 +288,10 @@ function ComposePanes(data) {
 
       // skip if empty pane
       if (Object.keys(composedPaneFragments).length === 0) return;
-
       // prepare css for pane
       css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
       if (background_colour.length)
         css = `${css} background-color: ${background_colour[0].field_background_colour};`;
-
       // inject imageMaskShape(s) (if available)
       if (Object.keys(imageMaskShapes).length)
         imageMaskShapes.map((e) => {
@@ -292,14 +307,8 @@ function ComposePanes(data) {
       // inject textShapeOutside(s) (if available)
       if (Object.keys(textShapeOutsides).length)
         Object.keys(textShapeOutsides).map((i) => {
-          console.log(textShapeOutsides[i]);
-          css = `${css} .paneFragmentParagraph { .left-mask {float:left;shape-outside:url(${textShapeOutsides[i]?.left})} .right-mask {float:right;shape-outside:url(${textShapeOutsides[i]?.right})} }`;
+          css = `${css} .paneFragmentParagraph { .svg-shape-outside-left {float:left;shape-outside:url(${textShapeOutsides[i]?.left})} .svg-shape-outside-right {float:right;shape-outside:url(${textShapeOutsides[i]?.right})} }`;
         });
-      /*
-        textShapeOutsides.map(e => {
-          console.log(1, e);
-        });
-        */
       // may we wrap this in animation?
       let effects_payload = {};
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {

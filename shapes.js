@@ -276,13 +276,12 @@ function SvgPane(layout, viewport, mode = false) {
     }
 
     if (mode === "shape-outside") {
-      let this_className = `svg svg-shape-outside svg-shape-outside__${layout} svg-shape-outside__${layout}--${viewport}`;
       let left = /*#__PURE__*/React.createElement("svg", {
         id: `svg-shape-outside__${layout}--${viewport}`,
         "data-name": `svg-shape-outside__${layout}--${viewport}`,
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: `0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
-        className: `${this_className} left-mask`
+        className: `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left svg-shape-outside__${layout}-left--${viewport} svg-shape-outside__${layout}-left--${viewport}`
       }, /*#__PURE__*/React.createElement("desc", {
         id: "desc"
       }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
@@ -292,13 +291,11 @@ function SvgPane(layout, viewport, mode = false) {
         id: `svg-shape-outside__${layout}--${viewport}`,
         "data-name": `svg-shape-outside__${layout}--${viewport}`,
         xmlns: "http://www.w3.org/2000/svg",
-        viewBox: `0 0 ${parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
-        className: `${this_className} right-mask`
+        viewBox: `${SvgPanes[layout][viewport]["cut"]} 0 ${parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
+        className: `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-left svg-shape-outside__${layout}-right--${viewport} svg-shape-outside__${layout}-right--${viewport}`
       }, /*#__PURE__*/React.createElement("desc", {
         id: "desc"
-      }, "decorative background"), /*#__PURE__*/React.createElement("g", {
-        transform: `matrix(1,0,0,1,${parseInt(-SvgPanes[layout][viewport]["cut"])},0)`
-      }, /*#__PURE__*/React.createElement("path", {
+      }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
         d: SvgPanes[layout][viewport]["path"]
       })));
       let left_mask = /*#__PURE__*/React.createElement("svg", {
@@ -306,7 +303,7 @@ function SvgPane(layout, viewport, mode = false) {
         "data-name": `svg-shape-outside-mask__${layout}-left--${viewport}`,
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: `0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
-        className: `${this_className} left`
+        className: `svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-left--${viewport} left-mask`
       }, /*#__PURE__*/React.createElement("desc", {
         id: "desc"
       }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
@@ -326,8 +323,8 @@ function SvgPane(layout, viewport, mode = false) {
         id: `svg-shape-outside-mask__${layout}-right--${viewport}`,
         "data-name": `svg-shape-outside-mask__${layout}-right--${viewport}`,
         xmlns: "http://www.w3.org/2000/svg",
-        viewBox: `${parseInt(SvgPanes[layout][viewport]["cut"])} 0 ${parseInt(SvgPanes[layout][viewport]["viewBox"][0])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
-        className: `${this_className} right`
+        viewBox: `${SvgPanes[layout][viewport]["cut"]} 0 ${parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
+        className: `svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-right--${viewport} right-mask`
       }, /*#__PURE__*/React.createElement("desc", {
         id: "desc"
       }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
@@ -336,9 +333,7 @@ function SvgPane(layout, viewport, mode = false) {
         fill: "white",
         width: parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"]),
         height: SvgPanes[layout][viewport]["viewBox"][1]
-      }), /*#__PURE__*/React.createElement("g", {
-        transform: `translate(${parseInt(-SvgPanes[layout][viewport]["cut"])} 0)`
-      }, /*#__PURE__*/React.createElement("path", {
+      }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
         d: SvgPanes[layout][viewport]["path"]
       }))), /*#__PURE__*/React.createElement("rect", {
         mask: `url(#svg__${layout}-right--${viewport})`,

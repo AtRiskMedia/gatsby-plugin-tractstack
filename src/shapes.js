@@ -289,7 +289,6 @@ function SvgPane(layout, viewport, mode = false) {
       );
     }
     if (mode === "shape-outside") {
-      let this_className = `svg svg-shape-outside svg-shape-outside__${layout} svg-shape-outside__${layout}--${viewport}`;
       let left = (
         <svg
           id={`svg-shape-outside__${layout}--${viewport}`}
@@ -298,7 +297,7 @@ function SvgPane(layout, viewport, mode = false) {
           viewBox={`0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${
             SvgPanes[layout][viewport]["viewBox"][1]
           }`}
-          className={`${this_className} left-mask`}
+          className={`svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left svg-shape-outside__${layout}-left--${viewport} svg-shape-outside__${layout}-left--${viewport}`}
         >
           <desc id="desc">decorative background</desc>
           <g>
@@ -311,18 +310,14 @@ function SvgPane(layout, viewport, mode = false) {
           id={`svg-shape-outside__${layout}--${viewport}`}
           data-name={`svg-shape-outside__${layout}--${viewport}`}
           xmlns="http://www.w3.org/2000/svg"
-          viewBox={`0 0 ${parseInt(
+          viewBox={`${SvgPanes[layout][viewport]["cut"]} 0 ${parseInt(
             SvgPanes[layout][viewport]["viewBox"][0] -
               SvgPanes[layout][viewport]["cut"]
           )} ${SvgPanes[layout][viewport]["viewBox"][1]}`}
-          className={`${this_className} right-mask`}
+          className={`svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-left svg-shape-outside__${layout}-right--${viewport} svg-shape-outside__${layout}-right--${viewport}`}
         >
           <desc id="desc">decorative background</desc>
-          <g
-            transform={`matrix(1,0,0,1,${parseInt(
-              -SvgPanes[layout][viewport]["cut"]
-            )},0)`}
-          >
+          <g>
             <path d={SvgPanes[layout][viewport]["path"]} />
           </g>
         </svg>
@@ -336,7 +331,7 @@ function SvgPane(layout, viewport, mode = false) {
           viewBox={`0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${
             SvgPanes[layout][viewport]["viewBox"][1]
           }`}
-          className={`${this_className} left`}
+          className={`svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-left--${viewport} left-mask`}
         >
           <desc id="desc">decorative background</desc>
           <mask id={`svg__${layout}-left--${viewport}`}>
@@ -361,10 +356,11 @@ function SvgPane(layout, viewport, mode = false) {
           id={`svg-shape-outside-mask__${layout}-right--${viewport}`}
           data-name={`svg-shape-outside-mask__${layout}-right--${viewport}`}
           xmlns="http://www.w3.org/2000/svg"
-          viewBox={`${parseInt(SvgPanes[layout][viewport]["cut"])} 0 ${parseInt(
-            SvgPanes[layout][viewport]["viewBox"][0]
+          viewBox={`${SvgPanes[layout][viewport]["cut"]} 0 ${parseInt(
+            SvgPanes[layout][viewport]["viewBox"][0] -
+              SvgPanes[layout][viewport]["cut"]
           )} ${SvgPanes[layout][viewport]["viewBox"][1]}`}
-          className={`${this_className} right`}
+          className={`svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-right--${viewport} right-mask`}
         >
           <desc id="desc">decorative background</desc>
           <mask id={`svg__${layout}-right--${viewport}`}>
@@ -376,11 +372,7 @@ function SvgPane(layout, viewport, mode = false) {
               )}
               height={SvgPanes[layout][viewport]["viewBox"][1]}
             ></rect>
-            <g
-              transform={`translate(${parseInt(
-                -SvgPanes[layout][viewport]["cut"]
-              )} 0)`}
-            >
+            <g>
               <path d={SvgPanes[layout][viewport]["path"]} />
             </g>
           </mask>

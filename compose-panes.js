@@ -81,7 +81,13 @@ function ComposePanes(data) {
     .filter(e => e.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.state?.viewport?.viewport?.key) == -1) // already processed background_colour
     .filter(e => e?.internal?.type !== "paragraph__background_colour") // sort by zIndex ***important
     .sort((a, b) => a?.field_zindex > b?.field_zindex ? 1 : -1).map((pane_fragment, index) => {
-      let react_fragment, alt_text, imageData, shape, maskData, css_styles, css_styles_parent; // select css for viewport
+      let react_fragment,
+          alt_text,
+          imageData = [],
+          shape,
+          maskData,
+          css_styles,
+          css_styles_parent; // select css for viewport
 
       css_styles = thisViewportValue(data?.state?.viewport?.viewport?.key, {
         mobile: pane_fragment?.field_css_styles_mobile || "",
@@ -114,8 +120,21 @@ function ComposePanes(data) {
           left: textShapeOutside?.left_mask,
           right: textShapeOutside?.right_mask
         };
-      } // render this paneFragment
+      } // prepare any images from this paneFragment
 
+
+      pane_fragment?.relationships?.field_image.map(e => {
+        let this_image = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+          mobile: e?.mobile,
+          tablet: e?.tablet,
+          desktop: e?.desktop
+        });
+        if (this_image) imageData.push({
+          id: e?.id,
+          filename: e?.filename,
+          data: this_image
+        });
+      }); // render this paneFragment
 
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
@@ -134,7 +153,7 @@ function ComposePanes(data) {
             }
           }
 
-          react_fragment = MarkdownParagraph(pane_fragment?.id, child, pane_fragment?.relationships?.field_image, buttonData, maskData, css_styles_parent, css_styles, pane_fragment?.field_zindex, data?.hooks);
+          react_fragment = MarkdownParagraph(pane_fragment?.id, child, imageData, buttonData, maskData, css_styles_parent, css_styles, pane_fragment?.field_zindex, data?.hooks);
           break;
 
         case "paragraph__background_pane":
@@ -188,15 +207,8 @@ function ComposePanes(data) {
     }); // inject textShapeOutside(s) (if available)
 
     if (Object.keys(textShapeOutsides).length) Object.keys(textShapeOutsides).map(i => {
-      console.log(textShapeOutsides[i]);
-      css = `${css} .paneFragmentParagraph { .left-mask {float:left;shape-outside:url(${textShapeOutsides[i]?.left})} .right-mask {float:right;shape-outside:url(${textShapeOutsides[i]?.right})} }`;
-    });
-    /*
-      textShapeOutsides.map(e => {
-        console.log(1, e);
-      });
-      */
-    // may we wrap this in animation?
+      css = `${css} .paneFragmentParagraph { .svg-shape-outside-left {float:left;shape-outside:url(${textShapeOutsides[i]?.left})} .svg-shape-outside-right {float:right;shape-outside:url(${textShapeOutsides[i]?.right})} }`;
+    }); // may we wrap this in animation?
 
     let effects_payload = {};
 

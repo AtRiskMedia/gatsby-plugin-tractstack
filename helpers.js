@@ -182,11 +182,12 @@ const HtmlAstToReact = (children, imageData = [], buttonData = [], maskData = []
 
         if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
           // imageData in this case is an array ... assumes image is first element
-          let this_imageData = imageData.filter(image => image.filename === e?.properties?.src)[0]?.localFile?.childImageSharp?.gatsbyImageData;
+          let this_imageData = imageData.filter(image => image.filename === e?.properties?.src)[0]?.data?.childImageSharp?.gatsbyImageData;
           let image = /*#__PURE__*/React.createElement(GatsbyImage, {
             key: index,
             alt: e?.properties?.alt,
-            image: this_imageData
+            image: this_imageData,
+            objectFit: "contain"
           });
           return image;
         }
