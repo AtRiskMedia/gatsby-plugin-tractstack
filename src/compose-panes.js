@@ -191,9 +191,9 @@ function ComposePanes(data) {
               // now pre-render MarkdownParagraph elements and inject images
               let action,
                 buttonData = {};
-              let child =
+              let children =
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-              child.children =
+              children.children =
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
                   (e) => !(e.type === "text" && e.value === "\n")
                 );
@@ -208,7 +208,7 @@ function ComposePanes(data) {
               }
               react_fragment = MarkdownParagraph(
                 pane_fragment?.id,
-                child,
+                children,
                 imageData,
                 buttonData,
                 maskData,

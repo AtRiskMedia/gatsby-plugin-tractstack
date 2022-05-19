@@ -141,8 +141,8 @@ function ComposePanes(data) {
           // now pre-render MarkdownParagraph elements and inject images
           let action,
               buttonData = {};
-          let child = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-          child.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
+          let children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
+          children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
 
           try {
             action = JSON.parse(pane_fragment?.field_options);
@@ -153,7 +153,7 @@ function ComposePanes(data) {
             }
           }
 
-          react_fragment = MarkdownParagraph(pane_fragment?.id, child, imageData, buttonData, maskData, css_styles_parent, css_styles, pane_fragment?.field_zindex, data?.hooks);
+          react_fragment = MarkdownParagraph(pane_fragment?.id, children, imageData, buttonData, maskData, css_styles_parent, css_styles, pane_fragment?.field_zindex, data?.hooks);
           break;
 
         case "paragraph__background_pane":
