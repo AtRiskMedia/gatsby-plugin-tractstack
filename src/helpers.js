@@ -5,8 +5,35 @@ import { graphql, useStaticQuery, Link } from "gatsby";
 import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
+import Ajv from "ajv";
 import { SvgPane } from "./shapes";
 import { lispLexer } from "./lexer";
+import { tractStackFragmentSchema } from "./schema";
+
+const viewportWidth = {
+  mobile: 600,
+  tablet: 1080,
+  desktop: 1920,
+};
+
+const ajv = new Ajv();
+const validateSchema = (fragment) => {
+  let validate = ajv.compile(tractStackFragmentSchema);
+  let valid = validate(fragment);
+  if (!valid) {
+    console.log(
+      "Render error in helpers.js > validateSchema:",
+      validate.errors,
+      fragment
+    );
+    return false;
+  }
+  return true;
+};
+
+const thisViewportValue = (viewport, value) => {
+  return value[viewport];
+};
 
 const getCurrentPane = (paneId = "", panes = []) => {
   if (!paneId) return panes[0];
@@ -99,19 +126,43 @@ const lispCallback = (payload, context = "", hooks = []) => {
   }
 };
 
-const HtmlAstToReact = (
-  children,
-  imageData = [],
-  buttonData = [],
-  maskData = [],
-  hooks = []
-) => {
+const HtmlAstToReact = (fragment, depth = 0, element = false) => {
   // recursive function
-  // breaks gatsby images free of enclosing p tag
-  let contents, raw;
-  const fragment = children.map((e, index) => {
-    if (e?.type === "text") return <span key={index}>{e?.value}</span>;
+  let contents,
+    raw,
+    raw_element,
+    this_key = `${fragment?.id}-${depth}`;
+  if (depth) raw = element;
+  else if (typeof fragment?.children?.children === "object")
+    raw = fragment?.children?.children;
+  else return null;
+  const composed = raw.map((e) => {
+    if (e?.type === "text") return <span key={this_key}>{e?.value}</span>;
     switch (e?.tagName) {
+      case "p":
+        contents = e?.children?.map((p, i) => {
+          // use recursion to compose the MarkdownParagraph
+          depth = depth + 1;
+          return HtmlAstToReact(fragment, depth, [p]);
+        });
+        this_key = `${fragment?.id}-${depth}`;
+        // is this an image? (only uses first image)
+        if (
+          contents &&
+          contents?.length &&
+          contents[0] &&
+          contents[0][0] &&
+          contents[0][0].props?.image
+        )
+          return <div key={this_key}>{contents[0][0]}</div>;
+        // else it's a paragraph
+        return (
+          <div key={this_key}>
+            <p>{contents}</p>
+          </div>
+        );
+        break;
+
       case "h1":
       case "h2":
       case "h3":
@@ -120,25 +171,10 @@ const HtmlAstToReact = (
       case "h6":
         const Tag = e?.tagName;
         return (
-          <div key={index}>
+          <div key={this_key}>
             <Tag>{e?.children[0].value}</Tag>
           </div>
         );
-
-      case "br":
-        return <br key={index} />;
-
-      case "em":
-        if (typeof e?.children[0]?.value === "string") {
-          return <em key={index}>{e?.children[0]?.value}</em>;
-        }
-        break;
-
-      case "strong":
-        if (typeof e?.children[0]?.value === "string") {
-          return <strong key={index}>{e?.children[0]?.value}</strong>;
-        }
-        break;
 
       case "a":
         if (
@@ -149,24 +185,30 @@ const HtmlAstToReact = (
           // check for buttons action payload
           let is_button;
           if (
-            typeof buttonData === "object" &&
-            Object.keys(buttonData).length
+            typeof fragment?.payload?.buttonData === "object" &&
+            Object.keys(fragment?.payload?.buttonData).length
           ) {
-            let key = Object.keys(buttonData).find(
-              (target) => buttonData[target]?.urlTarget === e?.properties?.href
+            let key = Object.keys(fragment?.payload?.buttonData).find(
+              (target) =>
+                fragment?.payload?.buttonData[target]?.urlTarget ===
+                e?.properties?.href
             );
-            is_button = buttonData[key];
+            is_button = fragment?.payload?.buttonData[key];
           }
           if (is_button) {
             // inject button with callback function, add css className
             let payload = is_button?.callbackPayload;
             let payload_ast = lispLexer(payload);
             function injectPayload() {
-              lispCallback(payload_ast[0], "button", hooks);
+              lispCallback(
+                payload_ast[0],
+                "button",
+                fragment?.payload?.hooksData
+              );
             }
             return (
               <button
-                key={index}
+                key={this_key}
                 className={is_button?.className}
                 onClick={() => injectPayload()}
               >
@@ -174,13 +216,16 @@ const HtmlAstToReact = (
               </button>
             );
           }
-
           // else, treat at internal link
           // ...TODO: add check here and use a href for external links
           return (
             <a
-              onClick={() => hooks?.hookGotoStoryFragment(e?.properties?.href)}
-              key={index}
+              onClick={() =>
+                fragment?.payload?.hooksData?.hookGotoStoryFragment(
+                  e?.properties?.href
+                )
+              }
+              key={this_key}
             >
               {e?.children[0]?.value}
             </a>
@@ -194,67 +239,68 @@ const HtmlAstToReact = (
         let extcheck = e?.properties?.src?.match(pass);
         if (extcheck && (extcheck[0] === ".png" || extcheck[0] === ".jpg")) {
           // imageData in this case is an array ... assumes image is first element
-          let this_imageData = imageData.filter(
+          let this_imageData = fragment?.payload?.imageData?.filter(
             (image) => image.filename === e?.properties?.src
           )[0]?.data?.childImageSharp?.gatsbyImageData;
+          let objectFitMode;
+          if (fragment?.mode === "paragraph__markdown")
+            objectFitMode = "contain";
+          else objectFitMode = "cover";
           let image = (
             <GatsbyImage
-              key={index}
+              key={this_key}
               alt={e?.properties?.alt}
               image={this_imageData}
-              objectFit="contain"
+              objectFit={objectFitMode}
             />
           );
           return image;
         }
         break;
 
-      case "p":
-        contents = e?.children?.map((p, i) => {
-          // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([p], imageData, buttonData, maskData, hooks);
-        });
-        // is this an image?
-        if (contents.length === 1 && contents[0][0].props?.image) {
-          return <div key={index}>{contents[0][0]}</div>;
-        }
-        return (
-          <div key={index}>
-            <p>{contents}</p>
-          </div>
-        );
-
       case "ul":
       case "ol":
-        raw = e?.children.filter(
+        raw_element = e?.children.filter(
           (e) => !(e.type === "text" && e.value === "\n")
         );
-        contents = HtmlAstToReact(raw, imageData, buttonData, maskData, hooks);
-        let list;
         if (e?.tagName === "ol") list = <ol>{contents}</ol>;
         if (e?.tagName === "ul") list = <ul>{contents}</ul>;
-        return <div key={index}>{list}</div>;
+        return <div key={this_key}>{list}</div>;
+        break;
 
       case "li":
         contents = e?.children?.map((li, i) => {
-          // use recursion to compose the MarkdownParagraph
-          return HtmlAstToReact([li], imageData, buttonData, maskData, hooks);
+          depth = depth + 1;
+          return HtmlAstToReact(fragment, depth, [li]);
         });
-        return <li key={index}>{contents}</li>;
+        this_key = `${fragment?.id}-${depth}`;
+        return <li key={this_key}>{contents}</li>;
+        break;
+
+      case "br":
+        return <br key={this_key} />;
+
+      case "em":
+        if (typeof e?.children[0]?.value === "string") {
+          return <em key={this_key}>{e?.children[0]?.value}</em>;
+        }
+        break;
+
+      case "strong":
+        if (typeof e?.children[0]?.value === "string") {
+          return <strong key={this_key}>{e?.children[0]?.value}</strong>;
+        }
+        break;
 
       case "blockquote":
-        raw = e?.children.filter(
+        raw_element = e?.children.filter(
           (e) => !(e.type === "text" && e.value === "\n")
         );
-        let contents = HtmlAstToReact(
-          raw,
-          imageData,
-          buttonData,
-          maskData,
-          hooks
-        );
+        depth = depth + 1;
+        contents = HtmlAstToReact(fragment, depth, raw_element);
         if (typeof e?.children[0]?.value === "string") {
-          return <blockquote key={index}>{contents}</blockquote>;
+          this_key = `${fragment?.id}-${depth}`;
+          return <blockquote key={this_key}>{contents}</blockquote>;
         }
         break;
 
@@ -262,7 +308,7 @@ const HtmlAstToReact = (
         console.log("helpers.js: MISS on", e);
     }
   });
-  return fragment;
+  return composed;
 };
 
 const StyledWrapperDiv = styled.div`
@@ -271,6 +317,10 @@ const StyledWrapperDiv = styled.div`
 const StyledWrapperSection = styled.section`
   ${(props) => props.css};
 `;
+
+const TextShapeOutside = (shape, viewport) => {
+  return SvgPane(shape, viewport, "shape-outside");
+};
 
 const PaneFragment = (id, child, css) => {
   let this_css = `height:100%; ${css}`;
@@ -281,101 +331,100 @@ const PaneFragment = (id, child, css) => {
   );
 };
 
-const InjectSvgShape = (id, shape, viewport, parent_css = "", zIndex) => {
-  let css = `z-index: ${parseInt(zIndex)};`;
-  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
-  let child = SvgPane(shape, viewport);
-  return PaneFragment(id, child, css);
+const InjectSvgShape = (fragment) => {
+  if (!validateSchema(fragment)) return <></>;
+  let this_id = `${fragment?.id}-svg-shape`;
+  let css = `z-index: ${parseInt(fragment?.z_index)};`;
+  if (typeof fragment?.css?.parent === "string")
+    css = `${css} ${fragment?.css?.parent}`;
+  return PaneFragment(this_id, fragment?.children, css);
 };
 
-const InjectSvg = (id, url, alt_text, parent_css = "", zIndex) => {
-  let css = `z-index: ${parseInt(zIndex)};`;
-  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
-  let child = <img src={url} alt={alt_text} className="paneFragmentSvg" />;
-  return PaneFragment(id, child, css);
+const InjectSvg = (fragment) => {
+  if (!validateSchema(fragment)) return <></>;
+  let this_id = `${fragment?.id}-svg`;
+  let css = `z-index: ${parseInt(fragment?.z_index)};`;
+  if (typeof fragment?.css?.parent === "string")
+    css = `${css} ${fragment?.css?.parent}`;
+  let child = (
+    <img
+      src={fragment?.payload?.imageData?.url}
+      alt={fragment?.payload?.imageData?.alt_text}
+      className="paneFragmentSvg"
+    />
+  );
+  return PaneFragment(this_id, fragment?.children, css);
 };
 
-const InjectGatsbyBackgroundImage = (
-  id,
-  imageData,
-  alt_text,
-  parent_css = "",
-  zIndex
-) => {
-  const this_imageData = getImage(imageData);
+const InjectGatsbyBackgroundImage = (fragment) => {
+  if (!validateSchema(fragment)) return <></>;
+  // always uses the first image only
+  let this_id = `${fragment?.id}-background-image`;
+  const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
   const bgImage = convertToBgImage(this_imageData);
-  let css = `z-index: ${parseInt(zIndex)};`;
-  if (typeof parent_css === "string") css = `${css} img {${parent_css}}`;
+  let css = `z-index: ${parseInt(fragment?.z_index)};`;
+  if (typeof parent_css === "string")
+    css = `${css} img {${fragment?.css?.parent}}`;
   let child = (
     <div className="paneFragmentImage">
       <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
         <div>
-          <GatsbyImage image={this_imageData} alt={alt_text} />
+          <GatsbyImage
+            image={this_imageData}
+            alt={fragment?.payload?.imageData[0]?.alt_text}
+            objectFit="cover"
+          />
         </div>
       </BackgroundImage>
     </div>
   );
-  return PaneFragment(id, child, css);
+  return PaneFragment(this_id, child, css);
 };
 
-const InjectGatsbyBackgroundVideo = (
-  id,
-  url,
-  alt_text,
-  parent_css = "",
-  child_css = "",
-  zIndex
-) => {
-  let css = `z-index: ${parseInt(zIndex)};`;
-  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
-  if (typeof child_css === "string") css = `${css} ${child_css}`;
+const InjectGatsbyBackgroundVideo = (fragment) => {
+  if (!validateSchema(fragment)) return <></>;
+  let this_id = `${fragment?.id}-background-video`;
+  let css = `z-index: ${parseInt(fragment?.z_index)};`;
+  if (typeof parent_css === "string") css = `${css} ${fragment?.parent_css}`;
+  if (typeof child_css === "string") css = `${css} ${fragment?.child_css}`;
   let child = (
     <video
       autoPlay={true}
       muted
       loop
-      title={alt_text}
+      title={fragment?.payload?.videoData?.alt_text}
       className="paneFragmentVideo"
     >
-      <source src={url} type="video/mp4" />
+      <source src={fragment?.payload?.videoData?.url} type="video/mp4" />
     </video>
   );
-  return PaneFragment(id, child, css);
+  return PaneFragment(this_id, child, css);
 };
 
-const MarkdownParagraph = (
-  id,
-  htmlAst,
-  imageData = {},
-  buttonData = {},
-  maskData = {},
-  parent_css = "",
-  child_css = "",
-  zIndex,
-  hooks = []
-) => {
-  const paragraph = HtmlAstToReact(
-    htmlAst?.children,
-    imageData,
-    buttonData,
-    maskData,
-    hooks
-  );
+const MarkdownParagraph = (fragment) => {
+  if (!validateSchema(fragment)) return <></>;
+  let this_id = `${fragment?.id}-paragraph`;
+  const paragraph = HtmlAstToReact(fragment);
   let has_shape_outside,
-    css = `z-index: ${parseInt(zIndex)};`;
-  if (typeof parent_css === "string") css = `${css} ${parent_css}`;
-  if (typeof child_css === "string") css = `${css} ${child_css}`;
-  let composed = PaneFragment(id, paragraph, css);
+    css = `z-index: ${parseInt(fragment?.z_index)};`;
+  if (typeof fragment?.css?.parent === "string")
+    css = `${css} ${fragment?.css?.parent}`;
+  if (typeof fragment?.css?.child === "string")
+    css = `${css} ${fragment?.css?.child}`;
+  let composed = PaneFragment(this_id, paragraph, css);
   // inject textShapeOutside(s) (if available)
   if (
-    Object.keys(maskData).length &&
-    typeof maskData?.textShapeOutside?.left_mask === "string" &&
-    typeof maskData?.textShapeOutside?.right_mask === "string"
+    fragment?.payload?.maskData &&
+    Object.keys(fragment?.payload?.maskData).length &&
+    typeof fragment?.payload?.maskData?.textShapeOutside?.left_mask ===
+      "string" &&
+    typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask ===
+      "string"
   ) {
     return (
       <div className="paneFragmentParagraph">
-        {maskData?.textShapeOutside?.left}
-        {maskData?.textShapeOutside?.right}
+        {fragment?.payload?.maskData?.textShapeOutside?.left}
+        {fragment?.payload?.maskData?.textShapeOutside?.right}
         {composed}
       </div>
     );
@@ -412,20 +461,6 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     css = css + "}";
   }
   return css;
-};
-
-const TextShapeOutside = (shape, viewport) => {
-  return SvgPane(shape, viewport, "shape-outside");
-};
-
-const thisViewportValue = (viewport, value) => {
-  return value[viewport];
-};
-
-const viewportWidth = {
-  mobile: 600,
-  tablet: 1080,
-  desktop: 1920,
 };
 
 export {

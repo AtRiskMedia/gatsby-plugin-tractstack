@@ -1,23 +1,63 @@
-import Ajv from "ajv";
-const ajv = new Ajv();
-const schema = {
+const tractStackFragmentSchema = {
   type: "object",
   properties: {
     id: {
       type: "string"
     },
+    mode: {
+      type: "string"
+    },
     children: {
       type: "object"
+    },
+    z_index: {
+      type: "number"
+    },
+    viewport: {
+      properties: {
+        device: {
+          type: "string"
+        },
+        width: {
+          type: "number"
+        }
+      }
+    },
+    css: {
+      properties: {
+        parent: {
+          type: "string"
+        },
+        child: {
+          type: "string"
+        }
+      }
+    },
+    payload: {
+      properties: {
+        maskData: {
+          type: "object"
+        },
+        imageData: {
+          type: "array"
+        },
+        buttonData: {
+          type: "object"
+        },
+        shapeData: {
+          type: "object"
+        },
+        videoData: {
+          type: "object"
+        },
+        hooksData: {
+          type: "object"
+        }
+      }
     }
   },
-  required: ["id"],
+  required: ["id", "mode", "z_index", "viewport"],
   additionalProperties: false
 };
-const tractStackFragment = {
-  id: "123123123-12312321-213123-12332131",
-  children: {}
-};
-const validate = ajv.compile(schema);
-const valid = validate(tractStackFragment);
-if (!valid) console.log(validate.errors);
+export { tractStackFragmentSchema };
 //# sourceMappingURL=schema.js.map

@@ -18,7 +18,6 @@ import { SvgPane } from "./shapes";
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
-
   // is there a current pane to scroll to?
   let visiblePane = getCurrentPane(
     data?.state?.viewport?.currentPane,
@@ -116,27 +115,25 @@ function ComposePanes(data) {
         .sort((a, b) => (a?.field_zindex > b?.field_zindex ? 1 : -1))
         .map((pane_fragment, index) => {
           let react_fragment,
-            alt_text,
-            imageData = [],
+            tractStackFragment,
             shape,
             maskData,
-            css_styles,
-            css_styles_parent;
+            buttonData,
+            imageData = [],
+            css_child,
+            css_parent;
 
           // select css for viewport
-          css_styles = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+          css_child = thisViewportValue(data?.state?.viewport?.viewport?.key, {
             mobile: pane_fragment?.field_css_styles_mobile || "",
             tablet: pane_fragment?.field_css_styles_tablet || "",
             desktop: pane_fragment?.field_css_styles_desktop || "",
           });
-          css_styles_parent = thisViewportValue(
-            data?.state?.viewport?.viewport?.key,
-            {
-              mobile: pane_fragment?.field_css_styles_parent_mobile || "",
-              tablet: pane_fragment?.field_css_styles_parent_tablet || "",
-              desktop: pane_fragment?.field_css_styles_parent_desktop || "",
-            }
-          );
+          css_parent = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+            mobile: pane_fragment?.field_css_styles_parent_mobile || "",
+            tablet: pane_fragment?.field_css_styles_parent_tablet || "",
+            desktop: pane_fragment?.field_css_styles_parent_desktop || "",
+          });
           if (pane_fragment?.internal?.type === "paragraph__background_pane")
             shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
               mobile: pane_fragment?.field_shape_mobile,
@@ -168,7 +165,7 @@ function ComposePanes(data) {
             };
           }
           // prepare any images from this paneFragment
-          pane_fragment?.relationships?.field_image.map((e) => {
+          pane_fragment?.relationships?.field_image?.map((e) => {
             let this_image = thisViewportValue(
               data?.state?.viewport?.viewport?.key,
               {
@@ -177,91 +174,84 @@ function ComposePanes(data) {
                 desktop: e?.desktop,
               }
             );
-            if (this_image)
-              imageData.push({
+            if (this_image) {
+              let this_imageData = {
                 id: e?.id,
                 filename: e?.filename,
                 data: this_image,
-              });
+              };
+              if (typeof pane_fragment?.field_alt_text === "string")
+                this_imageData.alt_text = pane_fragment?.field_alt_text;
+              imageData.push(this_imageData);
+            }
           });
+          // prepare structured data for this paneFragment
+          tractStackFragment = {
+            id: pane_fragment?.id,
+            mode: pane_fragment?.internal?.type,
+            viewport: {
+              device: data?.state?.viewport?.viewport?.key,
+              width: data?.state?.viewport?.viewport?.width,
+            },
+            z_index: pane_fragment?.field_zindex,
+            css: {
+              parent: css_parent,
+              child: css_child,
+            },
+            payload: {
+              imageData: imageData,
+              maskData: maskData,
+              hooksData: data?.hooks,
+            },
+          };
 
-          // render this paneFragment
-          switch (pane_fragment?.internal?.type) {
+          // all source data for this paneFragment
+          switch (tractStackFragment?.mode) {
             case "paragraph__markdown":
-              // now pre-render MarkdownParagraph elements and inject images
-              let action,
-                buttonData = {};
-              let children =
+              let action;
+              tractStackFragment.children =
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-              children.children =
+              tractStackFragment.children.children =
                 pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
                   (e) => !(e.type === "text" && e.value === "\n")
                 );
               try {
                 action = JSON.parse(pane_fragment?.field_options);
                 if (typeof action?.buttons === "object")
-                  buttonData = action?.buttons;
+                  tractStackFragment.payload.buttonData = action?.buttons;
               } catch (e) {
                 if (e instanceof SyntaxError) {
                   console.log("ERROR parsing json in {}: ", e);
                 }
               }
-              react_fragment = MarkdownParagraph(
-                pane_fragment?.id,
-                children,
-                imageData,
-                buttonData,
-                maskData,
-                css_styles_parent,
-                css_styles,
-                pane_fragment?.field_zindex,
-                data?.hooks
-              );
+              react_fragment = MarkdownParagraph(tractStackFragment);
               break;
 
             case "paragraph__background_pane":
-              react_fragment = InjectSvgShape(
-                pane_fragment?.id,
-                shape,
-                data?.state?.viewport?.viewport?.key,
-                css_styles_parent,
-                pane_fragment?.field_zindex
-              );
+              let child = SvgPane(shape, data?.state?.viewport?.viewport?.key);
+              tractStackFragment.children = child;
+              react_fragment = InjectSvgShape(tractStackFragment);
               break;
 
             case "paragraph__background_video":
-              react_fragment = InjectGatsbyBackgroundVideo(
-                pane_fragment?.id,
-                pane_fragment?.field_cdn_url,
-                pane_fragment?.field_alt_text,
-                css_styles_parent,
-                css_styles,
-                pane_fragment?.field_zindex
-              );
+              tractStackFragment.payload.videoData = {
+                url: pane_fragment?.field_cdn_url,
+                alt_text: pane_fragment?.field_alt_text,
+              };
+              react_fragment = InjectGatsbyBackgroundVideo(tractStackFragment);
               break;
 
             case "paragraph__background_image":
-              react_fragment = InjectGatsbyBackgroundImage(
-                pane_fragment?.id,
-                pane_fragment?.relationships?.field_image[0] &&
-                  pane_fragment?.relationships?.field_image[0][
-                    data?.state?.viewport?.viewport?.key
-                  ],
-                pane_fragment?.field_alt_text,
-                css_styles_parent,
-                pane_fragment?.field_zindex
-              );
+              react_fragment = InjectGatsbyBackgroundImage(tractStackFragment);
               break;
 
             case "paragraph__svg":
-              react_fragment = InjectSvg(
-                pane_fragment?.id,
-                pane_fragment?.relationships?.field_svg_file?.localFile
+              tractStackFragment.payload.imageData = {
+                url: pane_fragment?.relationships?.field_svg_file?.localFile
                   ?.publicURL,
-                pane_fragment?.field_svg_file?.description,
-                css_styles_parent,
-                pane_fragment?.field_zindex
-              );
+                alt_text: pane_fragment?.field_svg_file?.description,
+              };
+              react_fragment = InjectSvg(fragment);
               break;
 
             case "paragraph__d3":
@@ -272,6 +262,7 @@ function ComposePanes(data) {
               //
               break;
           }
+
           let thisClass = `paneFragment paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
           return (
             <div className={thisClass} key={pane_fragment?.id}>
@@ -345,6 +336,7 @@ function ComposePanes(data) {
       );
     }
   );
+
   // this is the storyFragment
   return composedPanes;
 }
