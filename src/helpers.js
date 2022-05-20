@@ -6,6 +6,7 @@ import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import Ajv from "ajv";
+import { v4 as uuidv4 } from "uuid";
 import { SvgPane } from "./shapes";
 import { lispLexer } from "./lexer";
 import { tractStackFragmentSchema } from "./schema";
@@ -126,26 +127,22 @@ const lispCallback = (payload, context = "", hooks = []) => {
   }
 };
 
-const HtmlAstToReact = (fragment, depth = 0, element = false) => {
+const HtmlAstToReact = (fragment, element = false) => {
   // recursive function
-  let contents,
-    raw,
-    raw_element,
-    this_key = `${fragment?.id}-${depth}`;
-  if (depth) raw = element;
+  let contents, raw_element, raw;
+  if (element) raw = element;
   else if (typeof fragment?.children?.children === "object")
     raw = fragment?.children?.children;
   else return null;
   const composed = raw.map((e) => {
-    if (e?.type === "text") return <span key={this_key}>{e?.value}</span>;
+    let this_id = uuidv4();
+    if (e?.type === "text") return <span key={this_id}>{e?.value}</span>;
     switch (e?.tagName) {
       case "p":
         contents = e?.children?.map((p, i) => {
           // use recursion to compose the MarkdownParagraph
-          depth = depth + 1;
-          return HtmlAstToReact(fragment, depth, [p]);
+          return HtmlAstToReact(fragment, [p]);
         });
-        this_key = `${fragment?.id}-${depth}`;
         // is this an image? (only uses first image)
         if (
           contents &&
@@ -154,10 +151,10 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
           contents[0][0] &&
           contents[0][0].props?.image
         )
-          return <div key={this_key}>{contents[0][0]}</div>;
+          return <div key={this_id}>{contents[0][0]}</div>;
         // else it's a paragraph
         return (
-          <div key={this_key}>
+          <div key={this_id}>
             <p>{contents}</p>
           </div>
         );
@@ -171,7 +168,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
       case "h6":
         const Tag = e?.tagName;
         return (
-          <div key={this_key}>
+          <div key={this_id}>
             <Tag>{e?.children[0].value}</Tag>
           </div>
         );
@@ -208,7 +205,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
             }
             return (
               <button
-                key={this_key}
+                key={this_id}
                 className={is_button?.className}
                 onClick={() => injectPayload()}
               >
@@ -225,7 +222,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
                   e?.properties?.href
                 )
               }
-              key={this_key}
+              key={this_id}
             >
               {e?.children[0]?.value}
             </a>
@@ -248,7 +245,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
           else objectFitMode = "cover";
           let image = (
             <GatsbyImage
-              key={this_key}
+              key={this_id}
               alt={e?.properties?.alt}
               image={this_imageData}
               objectFit={objectFitMode}
@@ -263,32 +260,31 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
         raw_element = e?.children.filter(
           (e) => !(e.type === "text" && e.value === "\n")
         );
-        if (e?.tagName === "ol") list = <ol>{contents}</ol>;
-        if (e?.tagName === "ul") list = <ul>{contents}</ul>;
-        return <div key={this_key}>{list}</div>;
+        contents = HtmlAstToReact(fragment, raw_element);
+        if (e?.tagName === "ol") contents = <ol>{contents}</ol>;
+        if (e?.tagName === "ul") contents = <ul>{contents}</ul>;
+        return <div key={this_id}>{contents}</div>;
         break;
 
       case "li":
         contents = e?.children?.map((li, i) => {
-          depth = depth + 1;
-          return HtmlAstToReact(fragment, depth, [li]);
+          return HtmlAstToReact(fragment, [li]);
         });
-        this_key = `${fragment?.id}-${depth}`;
-        return <li key={this_key}>{contents}</li>;
+        return <li key={this_id}>{contents}</li>;
         break;
 
       case "br":
-        return <br key={this_key} />;
+        return <br key={this_id} />;
 
       case "em":
         if (typeof e?.children[0]?.value === "string") {
-          return <em key={this_key}>{e?.children[0]?.value}</em>;
+          return <em key={this_id}>{e?.children[0]?.value}</em>;
         }
         break;
 
       case "strong":
         if (typeof e?.children[0]?.value === "string") {
-          return <strong key={this_key}>{e?.children[0]?.value}</strong>;
+          return <strong key={this_id}>{e?.children[0]?.value}</strong>;
         }
         break;
 
@@ -296,11 +292,9 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
         raw_element = e?.children.filter(
           (e) => !(e.type === "text" && e.value === "\n")
         );
-        depth = depth + 1;
-        contents = HtmlAstToReact(fragment, depth, raw_element);
+        contents = HtmlAstToReact(fragment, raw_element);
         if (typeof e?.children[0]?.value === "string") {
-          this_key = `${fragment?.id}-${depth}`;
-          return <blockquote key={this_key}>{contents}</blockquote>;
+          return <blockquote key={this_id}>{contents}</blockquote>;
         }
         break;
 
@@ -367,7 +361,12 @@ const InjectGatsbyBackgroundImage = (fragment) => {
     css = `${css} img {${fragment?.css?.parent}}`;
   let child = (
     <div className="paneFragmentImage">
-      <BackgroundImage Tag="section" {...bgImage} preserveStackingContext>
+      <BackgroundImage
+        Tag="section"
+        {...bgImage}
+        objectFit="cover"
+        preserveStackingContext
+      >
         <div>
           <GatsbyImage
             image={this_imageData}

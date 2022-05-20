@@ -238,7 +238,7 @@ function SvgPane(layout, viewport, mode = false) {
     comic1920r1main3: {
       desktop: {
         viewBox: [1920, 1313],
-        cut: 1531,
+        cut: 1240,
         path: "m 1903.8387,1294.6459 c -8.2747,3.262 -16.2034,2.491 -23.8751,1.4827 -46.2674,-6.0792 -92.4854,-12.534 -138.7429,-18.7021 -28.3437,-3.786 -56.816,-5.9309 -85.3772,-7.6608 -29.1347,-1.8188 -58.1407,-6.0298 -87.1469,-9.5883 -46.6332,-5.7234 -93.1477,-12.4154 -139.8501,-17.5259 -49.2926,-5.3971 -98.7434,-9.4005 -148.1151,-14.0562 -10.1333,-0.9885 -20.2765,-1.9177 -30.3704,-3.2423 -4.2016,-0.5634 -8.3142,-1.9769 -12.4071,-3.2126 -15.4917,-4.6755 -23.1436,-15.7465 -24.1223,-31.335 -1.2753,-20.3232 -1.8092,-40.686 -2.778,-61.0192 -0.9886,-20.9757 -2.2245,-41.9513 -3.2032,-62.927 -0.9886,-21.3315 -1.74,-42.6828 -2.7385,-64.0242 -0.9886,-20.97566 -2.2145,-41.94147 -3.213,-62.91711 -0.9886,-20.66925 -1.7103,-41.33849 -2.7187,-62.00774 q -1.6905,-34.92321 -3.6875,-69.81675 c -1.3446,-23.90157 -2.9659,-47.79327 -4.172,-71.70474 -1.473,-28.52772 -2.6199,-57.0653 -4.0237,-85.58312 -1.2259,-24.90984 -2.6594,-49.80978 -3.9544,-74.71963 q -2.0762,-41.30883 -3.9546,-82.62752 -1.9772,-42.79154 -3.9544,-85.58312 -1.9773,-41.83268 -3.9545,-83.65551 -1.9772,-40.81459 -3.9545,-81.64895 c -1.3248,-27.53921 -2.5606,-55.07841 -3.9545,-82.60774 -1.2061,-23.26896 -2.6198,-46.52803 -3.9545,-69.787098 q -0.9886,-17.199653 -1.8685,-34.389416 c -1.3148,-24.010322 4.6564,-34.824354 32.6838,-34.873782 q 153.2361,-0.296527 306.3832,-1.077446 c 33.267,-0.138382 66.5242,-0.523901 99.7814,-0.850099 34.2458,-0.336092 68.4817,-0.761134 102.7176,-1.097218 34.2359,-0.336091 68.5015,-0.514015 102.7571,-0.899522 20.069,-0.217473 40.138,-0.879752 60.2169,-0.988489 a 221.74743,221.71736 0 0 1 23.5983,1.393767 35.679289,35.674452 0 0 1 10.3607,2.906148 c 5.2397,2.253748 8.5121,6.039648 7.6025,12.326421 a 42.253611,42.247884 0 0 0 0,5.930915 V 1294.6459 Z",
       },
     },
@@ -297,7 +297,10 @@ function SvgPane(layout, viewport, mode = false) {
           viewBox={`0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${
             SvgPanes[layout][viewport]["viewBox"][1]
           }`}
-          className={`svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left svg-shape-outside__${layout}-left--${viewport} svg-shape-outside__${layout}-left--${viewport}`}
+          className={
+            `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left ` +
+            `svg-shape-outside__${layout}-left--${viewport}`
+          }
         >
           <desc id="desc">decorative background</desc>
           <g>
@@ -314,7 +317,10 @@ function SvgPane(layout, viewport, mode = false) {
             SvgPanes[layout][viewport]["viewBox"][0] -
               SvgPanes[layout][viewport]["cut"]
           )} ${SvgPanes[layout][viewport]["viewBox"][1]}`}
-          className={`svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-left svg-shape-outside__${layout}-right--${viewport} svg-shape-outside__${layout}-right--${viewport}`}
+          className={
+            `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-right ` +
+            `svg-shape-outside__${layout}-right--${viewport}`
+          }
         >
           <desc id="desc">decorative background</desc>
           <g>

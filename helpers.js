@@ -8,6 +8,7 @@ import { getImage, GatsbyImage } from "gatsby-plugin-image";
 import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import Ajv from "ajv";
+import { v4 as uuidv4 } from "uuid";
 import { SvgPane } from "./shapes";
 import { lispLexer } from "./lexer";
 import { tractStackFragmentSchema } from "./schema";
@@ -119,33 +120,29 @@ const lispCallback = (payload, context = "", hooks = []) => {
   }
 };
 
-const HtmlAstToReact = (fragment, depth = 0, element = false) => {
+const HtmlAstToReact = (fragment, element = false) => {
   // recursive function
-  let contents,
-      raw,
-      raw_element,
-      this_key = `${fragment?.id}-${depth}`;
-  if (depth) raw = element;else if (typeof fragment?.children?.children === "object") raw = fragment?.children?.children;else return null;
+  let contents, raw_element, raw;
+  if (element) raw = element;else if (typeof fragment?.children?.children === "object") raw = fragment?.children?.children;else return null;
   const composed = raw.map(e => {
+    let this_id = uuidv4();
     if (e?.type === "text") return /*#__PURE__*/React.createElement("span", {
-      key: this_key
+      key: this_id
     }, e?.value);
 
     switch (e?.tagName) {
       case "p":
         contents = e?.children?.map((p, i) => {
           // use recursion to compose the MarkdownParagraph
-          depth = depth + 1;
-          return HtmlAstToReact(fragment, depth, [p]);
-        });
-        this_key = `${fragment?.id}-${depth}`; // is this an image? (only uses first image)
+          return HtmlAstToReact(fragment, [p]);
+        }); // is this an image? (only uses first image)
 
         if (contents && contents?.length && contents[0] && contents[0][0] && contents[0][0].props?.image) return /*#__PURE__*/React.createElement("div", {
-          key: this_key
+          key: this_id
         }, contents[0][0]); // else it's a paragraph
 
         return /*#__PURE__*/React.createElement("div", {
-          key: this_key
+          key: this_id
         }, /*#__PURE__*/React.createElement("p", null, contents));
         break;
 
@@ -157,7 +154,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
       case "h6":
         const Tag = e?.tagName;
         return /*#__PURE__*/React.createElement("div", {
-          key: this_key
+          key: this_id
         }, /*#__PURE__*/React.createElement(Tag, null, e?.children[0].value));
 
       case "a":
@@ -180,7 +177,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
             }
 
             return /*#__PURE__*/React.createElement("button", {
-              key: this_key,
+              key: this_id,
               className: is_button?.className,
               onClick: () => injectPayload()
             }, e?.children[0]?.value);
@@ -190,7 +187,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
 
           return /*#__PURE__*/React.createElement("a", {
             onClick: () => fragment?.payload?.hooksData?.hookGotoStoryFragment(e?.properties?.href),
-            key: this_key
+            key: this_id
           }, e?.children[0]?.value);
         }
 
@@ -207,7 +204,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
           let objectFitMode;
           if (fragment?.mode === "paragraph__markdown") objectFitMode = "contain";else objectFitMode = "cover";
           let image = /*#__PURE__*/React.createElement(GatsbyImage, {
-            key: this_key,
+            key: this_id,
             alt: e?.properties?.alt,
             image: this_imageData,
             objectFit: objectFitMode
@@ -220,33 +217,32 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
       case "ul":
       case "ol":
         raw_element = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        if (e?.tagName === "ol") list = /*#__PURE__*/React.createElement("ol", null, contents);
-        if (e?.tagName === "ul") list = /*#__PURE__*/React.createElement("ul", null, contents);
+        contents = HtmlAstToReact(fragment, raw_element);
+        if (e?.tagName === "ol") contents = /*#__PURE__*/React.createElement("ol", null, contents);
+        if (e?.tagName === "ul") contents = /*#__PURE__*/React.createElement("ul", null, contents);
         return /*#__PURE__*/React.createElement("div", {
-          key: this_key
-        }, list);
+          key: this_id
+        }, contents);
         break;
 
       case "li":
         contents = e?.children?.map((li, i) => {
-          depth = depth + 1;
-          return HtmlAstToReact(fragment, depth, [li]);
+          return HtmlAstToReact(fragment, [li]);
         });
-        this_key = `${fragment?.id}-${depth}`;
         return /*#__PURE__*/React.createElement("li", {
-          key: this_key
+          key: this_id
         }, contents);
         break;
 
       case "br":
         return /*#__PURE__*/React.createElement("br", {
-          key: this_key
+          key: this_id
         });
 
       case "em":
         if (typeof e?.children[0]?.value === "string") {
           return /*#__PURE__*/React.createElement("em", {
-            key: this_key
+            key: this_id
           }, e?.children[0]?.value);
         }
 
@@ -255,7 +251,7 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
       case "strong":
         if (typeof e?.children[0]?.value === "string") {
           return /*#__PURE__*/React.createElement("strong", {
-            key: this_key
+            key: this_id
           }, e?.children[0]?.value);
         }
 
@@ -263,13 +259,11 @@ const HtmlAstToReact = (fragment, depth = 0, element = false) => {
 
       case "blockquote":
         raw_element = e?.children.filter(e => !(e.type === "text" && e.value === "\n"));
-        depth = depth + 1;
-        contents = HtmlAstToReact(fragment, depth, raw_element);
+        contents = HtmlAstToReact(fragment, raw_element);
 
         if (typeof e?.children[0]?.value === "string") {
-          this_key = `${fragment?.id}-${depth}`;
           return /*#__PURE__*/React.createElement("blockquote", {
-            key: this_key
+            key: this_id
           }, contents);
         }
 
@@ -335,6 +329,7 @@ const InjectGatsbyBackgroundImage = fragment => {
   }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
     Tag: "section"
   }, bgImage, {
+    objectFit: "cover",
     preserveStackingContext: true
   }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
     image: this_imageData,

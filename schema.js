@@ -14,6 +14,7 @@ const tractStackFragmentSchema = {
       type: "number"
     },
     viewport: {
+      type: "object",
       properties: {
         device: {
           type: "string"
@@ -24,6 +25,7 @@ const tractStackFragmentSchema = {
       }
     },
     css: {
+      type: "object",
       properties: {
         parent: {
           type: "string"
@@ -34,6 +36,7 @@ const tractStackFragmentSchema = {
       }
     },
     payload: {
+      type: "object",
       properties: {
         maskData: {
           type: "object"

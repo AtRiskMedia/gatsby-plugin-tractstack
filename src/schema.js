@@ -6,18 +6,21 @@ const tractStackFragmentSchema = {
     children: { type: "object" },
     z_index: { type: "number" },
     viewport: {
+      type: "object",
       properties: {
         device: { type: "string" },
         width: { type: "number" },
       },
     },
     css: {
+      type: "object",
       properties: {
         parent: { type: "string" },
         child: { type: "string" },
       },
     },
     payload: {
+      type: "object",
       properties: {
         maskData: { type: "object" },
         imageData: { type: "array" },
