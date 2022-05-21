@@ -9,7 +9,7 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import Ajv from "ajv";
 import { v4 as uuidv4 } from "uuid";
-import { SvgPane } from "./shapes";
+import { SvgPane, SvgModal } from "./shapes";
 import { lispLexer } from "./lexer";
 import { tractStackFragmentSchema } from "./schema";
 const viewportWidth = {
@@ -303,6 +303,14 @@ const InjectSvgShape = fragment => {
   return PaneFragment(this_id, fragment?.children, css);
 };
 
+const InjectSvgModal = fragment => {
+  if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
+  let this_id = `${fragment?.id}-svg-modal`;
+  let css = `z-index: ${parseInt(fragment?.z_index)};`;
+  if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent} ` + `svg { width: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.y}); ` + `}`;
+  return PaneFragment(this_id, fragment?.children?.modal_shape, css);
+};
+
 const InjectSvg = fragment => {
   if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
   let this_id = `${fragment?.id}-svg`;
@@ -415,5 +423,5 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, InjectSvgModal, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
 //# sourceMappingURL=helpers.js.map

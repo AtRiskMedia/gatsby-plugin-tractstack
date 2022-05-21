@@ -26,6 +26,174 @@ function TractStackLogo() {
   );
 }
 
+function SvgModal(layout, viewport, options = {}) {
+  const SvgModals = {
+    "bubble-1": {
+      viewBox: [600, 500],
+      cut: 300,
+      allow_inner_crop: {
+        top: 166,
+        bottom: 0,
+        left: 282,
+        right: 50,
+      },
+      path: "m 11.52437,0 h 581 c 7.6,47.16 6.37,93.94 -6.26,140.2 -17.94,65.75 -53,119.87 -108.61,160.11 -19.83,14.36 -41.52,25.25 -64.21,34.24 -4,1.57 -5,3.48 -4,7.85 q 12.6,52.74 24.61,105.62 c 0.64,2.81 0.08,5.89 0.08,8.85 l -1.7,0.62 c -3.39,-4.63 -7.28,-9 -10.08,-13.92 -9.33,-16.54 -18.26,-33.31 -27.39,-50 q -12.84,-23.46 -25.76,-46.86 c -1.48,-2.69 -3.08,-4.15 -6.75,-3.28 -61.59,14.74 -122.28,11.41 -182,-9.53 -4.39,-1.54 -8.84,-3 -13,-5 a 250.26,250.26 0 0 1 -60.62,-39.19 c -26.34,-23.11 -48.3,-49.64 -64.54,-80.72 -26.1,-49.95 -38.4,-103.16 -36,-159.48 0.61,-16.51 3.4,-32.98 5.23,-49.51 z",
+    },
+    "modal-1": {
+      viewBox: [600, 240],
+      cut: 300,
+      allow_inner_crop: {
+        top: 80,
+        bottom: 80,
+        left: 200,
+        right: 200,
+      },
+      path: "M 5.0065268,4 H 595 v 5.9840083 c -0.10994,35.9040497 0.11993,71.8080987 -0.43974,107.7121517 -0.54968,35.35551 -1.83892,70.70105 -2.99824,106.0466 -0.3498,10.97068 -0.93945,11.39953 -11.89302,11.41948 Q 298.68404,235.59109 17.719061,236 C 11.252858,236 9.10412,234.4641 8.8442731,228.13103 8.0347486,207.88513 7.3251653,187.63924 7.0153473,167.39335 6.2058224,115.08314 5.6261628,62.762961 5.0165209,10.452756 4.9865385,8.4580861 5.0065268,6.4833634 5.0065268,4 Z",
+    },
+    "modal-2": {
+      viewBox: [600, 200],
+      cut: 300,
+      allow_inner_crop: {
+        top: 80,
+        bottom: 80,
+        left: 200,
+        right: 200,
+      },
+      path: "m 594.88887,194.93308 h -27.41974 c -86.19939,-0.12924 -172.38869,-0.44735 -258.58809,-0.338 -46.61556,0.0596 -93.23113,0.99411 -139.8467,1.24265 -51.0003,0.24852 -102.041011,0.12922 -153.011002,0.15905 -8.991733,0 -9.092763,-0.18888 -9.163485,-8.83766 Q 5.950577,99.478438 5.010991,11.797759 c -0.070721,-6.8295497 0,-7.1675478 6.688233,-7.2470768 C 37.280198,4.2325664 62.861173,3.9641561 88.48256,4.0039206 q 56.05184,0.1093523 112.14408,0.656114 c 90.55382,0.9444064 181.10764,2.0975763 271.66147,2.9823361 36.18919,0.3479391 72.37839,0.2385868 108.57769,0.337998 1.67711,0 3.36433,0 5.05154,0.049706 6.32452,0.2584693 7.52679,1.4414628 7.61771,7.8435443 q 0.21217,15.647323 0.26268,31.294648 c 0.0808,16.402848 0,32.805697 0.19196,49.188664 Q 594.39382,142.55331 595,188.7497 c -0.11113,1.79935 -0.11113,3.59869 -0.11113,6.18338 z",
+    },
+  };
+
+  let modal_shape;
+  if (SvgModals[layout]) {
+    let this_className = `svg svg__${layout} svg__${layout}--${viewport}`;
+    modal_shape = (
+      <svg
+        id={`svg__${layout}--${viewport}`}
+        data-name={`svg__${layout}--${viewport}`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`${options?.render?.viewbox_x1} ${options?.render?.viewbox_y1} ${options?.render?.viewbox_x2} ${options?.render?.viewbox_y2}`}
+        className={this_className}
+      >
+        <desc id="desc">decorative background</desc>
+        <g>
+          <path d={SvgModals[layout]["path"]} />
+        </g>
+      </svg>
+    );
+    let left = (
+      <svg
+        id={`svg-shape-outside__${layout}--${viewport}`}
+        data-name={`svg-shape-outside__${layout}--${viewport}`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`0 0 ${parseInt(SvgModals[layout]["cut"])} ${
+          options?.render?.height
+        }`}
+        className={
+          `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left ` +
+          `svg-shape-outside__${layout}-left--${viewport}`
+        }
+      >
+        <desc id="desc">decorative background</desc>
+        <g>
+          <path d={SvgModals[layout]["path"]} />
+        </g>
+      </svg>
+    );
+    let right = (
+      <svg
+        id={`svg-shape-outside__${layout}--${viewport}`}
+        data-name={`svg-shape-outside__${layout}--${viewport}`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`${SvgModals[layout]["cut"]} 0 ${parseInt(
+          options?.render?.width - SvgModals[layout]["cut"]
+        )} ${options?.render?.height}`}
+        className={
+          `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-right ` +
+          `svg-shape-outside__${layout}-right--${viewport}`
+        }
+      >
+        <desc id="desc">decorative background</desc>
+        <g>
+          <path d={SvgModals[layout]["path"]} />
+        </g>
+      </svg>
+    );
+
+    let left_mask = (
+      <svg
+        id={`svg-shape-outside-mask__${layout}-left--${viewport}`}
+        data-name={`svg-shape-outside-mask__${layout}-left--${viewport}`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`0 0 ${parseInt(SvgModals[layout]["cut"])} ${
+          options?.render?.height
+        }`}
+        className={`svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-left--${viewport} left-mask`}
+      >
+        <desc id="desc">decorative background</desc>
+        <mask id={`svg__${layout}-left--${viewport}`}>
+          <rect
+            fill="white"
+            width={SvgModals[layout]["cut"]}
+            height={options?.render?.height}
+          ></rect>
+          <g>
+            <path d={SvgModals[layout]["path"]} />
+          </g>
+        </mask>
+        <rect
+          mask={`url(#svg__${layout}-left--${viewport})`}
+          width={SvgModals[layout]["cut"]}
+          height={options?.render?.height}
+        ></rect>
+      </svg>
+    );
+    let right_mask = (
+      <svg
+        id={`svg-shape-outside-mask__${layout}-right--${viewport}`}
+        data-name={`svg-shape-outside-mask__${layout}-right--${viewport}`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`${SvgModals[layout]["cut"]} 0 ${parseInt(
+          options?.render?.height - SvgModals[layout]["cut"]
+        )} ${options?.render?.height}`}
+        className={`svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-right--${viewport} right-mask`}
+      >
+        <desc id="desc">decorative background</desc>
+        <mask id={`svg__${layout}-right--${viewport}`}>
+          <rect
+            fill="white"
+            width={parseInt(options?.render?.width - SvgModals[layout]["cut"])}
+            height={options?.render?.height}
+          ></rect>
+          <g>
+            <path d={SvgModals[layout]["path"]} />
+          </g>
+        </mask>
+        <rect
+          mask={`url(#svg__${layout}-right--${viewport})`}
+          width={parseInt(options?.render?.width - SvgModals[layout]["cut"])}
+          height={options?.render?.height}
+        ></rect>
+      </svg>
+    );
+
+    // render to base64
+    let svgStringLeft = renderToStaticMarkup(left_mask);
+    let b64Left = window.btoa(svgStringLeft);
+    let dataUriLeft = `data:image/svg+xml;base64,${b64Left}`;
+    let svgStringRight = renderToStaticMarkup(right_mask);
+    let b64Right = window.btoa(svgStringRight);
+    let dataUriRight = `data:image/svg+xml;base64,${b64Right}`;
+    // return shape-outside
+    return {
+      modal_shape: modal_shape,
+      left: left,
+      left_mask: dataUriLeft,
+      right: right,
+      right_mask: dataUriRight,
+    };
+  }
+}
+
 function SvgPane(layout, viewport, mode = false) {
   const SvgPanes = {
     mini: {
@@ -411,4 +579,4 @@ function SvgPane(layout, viewport, mode = false) {
   }
 }
 
-export { TractStackLogo, SvgPane };
+export { TractStackLogo, SvgPane, SvgModal };

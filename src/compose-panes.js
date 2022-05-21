@@ -8,12 +8,13 @@ import {
   InjectGatsbyBackgroundVideo,
   InjectSvg,
   InjectSvgShape,
+  InjectSvgModal,
   StyledWrapperDiv,
   InjectCssAnimation,
   getCurrentPane,
   thisViewportValue,
 } from "./helpers";
-import { SvgPane } from "./shapes";
+import { SvgPane, SvgModal } from "./shapes";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
@@ -117,6 +118,7 @@ function ComposePanes(data) {
           let react_fragment,
             tractStackFragment,
             shape,
+            child,
             maskData,
             buttonData,
             imageData = [],
@@ -148,6 +150,16 @@ function ComposePanes(data) {
               desktop: pane_fragment?.field_text_shape_outside_desktop,
             }
           );
+          // add modal if available
+          let modalData = thisViewportValue(
+            data?.state?.viewport?.viewport?.key,
+            {
+              mobile: pane_fragment?.field_options_mobile,
+              tablet: pane_fragment?.field_options_tablet,
+              desktop: pane_fragment?.field_options_desktop,
+            }
+          );
+          // add shape outside if available
           if (has_shape_outside && has_shape_outside !== "none") {
             let textShapeOutside = SvgPane(
               has_shape_outside,
@@ -201,6 +213,7 @@ function ComposePanes(data) {
             payload: {
               imageData: imageData,
               maskData: maskData,
+              modalData: modalData,
               hooksData: data?.hooks,
             },
           };
@@ -228,9 +241,35 @@ function ComposePanes(data) {
               break;
 
             case "paragraph__background_pane":
-              let child = SvgPane(shape, data?.state?.viewport?.viewport?.key);
+              child = SvgPane(shape, data?.state?.viewport?.viewport?.key);
               tractStackFragment.children = child;
               react_fragment = InjectSvgShape(tractStackFragment);
+              break;
+
+            case "paragraph__background_image":
+              react_fragment = InjectGatsbyBackgroundImage(tractStackFragment);
+              break;
+
+            case "paragraph__modal":
+              let this_options;
+              try {
+                this_options = JSON.parse(
+                  tractStackFragment?.payload?.modalData
+                );
+                if (typeof this_options?.render === "object")
+                  tractStackFragment.payload.modalData = this_options?.render;
+              } catch (e) {
+                if (e instanceof SyntaxError) {
+                  console.log("ERROR parsing json in {}: ", e);
+                }
+              }
+              child = SvgModal(
+                pane_fragment?.field_modal_shape,
+                data?.state?.viewport?.viewport?.key,
+                this_options
+              );
+              tractStackFragment.children = child;
+              react_fragment = InjectSvgModal(tractStackFragment);
               break;
 
             case "paragraph__background_video":
@@ -239,10 +278,6 @@ function ComposePanes(data) {
                 alt_text: pane_fragment?.field_alt_text,
               };
               react_fragment = InjectGatsbyBackgroundVideo(tractStackFragment);
-              break;
-
-            case "paragraph__background_image":
-              react_fragment = InjectGatsbyBackgroundImage(tractStackFragment);
               break;
 
             case "paragraph__svg":
@@ -263,6 +298,12 @@ function ComposePanes(data) {
             case "paragraph__h5p":
               //
               break;
+
+            default:
+              console.log(
+                "MISS on compose-panes.js:",
+                tractStackFragment?.mode
+              );
           }
 
           let thisClass = `paneFragment paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
