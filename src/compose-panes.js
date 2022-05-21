@@ -246,12 +246,14 @@ function ComposePanes(data) {
               break;
 
             case "paragraph__svg":
-              tractStackFragment.payload.imageData = {
-                url: pane_fragment?.relationships?.field_svg_file?.localFile
-                  ?.publicURL,
-                alt_text: pane_fragment?.field_svg_file?.description,
-              };
-              react_fragment = InjectSvg(fragment);
+              tractStackFragment.payload.imageData = [
+                {
+                  url: pane_fragment?.relationships?.field_svg_file?.localFile
+                    ?.publicURL,
+                  alt_text: pane_fragment?.field_svg_file?.description,
+                },
+              ];
+              react_fragment = InjectSvg(tractStackFragment);
               break;
 
             case "paragraph__d3":

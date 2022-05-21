@@ -309,11 +309,11 @@ const InjectSvg = fragment => {
   let css = `z-index: ${parseInt(fragment?.z_index)};`;
   if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
   let child = /*#__PURE__*/React.createElement("img", {
-    src: fragment?.payload?.imageData?.url,
-    alt: fragment?.payload?.imageData?.alt_text,
+    src: fragment?.payload?.imageData[0]?.url,
+    alt: fragment?.payload?.imageData[0]?.alt_text,
     className: "paneFragmentSvg"
   });
-  return PaneFragment(this_id, fragment?.children, css);
+  return PaneFragment(this_id, child, css);
 };
 
 const InjectGatsbyBackgroundImage = fragment => {

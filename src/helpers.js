@@ -342,12 +342,12 @@ const InjectSvg = (fragment) => {
     css = `${css} ${fragment?.css?.parent}`;
   let child = (
     <img
-      src={fragment?.payload?.imageData?.url}
-      alt={fragment?.payload?.imageData?.alt_text}
+      src={fragment?.payload?.imageData[0]?.url}
+      alt={fragment?.payload?.imageData[0]?.alt_text}
       className="paneFragmentSvg"
     />
   );
-  return PaneFragment(this_id, fragment?.children, css);
+  return PaneFragment(this_id, child, css);
 };
 
 const InjectGatsbyBackgroundImage = (fragment) => {
