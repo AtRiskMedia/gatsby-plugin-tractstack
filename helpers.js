@@ -308,6 +308,7 @@ const InjectSvgModal = fragment => {
   let this_id = `${fragment?.id}-svg-modal`;
   let css = `z-index: ${parseInt(fragment?.z_index)};`;
   if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent} ` + `svg { width: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.y}); ` + `}`;
+  console.log("InjectSvgModal", this_id, fragment);
   return PaneFragment(this_id, fragment?.children?.modal_shape, css);
 };
 

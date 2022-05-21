@@ -85,8 +85,11 @@ function ComposePanes(data) {
           tractStackFragment,
           shape,
           child,
+          action,
+          child_payload,
           maskData,
           buttonData,
+          videoData,
           imageData = [],
           css_child,
           css_parent; // select css for viewport
@@ -112,11 +115,27 @@ function ComposePanes(data) {
         desktop: pane_fragment?.field_text_shape_outside_desktop
       }); // add modal if available
 
-      let modalData = thisViewportValue(data?.state?.viewport?.viewport?.key, {
-        mobile: pane_fragment?.field_options_mobile,
-        tablet: pane_fragment?.field_options_tablet,
-        desktop: pane_fragment?.field_options_desktop
-      }); // add shape outside if available
+      let modalData,
+          modalData_raw = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+        mobile: pane_fragment?.field_render_mobile,
+        tablet: pane_fragment?.field_render_tablet,
+        desktop: pane_fragment?.field_render_desktop
+      });
+
+      if (modalData_raw) {
+        let this_options;
+
+        try {
+          this_options = JSON.parse(modalData_raw);
+          if (typeof this_options?.render === "object") modalData = this_options?.render;
+          modalData.modal_shape = SvgModal(pane_fragment?.field_modal_shape, data?.state?.viewport?.viewport?.key, this_options);
+        } catch (e) {
+          if (e instanceof SyntaxError) {
+            console.log("ERROR parsing json in {}: ", e);
+          }
+        }
+      } // add shape outside if available
+
 
       if (has_shape_outside && has_shape_outside !== "none") {
         let textShapeOutside = SvgPane(has_shape_outside, data?.state?.viewport?.viewport?.key, "shape-outside");
@@ -128,6 +147,23 @@ function ComposePanes(data) {
           left: textShapeOutside?.left_mask,
           right: textShapeOutside?.right_mask
         };
+      } // prepare any markdown for this paneFragment
+
+
+      child_payload = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
+
+      if (child_payload) {
+        child_payload.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
+      } // prepare any buttonData
+
+
+      try {
+        action = JSON.parse(pane_fragment?.field_options);
+        if (typeof action?.buttons === "object") buttonData = action?.buttons;
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          console.log("ERROR parsing json in {}: ", e);
+        }
       } // prepare any images from this paneFragment
 
 
@@ -147,7 +183,24 @@ function ComposePanes(data) {
           if (typeof pane_fragment?.field_alt_text === "string") this_imageData.alt_text = pane_fragment?.field_alt_text;
           imageData.push(this_imageData);
         }
-      }); // prepare structured data for this paneFragment
+      }); // prepare any videos for this paneFragment
+
+      if (pane_fragment?.internal?.type === "paragraph__background_video") {
+        videoData = {
+          url: pane_fragment?.field_cdn_url,
+          alt_text: pane_fragment?.field_alt_text
+        };
+      } // prepare any svg for this paneFragment
+
+
+      if (pane_fragment?.internal?.type === "paragraph__svg") {
+        if (imageData.length) console.log("WARNING in compose-panes.js > imageData pre-exists?");
+        imageData = [{
+          url: pane_fragment?.relationships?.field_svg_file?.localFile?.publicURL,
+          alt_text: pane_fragment?.field_svg_file?.description
+        }];
+      } // prepare structured data for this paneFragment
+
 
       tractStackFragment = {
         id: pane_fragment?.id,
@@ -157,6 +210,7 @@ function ComposePanes(data) {
           width: data?.state?.viewport?.viewport?.width
         },
         z_index: pane_fragment?.field_zindex,
+        children: child_payload,
         css: {
           parent: css_parent,
           child: css_child
@@ -165,25 +219,13 @@ function ComposePanes(data) {
           imageData: imageData,
           maskData: maskData,
           modalData: modalData,
-          hooksData: data?.hooks
+          hooksData: data?.hooks,
+          videoData: videoData
         }
       }; // all source data for this paneFragment
 
       switch (tractStackFragment?.mode) {
         case "paragraph__markdown":
-          let action;
-          tractStackFragment.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-          tractStackFragment.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
-
-          try {
-            action = JSON.parse(pane_fragment?.field_options);
-            if (typeof action?.buttons === "object") tractStackFragment.payload.buttonData = action?.buttons;
-          } catch (e) {
-            if (e instanceof SyntaxError) {
-              console.log("ERROR parsing json in {}: ", e);
-            }
-          }
-
           react_fragment = MarkdownParagraph(tractStackFragment);
           break;
 
@@ -198,35 +240,14 @@ function ComposePanes(data) {
           break;
 
         case "paragraph__modal":
-          let this_options;
-
-          try {
-            this_options = JSON.parse(tractStackFragment?.payload?.modalData);
-            if (typeof this_options?.render === "object") tractStackFragment.payload.modalData = this_options?.render;
-          } catch (e) {
-            if (e instanceof SyntaxError) {
-              console.log("ERROR parsing json in {}: ", e);
-            }
-          }
-
-          child = SvgModal(pane_fragment?.field_modal_shape, data?.state?.viewport?.viewport?.key, this_options);
-          tractStackFragment.children = child;
           react_fragment = InjectSvgModal(tractStackFragment);
           break;
 
         case "paragraph__background_video":
-          tractStackFragment.payload.videoData = {
-            url: pane_fragment?.field_cdn_url,
-            alt_text: pane_fragment?.field_alt_text
-          };
           react_fragment = InjectGatsbyBackgroundVideo(tractStackFragment);
           break;
 
         case "paragraph__svg":
-          tractStackFragment.payload.imageData = [{
-            url: pane_fragment?.relationships?.field_svg_file?.localFile?.publicURL,
-            alt_text: pane_fragment?.field_svg_file?.description
-          }];
           react_fragment = InjectSvg(tractStackFragment);
           break;
 
