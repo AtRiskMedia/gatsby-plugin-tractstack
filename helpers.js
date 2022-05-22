@@ -299,9 +299,7 @@ const InjectSvgModal = (shape, options) => {
   // react fragment, not tractStackFragment
   let this_id = `${options?.id}-svg-modal`;
   let css = `z-index: ${parseInt(options?.z_index)};` + `svg { width: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.y}); ` + `}`;
-  let x = PaneFragment(this_id, shape, css);
-  console.log(5, x);
-  return x;
+  return PaneFragment(this_id, shape, css);
 };
 
 const InjectSvgShape = fragment => {

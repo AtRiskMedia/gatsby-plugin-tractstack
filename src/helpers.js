@@ -334,9 +334,7 @@ const InjectSvgModal = (shape, options) => {
     `padding-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.x}); ` +
     `padding-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.y}); ` +
     `}`;
-  let x = PaneFragment(this_id, shape, css);
-  console.log(5, x);
-  return x;
+  return PaneFragment(this_id, shape, css);
 };
 
 const InjectSvgShape = (fragment) => {

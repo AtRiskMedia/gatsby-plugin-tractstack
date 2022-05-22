@@ -294,11 +294,10 @@ function ComposePanes(data) {
     if (Object.keys(modals).length) modals.map(i => {
       composedPaneFragments[Object.keys(composedPaneFragments).length] = /*#__PURE__*/React.createElement("div", {
         className: `paneFragment paneFragment__modal paneFragment__modal--${data?.state?.viewport?.viewport?.key}`,
-        key: i?.id
+        key: `${i?.id}-modal`
       }, /*#__PURE__*/React.createElement(IsVisible, {
-        id: i?.id,
         className: "paneFragment",
-        key: i?.id
+        key: `${i?.id}-visible`
       }, i?.fragment));
     }); // inject imageMaskShape(s) (if available)
 
