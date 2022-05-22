@@ -325,32 +325,27 @@ const PaneFragment = (id, child, css) => {
   );
 };
 
+const InjectSvgModal = (shape, options) => {
+  // react fragment, not tractStackFragment
+  let this_id = `${options?.id}-svg-modal`;
+  let css =
+    `z-index: ${parseInt(options?.z_index)};` +
+    `svg { width: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.width}); ` +
+    `padding-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.x}); ` +
+    `padding-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.y}); ` +
+    `}`;
+  let x = PaneFragment(this_id, shape, css);
+  console.log(5, x);
+  return x;
+};
+
 const InjectSvgShape = (fragment) => {
   if (!validateSchema(fragment)) return <></>;
   let this_id = `${fragment?.id}-svg-shape`;
   let css = `z-index: ${parseInt(fragment?.z_index)};`;
   if (typeof fragment?.css?.parent === "string")
     css = `${css} ${fragment?.css?.parent}`;
-  return PaneFragment(this_id, fragment?.children, css);
-};
-
-const InjectSvgModal = (fragment) => {
-  if (!validateSchema(fragment)) return <></>;
-  let this_id = `${fragment?.id}-svg-modal`;
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof fragment?.css?.parent === "string")
-    css =
-      `${css} ${fragment?.css?.parent} ` +
-      `svg { width: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.width}); ` +
-      `padding-left: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.x}); ` +
-      `padding-top: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.y}); ` +
-      `}`;
-  console.log("InjectSvgModal", this_id, fragment);
-
-  // need shape, in payload.modalData.modalShape
-  // also need paragraph with textShapeOutside
-
-  return PaneFragment(this_id, fragment?.children?.modal_shape, css);
+  return PaneFragment(this_id, fragment?.payload?.paneData, css);
 };
 
 const InjectSvg = (fragment) => {

@@ -63,6 +63,18 @@ function SvgModal(layout, viewport, options = {}) {
     },
   };
 
+  let width = options?.width;
+  let height = options?.height;
+  let cut = SvgModals[layout]["cut"];
+  let viewbox_x1 = options?.viewbox_x1;
+  let viewbox_y1 = options?.viewbox_y1;
+  let viewbox_x2 = options?.viewbox_x2;
+  let viewbox_y2 = options?.viewbox_y2;
+  let x1 = 0;
+  let y1 = 0;
+  let x2 = SvgModals[layout].viewBox[0];
+  let y2 = SvgModals[layout].viewBox[1];
+
   let modal_shape;
   if (SvgModals[layout]) {
     let this_className = `svg svg__${layout} svg__${layout}--${viewport}`;
@@ -71,7 +83,7 @@ function SvgModal(layout, viewport, options = {}) {
         id={`svg__${layout}--${viewport}`}
         data-name={`svg__${layout}--${viewport}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`${options?.render?.viewbox_x1} ${options?.render?.viewbox_y1} ${options?.render?.viewbox_x2} ${options?.render?.viewbox_y2}`}
+        viewBox={`${viewbox_x1} ${viewbox_y1} ${viewbox_x2} ${viewbox_y2}`}
         className={this_className}
       >
         <desc id="desc">decorative background</desc>
@@ -85,9 +97,7 @@ function SvgModal(layout, viewport, options = {}) {
         id={`svg-shape-outside__${layout}--${viewport}`}
         data-name={`svg-shape-outside__${layout}--${viewport}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`0 0 ${parseInt(SvgModals[layout]["cut"])} ${
-          options?.render?.height
-        }`}
+        viewBox={`0 0 ${cut} ${height}`}
         className={
           `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left ` +
           `svg-shape-outside__${layout}-left--${viewport}`
@@ -104,9 +114,7 @@ function SvgModal(layout, viewport, options = {}) {
         id={`svg-shape-outside__${layout}--${viewport}`}
         data-name={`svg-shape-outside__${layout}--${viewport}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`${SvgModals[layout]["cut"]} 0 ${parseInt(
-          options?.render?.width - SvgModals[layout]["cut"]
-        )} ${options?.render?.height}`}
+        viewBox={`${cut} 0 ${parseInt(width - cut)} ${height}`}
         className={
           `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-right ` +
           `svg-shape-outside__${layout}-right--${viewport}`
@@ -124,26 +132,20 @@ function SvgModal(layout, viewport, options = {}) {
         id={`svg-shape-outside-mask__${layout}-left--${viewport}`}
         data-name={`svg-shape-outside-mask__${layout}-left--${viewport}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`0 0 ${parseInt(SvgModals[layout]["cut"])} ${
-          options?.render?.height
-        }`}
+        viewBox={`0 0 ${cut} ${height}`}
         className={`svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-left--${viewport} left-mask`}
       >
         <desc id="desc">decorative background</desc>
         <mask id={`svg__${layout}-left--${viewport}`}>
-          <rect
-            fill="white"
-            width={SvgModals[layout]["cut"]}
-            height={options?.render?.height}
-          ></rect>
+          <rect fill="white" width={cut} height={height}></rect>
           <g>
             <path d={SvgModals[layout]["path"]} />
           </g>
         </mask>
         <rect
           mask={`url(#svg__${layout}-left--${viewport})`}
-          width={SvgModals[layout]["cut"]}
-          height={options?.render?.height}
+          width={cut}
+          height={height}
         ></rect>
       </svg>
     );
@@ -152,17 +154,15 @@ function SvgModal(layout, viewport, options = {}) {
         id={`svg-shape-outside-mask__${layout}-right--${viewport}`}
         data-name={`svg-shape-outside-mask__${layout}-right--${viewport}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`${SvgModals[layout]["cut"]} 0 ${parseInt(
-          options?.render?.height - SvgModals[layout]["cut"]
-        )} ${options?.render?.height}`}
+        viewBox={`${cut} 0 ${parseInt(height - cut)} ${height}`}
         className={`svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-right--${viewport} right-mask`}
       >
         <desc id="desc">decorative background</desc>
         <mask id={`svg__${layout}-right--${viewport}`}>
           <rect
             fill="white"
-            width={parseInt(options?.render?.width - SvgModals[layout]["cut"])}
-            height={options?.render?.height}
+            width={parseInt(width - cut)}
+            height={height}
           ></rect>
           <g>
             <path d={SvgModals[layout]["path"]} />
@@ -170,8 +170,8 @@ function SvgModal(layout, viewport, options = {}) {
         </mask>
         <rect
           mask={`url(#svg__${layout}-right--${viewport})`}
-          width={parseInt(options?.render?.width - SvgModals[layout]["cut"])}
-          height={options?.render?.height}
+          width={parseInt(width - cut)}
+          height={height}
         ></rect>
       </svg>
     );
@@ -185,11 +185,11 @@ function SvgModal(layout, viewport, options = {}) {
     let dataUriRight = `data:image/svg+xml;base64,${b64Right}`;
     // return shape-outside
     return {
-      modal_shape: modal_shape,
       left: left,
       left_mask: dataUriLeft,
       right: right,
       right_mask: dataUriRight,
+      modal_shape: modal_shape,
     };
   }
 }

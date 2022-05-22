@@ -56,6 +56,17 @@ function SvgModal(layout, viewport, options = {}) {
       path: "m 594.88887,194.93308 h -27.41974 c -86.19939,-0.12924 -172.38869,-0.44735 -258.58809,-0.338 -46.61556,0.0596 -93.23113,0.99411 -139.8467,1.24265 -51.0003,0.24852 -102.041011,0.12922 -153.011002,0.15905 -8.991733,0 -9.092763,-0.18888 -9.163485,-8.83766 Q 5.950577,99.478438 5.010991,11.797759 c -0.070721,-6.8295497 0,-7.1675478 6.688233,-7.2470768 C 37.280198,4.2325664 62.861173,3.9641561 88.48256,4.0039206 q 56.05184,0.1093523 112.14408,0.656114 c 90.55382,0.9444064 181.10764,2.0975763 271.66147,2.9823361 36.18919,0.3479391 72.37839,0.2385868 108.57769,0.337998 1.67711,0 3.36433,0 5.05154,0.049706 6.32452,0.2584693 7.52679,1.4414628 7.61771,7.8435443 q 0.21217,15.647323 0.26268,31.294648 c 0.0808,16.402848 0,32.805697 0.19196,49.188664 Q 594.39382,142.55331 595,188.7497 c -0.11113,1.79935 -0.11113,3.59869 -0.11113,6.18338 z"
     }
   };
+  let width = options?.width;
+  let height = options?.height;
+  let cut = SvgModals[layout]["cut"];
+  let viewbox_x1 = options?.viewbox_x1;
+  let viewbox_y1 = options?.viewbox_y1;
+  let viewbox_x2 = options?.viewbox_x2;
+  let viewbox_y2 = options?.viewbox_y2;
+  let x1 = 0;
+  let y1 = 0;
+  let x2 = SvgModals[layout].viewBox[0];
+  let y2 = SvgModals[layout].viewBox[1];
   let modal_shape;
 
   if (SvgModals[layout]) {
@@ -64,7 +75,7 @@ function SvgModal(layout, viewport, options = {}) {
       id: `svg__${layout}--${viewport}`,
       "data-name": `svg__${layout}--${viewport}`,
       xmlns: "http://www.w3.org/2000/svg",
-      viewBox: `${options?.render?.viewbox_x1} ${options?.render?.viewbox_y1} ${options?.render?.viewbox_x2} ${options?.render?.viewbox_y2}`,
+      viewBox: `${viewbox_x1} ${viewbox_y1} ${viewbox_x2} ${viewbox_y2}`,
       className: this_className
     }, /*#__PURE__*/React.createElement("desc", {
       id: "desc"
@@ -75,7 +86,7 @@ function SvgModal(layout, viewport, options = {}) {
       id: `svg-shape-outside__${layout}--${viewport}`,
       "data-name": `svg-shape-outside__${layout}--${viewport}`,
       xmlns: "http://www.w3.org/2000/svg",
-      viewBox: `0 0 ${parseInt(SvgModals[layout]["cut"])} ${options?.render?.height}`,
+      viewBox: `0 0 ${cut} ${height}`,
       className: `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left ` + `svg-shape-outside__${layout}-left--${viewport}`
     }, /*#__PURE__*/React.createElement("desc", {
       id: "desc"
@@ -86,7 +97,7 @@ function SvgModal(layout, viewport, options = {}) {
       id: `svg-shape-outside__${layout}--${viewport}`,
       "data-name": `svg-shape-outside__${layout}--${viewport}`,
       xmlns: "http://www.w3.org/2000/svg",
-      viewBox: `${SvgModals[layout]["cut"]} 0 ${parseInt(options?.render?.width - SvgModals[layout]["cut"])} ${options?.render?.height}`,
+      viewBox: `${cut} 0 ${parseInt(width - cut)} ${height}`,
       className: `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-right ` + `svg-shape-outside__${layout}-right--${viewport}`
     }, /*#__PURE__*/React.createElement("desc", {
       id: "desc"
@@ -97,7 +108,7 @@ function SvgModal(layout, viewport, options = {}) {
       id: `svg-shape-outside-mask__${layout}-left--${viewport}`,
       "data-name": `svg-shape-outside-mask__${layout}-left--${viewport}`,
       xmlns: "http://www.w3.org/2000/svg",
-      viewBox: `0 0 ${parseInt(SvgModals[layout]["cut"])} ${options?.render?.height}`,
+      viewBox: `0 0 ${cut} ${height}`,
       className: `svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-left--${viewport} left-mask`
     }, /*#__PURE__*/React.createElement("desc", {
       id: "desc"
@@ -105,20 +116,20 @@ function SvgModal(layout, viewport, options = {}) {
       id: `svg__${layout}-left--${viewport}`
     }, /*#__PURE__*/React.createElement("rect", {
       fill: "white",
-      width: SvgModals[layout]["cut"],
-      height: options?.render?.height
+      width: cut,
+      height: height
     }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
       d: SvgModals[layout]["path"]
     }))), /*#__PURE__*/React.createElement("rect", {
       mask: `url(#svg__${layout}-left--${viewport})`,
-      width: SvgModals[layout]["cut"],
-      height: options?.render?.height
+      width: cut,
+      height: height
     }));
     let right_mask = /*#__PURE__*/React.createElement("svg", {
       id: `svg-shape-outside-mask__${layout}-right--${viewport}`,
       "data-name": `svg-shape-outside-mask__${layout}-right--${viewport}`,
       xmlns: "http://www.w3.org/2000/svg",
-      viewBox: `${SvgModals[layout]["cut"]} 0 ${parseInt(options?.render?.height - SvgModals[layout]["cut"])} ${options?.render?.height}`,
+      viewBox: `${cut} 0 ${parseInt(height - cut)} ${height}`,
       className: `svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-right--${viewport} right-mask`
     }, /*#__PURE__*/React.createElement("desc", {
       id: "desc"
@@ -126,14 +137,14 @@ function SvgModal(layout, viewport, options = {}) {
       id: `svg__${layout}-right--${viewport}`
     }, /*#__PURE__*/React.createElement("rect", {
       fill: "white",
-      width: parseInt(options?.render?.width - SvgModals[layout]["cut"]),
-      height: options?.render?.height
+      width: parseInt(width - cut),
+      height: height
     }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
       d: SvgModals[layout]["path"]
     }))), /*#__PURE__*/React.createElement("rect", {
       mask: `url(#svg__${layout}-right--${viewport})`,
-      width: parseInt(options?.render?.width - SvgModals[layout]["cut"]),
-      height: options?.render?.height
+      width: parseInt(width - cut),
+      height: height
     })); // render to base64
 
     let svgStringLeft = renderToStaticMarkup(left_mask);
@@ -144,11 +155,11 @@ function SvgModal(layout, viewport, options = {}) {
     let dataUriRight = `data:image/svg+xml;base64,${b64Right}`; // return shape-outside
 
     return {
-      modal_shape: modal_shape,
       left: left,
       left_mask: dataUriLeft,
       right: right,
-      right_mask: dataUriRight
+      right_mask: dataUriRight,
+      modal_shape: modal_shape
     };
   }
 }
