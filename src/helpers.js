@@ -346,6 +346,10 @@ const InjectSvgModal = (fragment) => {
       `padding-top: calc((100vw - (var(--offset) * 1px)) / ${fragment?.viewport?.width} * ${fragment?.payload?.modalData?.y}); ` +
       `}`;
   console.log("InjectSvgModal", this_id, fragment);
+
+  // need shape, in payload.modalData.modalShape
+  // also need paragraph with textShapeOutside
+
   return PaneFragment(this_id, fragment?.children?.modal_shape, css);
 };
 

@@ -83,16 +83,12 @@ function ComposePanes(data) {
     .sort((a, b) => a?.field_zindex > b?.field_zindex ? 1 : -1).map((pane_fragment, index) => {
       let react_fragment,
           tractStackFragment,
+          payload = {},
+          tempValue,
           shape,
-          child,
-          action,
-          child_payload,
-          maskData,
-          buttonData,
-          videoData,
-          imageData = [],
           css_child,
-          css_parent; // select css for viewport
+          css_parent;
+      payload.imageData = []; // select css for viewport
 
       css_child = thisViewportValue(data?.state?.viewport?.viewport?.key, {
         mobile: pane_fragment?.field_css_styles_mobile || "",
@@ -103,63 +99,88 @@ function ComposePanes(data) {
         mobile: pane_fragment?.field_css_styles_parent_mobile || "",
         tablet: pane_fragment?.field_css_styles_parent_tablet || "",
         desktop: pane_fragment?.field_css_styles_parent_desktop || ""
-      });
-      if (pane_fragment?.internal?.type === "paragraph__background_pane") shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
-        mobile: pane_fragment?.field_shape_mobile,
-        tablet: pane_fragment?.field_shape_tablet,
-        desktop: pane_fragment?.field_shape_desktop
-      });
-      let has_shape_outside = thisViewportValue(data?.state?.viewport?.viewport?.key, {
-        mobile: pane_fragment?.field_text_shape_outside_mobile,
-        tablet: pane_fragment?.field_text_shape_outside_tablet,
-        desktop: pane_fragment?.field_text_shape_outside_desktop
-      }); // add modal if available
+      }); // pre-pass paneFragment based on type
 
-      let modalData,
-          modalData_raw = thisViewportValue(data?.state?.viewport?.viewport?.key, {
-        mobile: pane_fragment?.field_render_mobile,
-        tablet: pane_fragment?.field_render_tablet,
-        desktop: pane_fragment?.field_render_desktop
-      });
+      switch (pane_fragment?.internal?.type) {
+        case "paragraph__markdown":
+          shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+            mobile: pane_fragment?.field_text_shape_outside_mobile,
+            tablet: pane_fragment?.field_text_shape_outside_tablet,
+            desktop: pane_fragment?.field_text_shape_outside_desktop
+          });
+          break;
 
-      if (modalData_raw) {
-        let this_options;
+        case "paragraph__background_pane":
+          shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+            mobile: pane_fragment?.field_shape_mobile,
+            tablet: pane_fragment?.field_shape_tablet,
+            desktop: pane_fragment?.field_shape_desktop
+          });
+          tempValue = SvgPane(shape, data?.state?.viewport?.viewport?.key);
+          if (tempValue) payload.children = tempValue;
+          break;
 
-        try {
-          this_options = JSON.parse(modalData_raw);
-          if (typeof this_options?.render === "object") modalData = this_options?.render;
-          modalData.modal_shape = SvgModal(pane_fragment?.field_modal_shape, data?.state?.viewport?.viewport?.key, this_options);
-        } catch (e) {
-          if (e instanceof SyntaxError) {
-            console.log("ERROR parsing json in {}: ", e);
+        case "paragraph__modal":
+          tempValue = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+            mobile: pane_fragment?.field_render_mobile,
+            tablet: pane_fragment?.field_render_tablet,
+            desktop: pane_fragment?.field_render_desktop
+          });
+
+          if (tempValue) {
+            let this_options;
+
+            try {
+              this_options = JSON.parse(tempValue);
+              if (typeof this_options?.render === "object") payload.modalData = this_options?.render;
+              payload.modalData.modal_shape = SvgModal(pane_fragment?.field_modal_shape, data?.state?.viewport?.viewport?.key, this_options);
+            } catch (e) {
+              if (e instanceof SyntaxError) {
+                console.log("ERROR parsing json in {}: ", e);
+              }
+            }
           }
-        }
+
+          break;
+
+        case "paragraph__background_video":
+          payload.videoData = {
+            url: pane_fragment?.field_cdn_url,
+            alt_text: pane_fragment?.field_alt_text
+          };
+          break;
+
+        case "paragraph__svg":
+          payload.imageData = [{
+            url: pane_fragment?.relationships?.field_svg_file?.localFile?.publicURL,
+            alt_text: pane_fragment?.field_svg_file?.description
+          }];
+          break;
       } // add shape outside if available
 
 
-      if (has_shape_outside && has_shape_outside !== "none") {
-        let textShapeOutside = SvgPane(has_shape_outside, data?.state?.viewport?.viewport?.key, "shape-outside");
-        if (textShapeOutside) maskData = {
-          textShapeOutside: textShapeOutside
+      if (shape && shape !== "none") {
+        let tempValue = SvgPane(shape, data?.state?.viewport?.viewport?.key, "shape-outside");
+        if (tempValue) payload.maskData = {
+          textShapeOutside: tempValue
         }; // store and inject into pane
 
         textShapeOutsides[Object.keys(textShapeOutsides).length] = {
-          left: textShapeOutside?.left_mask,
-          right: textShapeOutside?.right_mask
+          left: tempValue?.left_mask,
+          right: tempValue?.right_mask
         };
       } // prepare any markdown for this paneFragment
 
 
-      child_payload = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-
-      if (child_payload) {
-        child_payload.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
+      if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
+        payload.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
+        payload.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
       } // prepare any buttonData
 
 
       try {
-        action = JSON.parse(pane_fragment?.field_options);
-        if (typeof action?.buttons === "object") buttonData = action?.buttons;
+        tempValue = JSON.parse(pane_fragment?.field_options);
+        if (typeof tempValue?.buttons === "object") payload.buttonData = tempValue?.buttons;
       } catch (e) {
         if (e instanceof SyntaxError) {
           console.log("ERROR parsing json in {}: ", e);
@@ -181,26 +202,9 @@ function ComposePanes(data) {
             data: this_image
           };
           if (typeof pane_fragment?.field_alt_text === "string") this_imageData.alt_text = pane_fragment?.field_alt_text;
-          imageData.push(this_imageData);
+          payload.imageData.push(this_imageData);
         }
-      }); // prepare any videos for this paneFragment
-
-      if (pane_fragment?.internal?.type === "paragraph__background_video") {
-        videoData = {
-          url: pane_fragment?.field_cdn_url,
-          alt_text: pane_fragment?.field_alt_text
-        };
-      } // prepare any svg for this paneFragment
-
-
-      if (pane_fragment?.internal?.type === "paragraph__svg") {
-        if (imageData.length) console.log("WARNING in compose-panes.js > imageData pre-exists?");
-        imageData = [{
-          url: pane_fragment?.relationships?.field_svg_file?.localFile?.publicURL,
-          alt_text: pane_fragment?.field_svg_file?.description
-        }];
-      } // prepare structured data for this paneFragment
-
+      }); // prepare structured data for this paneFragment
 
       tractStackFragment = {
         id: pane_fragment?.id,
@@ -210,19 +214,19 @@ function ComposePanes(data) {
           width: data?.state?.viewport?.viewport?.width
         },
         z_index: pane_fragment?.field_zindex,
-        children: child_payload,
+        children: payload?.children,
         css: {
           parent: css_parent,
           child: css_child
         },
         payload: {
-          imageData: imageData,
-          maskData: maskData,
-          modalData: modalData,
+          imageData: payload?.imageData,
+          maskData: payload?.maskData,
+          modalData: payload?.modalData,
           hooksData: data?.hooks,
-          videoData: videoData
+          videoData: payload?.videoData
         }
-      }; // all source data for this paneFragment
+      }; // generate react for this paneFragment
 
       switch (tractStackFragment?.mode) {
         case "paragraph__markdown":
@@ -230,8 +234,6 @@ function ComposePanes(data) {
           break;
 
         case "paragraph__background_pane":
-          child = SvgPane(shape, data?.state?.viewport?.viewport?.key);
-          tractStackFragment.children = child;
           react_fragment = InjectSvgShape(tractStackFragment);
           break;
 

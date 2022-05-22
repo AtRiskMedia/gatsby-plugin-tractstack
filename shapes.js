@@ -393,6 +393,7 @@ function SvgPane(layout, viewport, mode = false) {
   };
 
   if (SvgPanes[layout]) {
+    // return pane if available
     if (SvgPanes[layout] && SvgPanes[layout][viewport] && SvgPanes[layout][viewport]["viewBox"] && !mode) {
       let this_className = `svg svg__${layout} svg__${layout}--${viewport}`;
       return /*#__PURE__*/React.createElement("svg", {
@@ -406,7 +407,8 @@ function SvgPane(layout, viewport, mode = false) {
       }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
         d: SvgPanes[layout][viewport]["path"]
       })));
-    }
+    } // else if special mode
+
 
     if (mode === "shape-outside") {
       let left = /*#__PURE__*/React.createElement("svg", {
@@ -430,63 +432,66 @@ function SvgPane(layout, viewport, mode = false) {
         id: "desc"
       }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
         d: SvgPanes[layout][viewport]["path"]
-      })));
-      let left_mask = /*#__PURE__*/React.createElement("svg", {
-        id: `svg-shape-outside-mask__${layout}-left--${viewport}`,
-        "data-name": `svg-shape-outside-mask__${layout}-left--${viewport}`,
-        xmlns: "http://www.w3.org/2000/svg",
-        viewBox: `0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
-        className: `svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-left--${viewport} left-mask`
-      }, /*#__PURE__*/React.createElement("desc", {
-        id: "desc"
-      }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
-        id: `svg__${layout}-left--${viewport}`
-      }, /*#__PURE__*/React.createElement("rect", {
-        fill: "white",
-        width: SvgPanes[layout][viewport]["cut"],
-        height: SvgPanes[layout][viewport]["viewBox"][1]
-      }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
-        d: SvgPanes[layout][viewport]["path"]
-      }))), /*#__PURE__*/React.createElement("rect", {
-        mask: `url(#svg__${layout}-left--${viewport})`,
-        width: SvgPanes[layout][viewport]["cut"],
-        height: SvgPanes[layout][viewport]["viewBox"][1]
-      }));
-      let right_mask = /*#__PURE__*/React.createElement("svg", {
-        id: `svg-shape-outside-mask__${layout}-right--${viewport}`,
-        "data-name": `svg-shape-outside-mask__${layout}-right--${viewport}`,
-        xmlns: "http://www.w3.org/2000/svg",
-        viewBox: `${SvgPanes[layout][viewport]["cut"]} 0 ${parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
-        className: `svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-right--${viewport} right-mask`
-      }, /*#__PURE__*/React.createElement("desc", {
-        id: "desc"
-      }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
-        id: `svg__${layout}-right--${viewport}`
-      }, /*#__PURE__*/React.createElement("rect", {
-        fill: "white",
-        width: parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"]),
-        height: SvgPanes[layout][viewport]["viewBox"][1]
-      }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
-        d: SvgPanes[layout][viewport]["path"]
-      }))), /*#__PURE__*/React.createElement("rect", {
-        mask: `url(#svg__${layout}-right--${viewport})`,
-        width: parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"]),
-        height: SvgPanes[layout][viewport]["viewBox"][1]
-      })); // render to base64
+      }))); // look for "cut" value
 
-      let svgStringLeft = renderToStaticMarkup(left_mask);
-      let b64Left = window.btoa(svgStringLeft);
-      let dataUriLeft = `data:image/svg+xml;base64,${b64Left}`;
-      let svgStringRight = renderToStaticMarkup(right_mask);
-      let b64Right = window.btoa(svgStringRight);
-      let dataUriRight = `data:image/svg+xml;base64,${b64Right}`; // return shape-outside
+      if (typeof SvgPanes[layout][viewport]["cut"] === "number") {
+        let left_mask = /*#__PURE__*/React.createElement("svg", {
+          id: `svg-shape-outside-mask__${layout}-left--${viewport}`,
+          "data-name": `svg-shape-outside-mask__${layout}-left--${viewport}`,
+          xmlns: "http://www.w3.org/2000/svg",
+          viewBox: `0 0 ${parseInt(SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
+          className: `svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-left--${viewport} left-mask`
+        }, /*#__PURE__*/React.createElement("desc", {
+          id: "desc"
+        }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
+          id: `svg__${layout}-left--${viewport}`
+        }, /*#__PURE__*/React.createElement("rect", {
+          fill: "white",
+          width: SvgPanes[layout][viewport]["cut"],
+          height: SvgPanes[layout][viewport]["viewBox"][1]
+        }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
+          d: SvgPanes[layout][viewport]["path"]
+        }))), /*#__PURE__*/React.createElement("rect", {
+          mask: `url(#svg__${layout}-left--${viewport})`,
+          width: SvgPanes[layout][viewport]["cut"],
+          height: SvgPanes[layout][viewport]["viewBox"][1]
+        }));
+        let right_mask = /*#__PURE__*/React.createElement("svg", {
+          id: `svg-shape-outside-mask__${layout}-right--${viewport}`,
+          "data-name": `svg-shape-outside-mask__${layout}-right--${viewport}`,
+          xmlns: "http://www.w3.org/2000/svg",
+          viewBox: `${SvgPanes[layout][viewport]["cut"]} 0 ${parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"])} ${SvgPanes[layout][viewport]["viewBox"][1]}`,
+          className: `svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport} svg-shape-outside__${layout}-right--${viewport} right-mask`
+        }, /*#__PURE__*/React.createElement("desc", {
+          id: "desc"
+        }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
+          id: `svg__${layout}-right--${viewport}`
+        }, /*#__PURE__*/React.createElement("rect", {
+          fill: "white",
+          width: parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"]),
+          height: SvgPanes[layout][viewport]["viewBox"][1]
+        }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
+          d: SvgPanes[layout][viewport]["path"]
+        }))), /*#__PURE__*/React.createElement("rect", {
+          mask: `url(#svg__${layout}-right--${viewport})`,
+          width: parseInt(SvgPanes[layout][viewport]["viewBox"][0] - SvgPanes[layout][viewport]["cut"]),
+          height: SvgPanes[layout][viewport]["viewBox"][1]
+        })); // render to base64
 
-      return {
-        left: left,
-        left_mask: dataUriLeft,
-        right: right,
-        right_mask: dataUriRight
-      };
+        let svgStringLeft = renderToStaticMarkup(left_mask);
+        let b64Left = window.btoa(svgStringLeft);
+        let dataUriLeft = `data:image/svg+xml;base64,${b64Left}`;
+        let svgStringRight = renderToStaticMarkup(right_mask);
+        let b64Right = window.btoa(svgStringRight);
+        let dataUriRight = `data:image/svg+xml;base64,${b64Right}`; // return shape-outside
+
+        return {
+          left: left,
+          left_mask: dataUriLeft,
+          right: right,
+          right_mask: dataUriRight
+        };
+      }
     }
   }
 }
