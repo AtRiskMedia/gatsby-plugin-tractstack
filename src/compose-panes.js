@@ -34,7 +34,7 @@ function ComposePanes(data) {
     (pane, i) => {
       let css = "",
         imageMaskShapes = {},
-        textShapeOutsides = {},
+        textShapeOutside = {},
         modals = {};
       // check for background colour
       let background_colour = pane?.relationships?.field_pane_fragments.filter(
@@ -58,52 +58,6 @@ function ComposePanes(data) {
           desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`,
         }
       );
-      // generate modals
-      modals = pane?.relationships?.field_pane_fragments
-        .filter((e) => e?.internal?.type === "paragraph__modal")
-        .map((e) => {
-          let options = thisViewportValue(
-            data?.state?.viewport?.viewport?.key,
-            {
-              mobile: e?.field_render_mobile,
-              tablet: e?.field_render_tablet,
-              desktop: e?.field_render_desktop,
-            }
-          );
-          if (options) {
-            let this_options, this_payload, this_fragment, this_shape;
-            try {
-              this_options = JSON.parse(options);
-              if (typeof this_options?.render === "object") {
-                this_payload = this_options?.render;
-                this_payload.id = e?.id;
-                this_shape = SvgModal(
-                  e?.field_modal_shape,
-                  data?.state?.viewport?.viewport?.key,
-                  this_payload
-                );
-                this_fragment = InjectSvgModal(
-                  this_shape?.modal_shape,
-                  this_payload
-                );
-                return {
-                  id: e?.id,
-                  fragment: this_fragment,
-                  z_index: e?.field_zindex,
-                  viewport: {
-                    device: data?.state?.viewport?.viewport?.key,
-                    width: data?.state?.viewport?.viewport?.width,
-                  },
-                };
-              }
-            } catch (e) {
-              if (e instanceof SyntaxError) {
-                console.log("ERROR parsing json in {}: ", e);
-              }
-            }
-          }
-        })
-        .filter(Boolean);
 
       // generate imageMaskShape(s)
       imageMaskShapes = pane?.relationships?.field_pane_fragments
@@ -196,7 +150,93 @@ function ComposePanes(data) {
                 tablet: pane_fragment?.field_text_shape_outside_tablet,
                 desktop: pane_fragment?.field_text_shape_outside_desktop,
               });
+              // add shape outside if any
+              if (shape && shape !== "none") {
+                let tempValue = SvgPane(
+                  shape,
+                  data?.state?.viewport?.viewport?.key,
+                  "shape-outside"
+                );
+                if (tempValue)
+                  payload.maskData = {
+                    textShapeOutside: tempValue,
+                  };
+                // store shapeOutside to inject into pane
+                textShapeOutside[pane_fragment?.id] = {
+                  left_mask: tempValue?.left_mask,
+                  right_mask: tempValue?.right_mask,
+                };
+              }
               break;
+
+            case "paragraph__modal":
+              tempValue = thisViewportValue(
+                data?.state?.viewport?.viewport?.key,
+                {
+                  mobile: pane_fragment?.field_render_mobile,
+                  tablet: pane_fragment?.field_render_tablet,
+                  desktop: pane_fragment?.field_render_desktop,
+                }
+              );
+              if (tempValue) {
+                let this_options,
+                  this_payload,
+                  this_fragment,
+                  this_shape,
+                  this_css;
+                try {
+                  this_options = JSON.parse(tempValue);
+                  if (typeof this_options?.render === "object") {
+                    this_payload = this_options?.render;
+                    this_payload.id = pane_fragment?.id;
+                    let this_viewport = {
+                      device: data?.state?.viewport?.viewport?.key,
+                      width: data?.state?.viewport?.viewport?.width,
+                    };
+                    this_payload.viewport = this_viewport;
+                    this_shape = SvgModal(
+                      pane_fragment?.field_modal_shape,
+                      data?.state?.viewport?.viewport?.key,
+                      this_payload
+                    );
+                    this_fragment = InjectSvgModal(
+                      this_shape?.modal_shape,
+                      this_payload
+                    );
+                    this_css = thisViewportValue(
+                      data?.state?.viewport?.viewport?.key,
+                      {
+                        mobile: pane_fragment?.field_css_styles_parent_mobile,
+                        tablet: pane_fragment?.field_css_styles_parent_tablet,
+                        desktop: pane_fragment?.field_css_styles_parent_desktop,
+                      }
+                    );
+                    // add modal to inject in pane later
+                    modals[Object.keys(modals).length] = {
+                      id: pane_fragment?.id,
+                      fragment: this_fragment,
+                      z_index: pane_fragment?.field_zindex,
+                      viewport: this_viewport,
+                      css: {
+                        parent: this_css,
+                      },
+                      payload: {
+                        modalData: {
+                          render: this_options?.render,
+                          shape: this_shape,
+                        },
+                      },
+                    };
+                  }
+                  // store shapeOutside to inject into pane
+                  textShapeOutside[pane_fragment?.id] = this_shape;
+                  payload.maskData = { textShapeOutside: this_shape };
+                } catch (e) {
+                  if (e instanceof SyntaxError) {
+                    console.log("ERROR parsing json in {}: ", e);
+                  }
+                }
+              }
 
             case "paragraph__background_pane":
               shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
@@ -226,23 +266,6 @@ function ComposePanes(data) {
               break;
           }
 
-          // add shape outside if available
-          if (shape && shape !== "none") {
-            let tempValue = SvgPane(
-              shape,
-              data?.state?.viewport?.viewport?.key,
-              "shape-outside"
-            );
-            if (tempValue)
-              payload.maskData = {
-                textShapeOutside: tempValue,
-              };
-            // store and inject into pane
-            textShapeOutsides[Object.keys(textShapeOutsides).length] = {
-              left: tempValue?.left_mask,
-              right: tempValue?.right_mask,
-            };
-          }
           // prepare any markdown for this paneFragment
           if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
             payload.children =
@@ -293,25 +316,25 @@ function ComposePanes(data) {
               width: data?.state?.viewport?.viewport?.width,
             },
             z_index: pane_fragment?.field_zindex,
-            children: payload?.children,
+            children: payload?.children || {},
             css: {
-              parent: payload?.css_parent,
-              child: payload?.css_child,
+              parent: payload?.css_parent || "",
+              child: payload?.css_child || "",
             },
             payload: {
-              imageData: payload?.imageData,
-              maskData: payload?.maskData,
-              modalData: payload?.modalData,
-              hooksData: data?.hooks,
-              videoData: payload?.videoData,
-              paneData: payload?.paneData,
+              imageData: payload?.imageData || [],
+              maskData: payload?.maskData || {},
+              hooksData: data?.hooks || {},
+              videoData: payload?.videoData || {},
+              paneData: payload?.paneData || {},
+              modalData: payload?.modalData || {},
             },
           };
 
           // generate react for this paneFragment
           switch (tractStackFragment?.mode) {
-            case "paragraph__modal":
             case "paragraph__markdown":
+            case "paragraph__modal":
               react_fragment = MarkdownParagraph(tractStackFragment);
               break;
 
@@ -366,21 +389,35 @@ function ComposePanes(data) {
       css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
       if (background_colour.length)
         css = `${css} background-color: ${background_colour[0].field_background_colour};`;
-      // inject modal(s) if available
+      // inject modal(s) if any
       if (Object.keys(modals).length)
-        modals.map((i) => {
+        Object.keys(modals).map((i) => {
+          let this_modal = modals[i];
+          css =
+            `${css} ${this_modal?.css?.parent} ` +
+            `#${this_modal?.id}-svg-modal svg { ` +
+            `z-index: ${parseInt(this_modal?.z_index)};` +
+            `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` +
+            `padding-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.render?.modalData?.x}); ` +
+            `padding-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.render?.modalData?.y}); ` +
+            `}`;
+          // add this modal to composedPaneFragments
           composedPaneFragments[Object.keys(composedPaneFragments).length] = (
             <div
               className={`paneFragment paneFragment__modal paneFragment__modal--${data?.state?.viewport?.viewport?.key}`}
-              key={`${i?.id}-modal`}
+              key={`${this_modal?.id}-modal`}
             >
-              <IsVisible className="paneFragment" key={`${i?.id}-visible`}>
-                {i?.fragment}
+              <IsVisible
+                id={`${this_modal?.id}-modal`}
+                className="paneFragment"
+                key={`${this_modal?.id}-visible`}
+              >
+                {this_modal?.fragment}
               </IsVisible>
             </div>
           );
         });
-      // inject imageMaskShape(s) (if available)
+      // inject imageMaskShape(s) (if any)
       if (Object.keys(imageMaskShapes).length)
         imageMaskShapes.map((e) => {
           if (typeof e?.shape === "object") {
@@ -392,11 +429,20 @@ function ComposePanes(data) {
               ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
           }
         });
-      // inject textShapeOutside(s) (if available)
-      if (Object.keys(textShapeOutsides).length)
-        Object.keys(textShapeOutsides).map((i) => {
-          css = `${css} .paneFragmentParagraph { .svg-shape-outside-left {float:left;shape-outside:url(${textShapeOutsides[i]?.left})} .svg-shape-outside-right {float:right;shape-outside:url(${textShapeOutsides[i]?.right})} }`;
-        });
+      // inject textShapeOutside(s) (if any)
+      Object.entries(textShapeOutside).forEach(([key, value]) => {
+        css =
+          `${css} #${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` +
+          `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`;
+        console.log(
+          1,
+          key,
+          value,
+          `#${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` +
+            `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`
+        );
+      });
+
       // may we wrap this in animation?
       let effects_payload = {};
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {

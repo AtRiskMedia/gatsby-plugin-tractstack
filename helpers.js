@@ -298,8 +298,11 @@ const PaneFragment = (id, child, css) => {
 const InjectSvgModal = (shape, options) => {
   // react fragment, not tractStackFragment
   let this_id = `${options?.id}-svg-modal`;
-  let css = `z-index: ${parseInt(options?.z_index)};` + `svg { width: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.y}); ` + `}`;
-  return PaneFragment(this_id, shape, css);
+  let css = `svg { width: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.y}); ` + `}`;
+  let fragment = PaneFragment(this_id, shape, css);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "paneFragmentModal"
+  }, fragment);
 };
 
 const InjectSvgShape = fragment => {
@@ -369,8 +372,7 @@ const MarkdownParagraph = fragment => {
   if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
   let this_id = `${fragment?.id}-paragraph`;
   const paragraph = HtmlAstToReact(fragment);
-  let has_shape_outside,
-      css = `z-index: ${parseInt(fragment?.z_index)};`;
+  let css = `z-index: ${parseInt(fragment?.z_index)};`;
   if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
   if (typeof fragment?.css?.child === "string") css = `${css} ${fragment?.css?.child}`;
   let composed = PaneFragment(this_id, paragraph, css); // inject textShapeOutside(s) (if available)

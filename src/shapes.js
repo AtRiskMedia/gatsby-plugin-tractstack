@@ -175,7 +175,6 @@ function SvgModal(layout, viewport, options = {}) {
         ></rect>
       </svg>
     );
-
     // render to base64
     let svgStringLeft = renderToStaticMarkup(left_mask);
     let b64Left = window.btoa(svgStringLeft);

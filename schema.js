@@ -65,7 +65,7 @@ const tractStackFragmentSchema = {
       }
     }
   },
-  required: ["id", "mode", "z_index", "viewport"],
+  required: ["id", "mode", "children", "z_index", "viewport", "css", "payload"],
   additionalProperties: false
 };
 const tractStackModalOptionsSchema = {
