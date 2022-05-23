@@ -21,7 +21,8 @@ function ComposePanes(data) {
     let css = "",
         imageMaskShapes = {},
         textShapeOutside = {},
-        modals = {}; // check for background colour
+        modals = {},
+        effects = []; // check for background colour
 
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // compose this pane
 
@@ -87,18 +88,7 @@ function ComposePanes(data) {
           payload = {},
           tempValue,
           shape;
-      payload.imageData = []; // select css for viewport
-
-      payload.css_child = thisViewportValue(data?.state?.viewport?.viewport?.key, {
-        mobile: pane_fragment?.field_css_styles_mobile || "",
-        tablet: pane_fragment?.field_css_styles_tablet || "",
-        desktop: pane_fragment?.field_css_styles_desktop || ""
-      });
-      payload.css_parent = thisViewportValue(data?.state?.viewport?.viewport?.key, {
-        mobile: pane_fragment?.field_css_styles_parent_mobile || "",
-        tablet: pane_fragment?.field_css_styles_parent_tablet || "",
-        desktop: pane_fragment?.field_css_styles_parent_desktop || ""
-      }); // pre-pass paneFragment based on type
+      payload.imageData = []; // pre-pass paneFragment based on type
 
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
@@ -209,15 +199,33 @@ function ComposePanes(data) {
       if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
         payload.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
         payload.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
-      } // prepare any buttonData
+      } // extract animation effects or buttonData (if any)
 
 
-      try {
-        tempValue = JSON.parse(pane_fragment?.field_options);
-        if (typeof tempValue?.buttons === "object") payload.buttonData = tempValue?.buttons;
-      } catch (e) {
-        if (e instanceof SyntaxError) {
-          console.log("ERROR parsing json in {}: ", e);
+      if (typeof pane_fragment?.field_options === "string") {
+        let action;
+
+        try {
+          action = JSON.parse(pane_fragment?.field_options);
+          if (typeof tempValue?.buttons === "object") payload.buttonData = tempValue?.buttons; // effects are directly injected into each pane below
+
+          if (typeof action?.effects === "object") {
+            for (const key in action?.effects) {
+              effects[pane_fragment?.id] = action?.effects[key];
+              effects[pane_fragment?.id]["paneFragment"] = pane_fragment?.id;
+              effects[pane_fragment?.id]["pane"] = pane?.id;
+
+              if (pane_fragment?.internal?.type === "paragraph__modal") {
+                effects[`${pane_fragment?.id}-modal`] = action?.effects[key];
+                effects[`${pane_fragment?.id}-modal`]["paneFragment"] = `${pane_fragment?.id}-modal`;
+                effects[`${pane_fragment?.id}-modal`]["pane"] = pane?.id;
+              }
+            }
+          }
+        } catch (e) {
+          if (e instanceof SyntaxError) {
+            console.log("ERROR parsing json in compose-panes.js: ", e);
+          }
         }
       } // prepare any images from this paneFragment
 
@@ -238,6 +246,17 @@ function ComposePanes(data) {
           if (typeof pane_fragment?.field_alt_text === "string") this_imageData.alt_text = pane_fragment?.field_alt_text;
           payload.imageData.push(this_imageData);
         }
+      }); // select css for viewport
+
+      payload.css_child = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+        mobile: pane_fragment?.field_css_styles_mobile || "",
+        tablet: pane_fragment?.field_css_styles_tablet || "",
+        desktop: pane_fragment?.field_css_styles_desktop || ""
+      });
+      payload.css_parent = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+        mobile: pane_fragment?.field_css_styles_parent_mobile || "",
+        tablet: pane_fragment?.field_css_styles_parent_tablet || "",
+        desktop: pane_fragment?.field_css_styles_parent_desktop || ""
       }); // prepare structured data for this paneFragment
 
       tractStackFragment = {
@@ -308,17 +327,18 @@ function ComposePanes(data) {
       }, react_fragment));
     }); // skip if empty pane
 
-    if (Object.keys(composedPaneFragments).length === 0) return; // prepare css for pane
+    if (Object.keys(composedPaneFragments).length === 0) return; // now render the pane
+    // prepare css for pane
 
     css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
     if (background_colour.length) css = `${css} background-color: ${background_colour[0].field_background_colour};`; // inject modal(s) if any
 
     if (Object.keys(modals).length) Object.keys(modals).map(i => {
       let this_modal = modals[i];
-      css = `${css} ${this_modal?.css?.parent} ` + `#${this_modal?.id}-svg-modal svg { ` + `z-index: ${parseInt(this_modal?.z_index)};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.render?.modalData?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.render?.modalData?.y}); ` + `}`; // add this modal to composedPaneFragments
+      css = `${css} ${this_modal?.css?.parent} ` + `#${this_modal?.id}-svg-modal svg { ` + `z-index: ${parseInt(this_modal?.z_index)};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.y}); ` + `}`; // add this modal to composedPaneFragments
 
       composedPaneFragments[Object.keys(composedPaneFragments).length] = /*#__PURE__*/React.createElement("div", {
-        className: `paneFragment paneFragment__modal paneFragment__modal--${data?.state?.viewport?.viewport?.key}`,
+        className: `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`,
         key: `${this_modal?.id}-modal`
       }, /*#__PURE__*/React.createElement(IsVisible, {
         id: `${this_modal?.id}-modal`,
@@ -338,22 +358,16 @@ function ComposePanes(data) {
 
     Object.entries(textShapeOutside).forEach(([key, value]) => {
       css = `${css} #${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` + `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`;
-      console.log(1, key, value, `#${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` + `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`);
     }); // may we wrap this in animation?
 
-    let effects_payload = {};
-
     if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
-      let effects = data?.state?.controller?.payload?.effects;
-      let effects_payload;
-
       for (const key in effects) {
         if (effects[key]?.pane === pane?.id) {
-          effects_payload = {
+          let this_effects_payload = {
             in: [effects[key]?.function, effects[key]?.speed, effects[key]?.delay]
           };
-          let this_effects_css = InjectCssAnimation(effects_payload, effects[key]?.paneFragment);
-          css = css + this_effects_css;
+          let this_effects_css = InjectCssAnimation(this_effects_payload, effects[key]?.paneFragment);
+          css = `${css} ${this_effects_css} `;
         }
       }
     }
