@@ -74,6 +74,20 @@ function SvgModal(layout, viewport, options = {}) {
   let y1 = 0;
   let x2 = SvgModals[layout].viewBox[0];
   let y2 = SvgModals[layout].viewBox[1];
+  console.log(
+    1,
+    width,
+    height,
+    cut,
+    viewbox_x1,
+    viewbox_y1,
+    viewbox_x2,
+    viewbox_y2,
+    x1,
+    y1,
+    x2,
+    y2
+  );
 
   let modal_shape;
   if (SvgModals[layout]) {
