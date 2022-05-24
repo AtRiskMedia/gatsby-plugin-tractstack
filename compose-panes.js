@@ -120,7 +120,7 @@ function ComposePanes(data) {
           });
 
           if (tempValue) {
-            let this_options, this_payload, this_fragment, this_shape, this_css;
+            let this_options, this_payload, this_fragment, this_shape, this_css, this_viewport;
 
             try {
               this_options = JSON.parse(tempValue);
@@ -129,10 +129,12 @@ function ComposePanes(data) {
                 this_payload = this_options?.render;
                 this_payload.id = pane_fragment?.id;
                 this_payload.pane_height = pane_height;
-                this_payload.viewport = {
+                console.log(5, pane_height, this_payload);
+                this_viewport = {
                   device: data?.state?.viewport?.viewport?.key,
                   width: data?.state?.viewport?.viewport?.width
                 };
+                this_payload.viewport = this_viewport;
                 this_shape = SvgModal(pane_fragment?.field_modal_shape, this_payload);
                 this_fragment = InjectSvgModal(this_shape?.modal_shape, this_payload);
                 this_css = thisViewportValue(data?.state?.viewport?.viewport?.key, {
@@ -141,21 +143,6 @@ function ComposePanes(data) {
                   desktop: pane_fragment?.field_css_styles_parent_desktop
                 }); // add modal to inject in pane later
 
-                console.log({
-                  id: pane_fragment?.id,
-                  fragment: this_fragment,
-                  z_index: pane_fragment?.field_zindex,
-                  viewport: this_viewport,
-                  css: {
-                    parent: this_css
-                  },
-                  payload: {
-                    modalData: {
-                      render: this_options?.render,
-                      shape: this_shape
-                    }
-                  }
-                });
                 modals[Object.keys(modals).length] = {
                   id: pane_fragment?.id,
                   fragment: this_fragment,
