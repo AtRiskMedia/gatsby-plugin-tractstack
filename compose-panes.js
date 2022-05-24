@@ -128,12 +128,12 @@ function ComposePanes(data) {
               if (typeof this_options?.render === "object") {
                 this_payload = this_options?.render;
                 this_payload.id = pane_fragment?.id;
-                let this_viewport = {
+                this_payload.pane_height = pane_height;
+                this_payload.viewport = {
                   device: data?.state?.viewport?.viewport?.key,
                   width: data?.state?.viewport?.viewport?.width
                 };
-                this_payload.viewport = this_viewport;
-                this_shape = SvgModal(pane_fragment?.field_modal_shape, data?.state?.viewport?.viewport?.key, this_payload);
+                this_shape = SvgModal(pane_fragment?.field_modal_shape, this_payload);
                 this_fragment = InjectSvgModal(this_shape?.modal_shape, this_payload);
                 this_css = thisViewportValue(data?.state?.viewport?.viewport?.key, {
                   mobile: pane_fragment?.field_css_styles_parent_mobile,
@@ -141,6 +141,21 @@ function ComposePanes(data) {
                   desktop: pane_fragment?.field_css_styles_parent_desktop
                 }); // add modal to inject in pane later
 
+                console.log({
+                  id: pane_fragment?.id,
+                  fragment: this_fragment,
+                  z_index: pane_fragment?.field_zindex,
+                  viewport: this_viewport,
+                  css: {
+                    parent: this_css
+                  },
+                  payload: {
+                    modalData: {
+                      render: this_options?.render,
+                      shape: this_shape
+                    }
+                  }
+                });
                 modals[Object.keys(modals).length] = {
                   id: pane_fragment?.id,
                   fragment: this_fragment,
@@ -156,6 +171,8 @@ function ComposePanes(data) {
                     }
                   }
                 };
+                console.log(4444);
+                console.log(44, modals[Object.keys(modals).length - 1]);
               } // store shapeOutside to inject into pane
 
 
@@ -344,7 +361,7 @@ function ComposePanes(data) {
         id: `${this_modal?.id}-modal`,
         className: "paneFragment",
         key: `${this_modal?.id}-visible`
-      }, this_modal?.fragment));
+      }, this_modal?.modal_shape));
     }); // inject imageMaskShape(s) (if any)
 
     if (Object.keys(imageMaskShapes).length) imageMaskShapes.map(e => {
