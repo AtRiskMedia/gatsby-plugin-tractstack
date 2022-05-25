@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import animateScrollTo from "animated-scroll-to";
 import { IsVisible } from "./is-visible.js";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, InjectSvgModal, StyledWrapperDiv, InjectCssAnimation, getCurrentPane, thisViewportValue } from "./helpers";
-import { SvgPane, SvgModal } from "./shapes";
+import { SvgPane, SvgModal, SvgModals } from "./shapes";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
@@ -27,11 +27,17 @@ function ComposePanes(data) {
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // compose this pane
 
     let this_selector, shape;
-    let pane_height = thisViewportValue(data?.state?.viewport?.viewport?.key, {
-      mobile: `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_mobile} / 100)`,
-      tablet: `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_tablet} / 100)`,
-      desktop: `calc((100vw - (var(--offset) * 1px)) * ${pane?.field_height_ratio_desktop} / 100)`
+    let pane_height_ratio = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+      mobile: pane?.field_height_ratio_mobile,
+      tablet: pane?.field_height_ratio_tablet,
+      desktop: pane?.field_height_ratio_desktop
     });
+    let pane_height = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+      mobile: pane_height_ratio * 10.8,
+      tablet: pane_height_ratio * 6,
+      desktop: pane_height_ratio * 19.2
+    });
+    let pane_height_css = `calc((100vw - (var(--offset) * 1px)) * ${pane_height_ratio} / 100)`;
     let height_offset = thisViewportValue(data?.state?.viewport?.viewport?.key, {
       mobile: `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`,
       tablet: `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`,
@@ -128,13 +134,14 @@ function ComposePanes(data) {
               if (typeof this_options?.render === "object") {
                 this_payload = this_options?.render;
                 this_payload.id = pane_fragment?.id;
-                this_payload.pane_height = pane_height;
-                console.log(5, pane_height, this_payload);
                 this_viewport = {
                   device: data?.state?.viewport?.viewport?.key,
                   width: data?.state?.viewport?.viewport?.width
                 };
                 this_payload.viewport = this_viewport;
+                this_payload.cut = SvgModals[pane_fragment?.field_modal_shape]["cut"];
+                this_payload.height = SvgModals[pane_fragment?.field_modal_shape]["viewBox"][1];
+                this_payload.pane_height = pane_height;
                 this_shape = SvgModal(pane_fragment?.field_modal_shape, this_payload);
                 this_fragment = InjectSvgModal(this_shape?.modal_shape, this_payload);
                 this_css = thisViewportValue(data?.state?.viewport?.viewport?.key, {
@@ -147,7 +154,6 @@ function ComposePanes(data) {
                   id: pane_fragment?.id,
                   fragment: this_fragment,
                   z_index: pane_fragment?.field_zindex,
-                  viewport: this_viewport,
                   css: {
                     parent: this_css
                   },
@@ -158,8 +164,6 @@ function ComposePanes(data) {
                     }
                   }
                 };
-                console.log(4444);
-                console.log(44, modals[Object.keys(modals).length - 1]);
               } // store shapeOutside to inject into pane
 
 
@@ -320,7 +324,7 @@ function ComposePanes(data) {
           console.log("MISS on compose-panes.js:", tractStackFragment?.mode);
       }
 
-      let thisClass = `paneFragment paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
+      let thisClass = `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
       return /*#__PURE__*/React.createElement("div", {
         className: thisClass,
         key: pane_fragment?.id
@@ -334,12 +338,13 @@ function ComposePanes(data) {
     if (Object.keys(composedPaneFragments).length === 0) return; // now render the pane
     // prepare css for pane
 
-    css = `${css} height: ${pane_height}; margin-bottom: ${height_offset};`;
+    css = `${css} height: ${pane_height_css}; margin-bottom: ${height_offset};`;
     if (background_colour.length) css = `${css} background-color: ${background_colour[0].field_background_colour};`; // inject modal(s) if any
 
     if (Object.keys(modals).length) Object.keys(modals).map(i => {
       let this_modal = modals[i];
-      css = `${css} ${this_modal?.css?.parent} ` + `#${this_modal?.id}-svg-modal svg { ` + `z-index: ${parseInt(this_modal?.z_index)};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` + `padding-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.x}); ` + `padding-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.y}); ` + `}`; // add this modal to composedPaneFragments
+      console.log(this_modal?.payload?.modalData?.render);
+      css = `${css} ${this_modal?.css?.parent} ` + `#${this_modal?.id} svg.svg-shape-outside-left { ` + `z-index: ${this_modal?.z_index - 1};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.cut}); ` + `height: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.height}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` + `margin-right: 0; ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` + `} ` + `#${this_modal?.id} svg.svg-shape-outside-right { ` + `z-index: ${this_modal?.z_index - 1};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width - this_modal?.payload?.modalData?.render?.cut}); ` + `height: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.height}); ` + `margin-left: 0; ` + `margin-right: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.viewport?.width - this_modal?.payload?.modalData?.render?.padding_left - this_modal?.payload?.modalData?.render?.width}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` + `} ` + `#${this_modal?.id}-svg-modal svg { ` + `z-index: ${this_modal?.z_index - 1}; ` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` + `}`; // add this modal to composedPaneFragments
 
       composedPaneFragments[Object.keys(composedPaneFragments).length] = /*#__PURE__*/React.createElement("div", {
         className: `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`,
@@ -348,7 +353,7 @@ function ComposePanes(data) {
         id: `${this_modal?.id}-modal`,
         className: "paneFragment",
         key: `${this_modal?.id}-visible`
-      }, this_modal?.modal_shape));
+      }, this_modal?.fragment));
     }); // inject imageMaskShape(s) (if any)
 
     if (Object.keys(imageMaskShapes).length) imageMaskShapes.map(e => {
