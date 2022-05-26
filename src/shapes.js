@@ -326,13 +326,14 @@ function SvgModal(layout, options = {}) {
         </g>
       </svg>
     );
-    console.log(cut, width, height, pane_height, padding_left, padding_top);
     let left = (
       <svg
         id={`svg-shape-outside__${layout}--${viewport_device}`}
         data-name={`svg-shape-outside__${layout}--${viewport_device}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`0 0 ${cut} ${height}`}
+        viewBox={`${-padding_left} ${-padding_top} ${
+          cut + padding_left
+        } ${pane_height}`}
         className={
           `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left ` +
           `svg-shape-outside__${layout}-left--${viewport_device}`
@@ -349,7 +350,9 @@ function SvgModal(layout, options = {}) {
         id={`svg-shape-outside__${layout}--${viewport_device}`}
         data-name={`svg-shape-outside__${layout}--${viewport_device}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`${cut} 0 ${width - cut} ${height}`}
+        viewBox={`${cut} ${-padding_top} ${
+          viewport_width - (width - cut + padding_left)
+        } ${pane_height}`}
         className={
           `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-right ` +
           `svg-shape-outside__${layout}-right--${viewport_device}`
@@ -366,14 +369,20 @@ function SvgModal(layout, options = {}) {
         id={`svg-shape-outside-mask__${layout}-left--${viewport_device}`}
         data-name={`svg-shape-outside-mask__${layout}-left--${viewport_device}`}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`${-padding_left} ${-padding_top} ${cut + padding_left} ${
-          pane_height - padding_top
-        }`}
+        viewBox={`${-padding_left} ${-padding_top} ${
+          cut + padding_left
+        } ${pane_height}`}
         className={`svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport_device} svg-shape-outside__${layout}-left--${viewport_device}`}
       >
         <desc id="desc">decorative background</desc>
         <mask id={`svg__${layout}-left--${viewport_device}`}>
-          <rect fill="white" width={cut} height={height}></rect>
+          <rect
+            fill="white"
+            x={-padding_left}
+            y={-padding_top}
+            width={cut + padding_left}
+            height={pane_height}
+          ></rect>
           <g>
             <path d={SvgModals[layout]["path"]} />
           </g>
@@ -383,7 +392,7 @@ function SvgModal(layout, options = {}) {
           x={-padding_left}
           y={-padding_top}
           width={cut + padding_left}
-          height={height + padding_top}
+          height={pane_height}
         ></rect>
       </svg>
     );
@@ -393,15 +402,17 @@ function SvgModal(layout, options = {}) {
         data-name={`svg-shape-outside-mask__${layout}-right--${viewport_device}`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox={`${cut} ${-padding_top} ${
-          viewport_width - cut - padding_left
-        } ${pane_height - padding_top}`}
+          viewport_width - (width - cut + padding_left)
+        } ${pane_height}`}
         className={`svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport_device} svg-shape-outside__${layout}-right--${viewport_device}`}
       >
         <desc id="desc">decorative background</desc>
         <mask id={`svg__${layout}-right--${viewport_device}`}>
           <rect
             fill="white"
-            width={viewport_width - cut - padding_left}
+            x={-padding_left}
+            y={-padding_top}
+            width={viewport_width - (width - cut + padding_left)}
             height={pane_height}
           ></rect>
           <g>
@@ -410,10 +421,10 @@ function SvgModal(layout, options = {}) {
         </mask>
         <rect
           mask={`url(#svg__${layout}-right--${viewport_device})`}
-          x="0"
+          x={-padding_left}
           y={-padding_top}
-          width={viewport_width - cut - padding_left}
-          height={height}
+          width={viewport_width - (width - cut + padding_left)}
+          height={pane_height}
         ></rect>
       </svg>
     );

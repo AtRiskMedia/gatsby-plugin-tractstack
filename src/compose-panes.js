@@ -12,7 +12,7 @@ import {
   StyledWrapperDiv,
   InjectCssAnimation,
   getCurrentPane,
-  thisViewportValue,
+  thisViewportValue
 } from "./helpers";
 import { SvgPane, SvgModal, SvgModals } from "./shapes";
 
@@ -39,7 +39,7 @@ function ComposePanes(data) {
         effects = [];
       // check for background colour
       let background_colour = pane?.relationships?.field_pane_fragments.filter(
-        (e) => e?.internal?.type === "paragraph__background_colour"
+        e => e?.internal?.type === "paragraph__background_colour"
       );
       // compose this pane
       let this_selector, shape;
@@ -48,15 +48,15 @@ function ComposePanes(data) {
         {
           mobile: pane?.field_height_ratio_mobile,
           tablet: pane?.field_height_ratio_tablet,
-          desktop: pane?.field_height_ratio_desktop,
+          desktop: pane?.field_height_ratio_desktop
         }
       );
       let pane_height = thisViewportValue(
         data?.state?.viewport?.viewport?.key,
         {
-          mobile: pane_height_ratio * 10.8,
-          tablet: pane_height_ratio * 6,
-          desktop: pane_height_ratio * 19.2,
+          mobile: (600 * pane_height_ratio) / 100,
+          tablet: (1080 * pane_height_ratio) / 100,
+          desktop: (1920 * pane_height_ratio) / 100
         }
       );
       let pane_height_css = `calc((100vw - (var(--offset) * 1px)) * ${pane_height_ratio} / 100)`;
@@ -65,20 +65,19 @@ function ComposePanes(data) {
         {
           mobile: `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`,
           tablet: `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`,
-          desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`,
+          desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`
         }
       );
-
       // generate imageMaskShape(s)
       imageMaskShapes = pane?.relationships?.field_pane_fragments
-        .map((e) => {
+        .map(e => {
           let imageMaskShapeSelector;
           let this_pane = thisViewportValue(
             data?.state?.viewport?.viewport?.key,
             {
               mobile: e?.field_image_mask_shape_mobile,
               tablet: e?.field_image_mask_shape_tablet,
-              desktop: e?.field_image_mask_shape_desktop,
+              desktop: e?.field_image_mask_shape_desktop
             }
           );
           if (typeof this_pane === "string" && this_pane !== "none") {
@@ -107,23 +106,24 @@ function ComposePanes(data) {
           return {
             selector: imageMaskShapeSelector,
             shape: shape,
-            paneFragment: e?.id,
+            paneFragment: e?.id
           };
         })
         .filter(Boolean);
 
       // now compose the paneFragments for this pane
-      let composedPaneFragments = pane?.relationships?.field_pane_fragments
+      let composedPaneFragments = [];
+      pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
         .filter(
-          (e) =>
+          e =>
             e.field_hidden_viewports
               .replace(/\s+/g, "")
               .split(",")
               .indexOf(data?.state?.viewport?.viewport?.key) == -1
         )
         // already processed background_colour
-        .filter((e) => e?.internal?.type !== "paragraph__background_colour")
+        .filter(e => e?.internal?.type !== "paragraph__background_colour")
         // sort by zIndex ***important
         .sort((a, b) => (a?.field_zindex > b?.field_zindex ? 1 : -1))
         .map((pane_fragment, index) => {
@@ -140,7 +140,7 @@ function ComposePanes(data) {
               shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
                 mobile: pane_fragment?.field_text_shape_outside_mobile,
                 tablet: pane_fragment?.field_text_shape_outside_tablet,
-                desktop: pane_fragment?.field_text_shape_outside_desktop,
+                desktop: pane_fragment?.field_text_shape_outside_desktop
               });
               // add shape outside if any
               if (shape && shape !== "none") {
@@ -151,12 +151,12 @@ function ComposePanes(data) {
                 );
                 if (tempValue)
                   payload.maskData = {
-                    textShapeOutside: tempValue,
+                    textShapeOutside: tempValue
                   };
                 // store shapeOutside to inject into pane
                 textShapeOutside[pane_fragment?.id] = {
                   left_mask: tempValue?.left_mask,
-                  right_mask: tempValue?.right_mask,
+                  right_mask: tempValue?.right_mask
                 };
               }
               break;
@@ -167,7 +167,7 @@ function ComposePanes(data) {
                 {
                   mobile: pane_fragment?.field_render_mobile,
                   tablet: pane_fragment?.field_render_tablet,
-                  desktop: pane_fragment?.field_render_desktop,
+                  desktop: pane_fragment?.field_render_desktop
                 }
               );
               if (tempValue) {
@@ -184,14 +184,17 @@ function ComposePanes(data) {
                     this_payload.id = pane_fragment?.id;
                     this_viewport = {
                       device: data?.state?.viewport?.viewport?.key,
-                      width: data?.state?.viewport?.viewport?.width,
+                      width: data?.state?.viewport?.viewport?.width
                     };
                     this_payload.viewport = this_viewport;
                     this_payload.cut =
                       SvgModals[pane_fragment?.field_modal_shape]["cut"];
+                    this_payload.width =
+                      SvgModals[pane_fragment?.field_modal_shape]["viewBox"][0];
                     this_payload.height =
                       SvgModals[pane_fragment?.field_modal_shape]["viewBox"][1];
                     this_payload.pane_height = pane_height;
+                    this_payload.z_index = pane_fragment?.field_zindex;
                     this_shape = SvgModal(
                       pane_fragment?.field_modal_shape,
                       this_payload
@@ -205,7 +208,7 @@ function ComposePanes(data) {
                       {
                         mobile: pane_fragment?.field_css_styles_parent_mobile,
                         tablet: pane_fragment?.field_css_styles_parent_tablet,
-                        desktop: pane_fragment?.field_css_styles_parent_desktop,
+                        desktop: pane_fragment?.field_css_styles_parent_desktop
                       }
                     );
                     // add modal to inject in pane later
@@ -214,14 +217,14 @@ function ComposePanes(data) {
                       fragment: this_fragment,
                       z_index: pane_fragment?.field_zindex,
                       css: {
-                        parent: this_css,
+                        parent: this_css
                       },
                       payload: {
                         modalData: {
                           render: this_options?.render,
-                          shape: this_shape,
-                        },
-                      },
+                          shape: this_shape
+                        }
+                      }
                     };
                   }
                   // store shapeOutside to inject into pane
@@ -238,7 +241,7 @@ function ComposePanes(data) {
               shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
                 mobile: pane_fragment?.field_shape_mobile,
                 tablet: pane_fragment?.field_shape_tablet,
-                desktop: pane_fragment?.field_shape_desktop,
+                desktop: pane_fragment?.field_shape_desktop
               });
               tempValue = SvgPane(shape, data?.state?.viewport?.viewport?.key);
               if (tempValue) payload.paneData = tempValue;
@@ -247,17 +250,18 @@ function ComposePanes(data) {
             case "paragraph__background_video":
               payload.videoData = {
                 url: pane_fragment?.field_cdn_url,
-                alt_text: pane_fragment?.field_alt_text,
+                alt_text: pane_fragment?.field_alt_text
               };
               break;
 
             case "paragraph__svg":
               payload.imageData = [
                 {
-                  url: pane_fragment?.relationships?.field_svg_file?.localFile
-                    ?.publicURL,
-                  alt_text: pane_fragment?.field_svg_file?.description,
-                },
+                  url:
+                    pane_fragment?.relationships?.field_svg_file?.localFile
+                      ?.publicURL,
+                  alt_text: pane_fragment?.field_svg_file?.description
+                }
               ];
               break;
           }
@@ -266,10 +270,9 @@ function ComposePanes(data) {
           if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
             payload.children =
               pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-            payload.children.children =
-              pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
-                (e) => !(e.type === "text" && e.value === "\n")
-              );
+            payload.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
+              e => !(e.type === "text" && e.value === "\n")
+            );
           }
           // extract animation effects or buttonData (if any)
           if (typeof pane_fragment?.field_options === "string") {
@@ -302,20 +305,20 @@ function ComposePanes(data) {
             }
           }
           // prepare any images from this paneFragment
-          pane_fragment?.relationships?.field_image?.map((e) => {
+          pane_fragment?.relationships?.field_image?.map(e => {
             let this_image = thisViewportValue(
               data?.state?.viewport?.viewport?.key,
               {
                 mobile: e?.mobile,
                 tablet: e?.tablet,
-                desktop: e?.desktop,
+                desktop: e?.desktop
               }
             );
             if (this_image) {
               let this_imageData = {
                 id: e?.id,
                 filename: e?.filename,
-                data: this_image,
+                data: this_image
               };
               if (typeof pane_fragment?.field_alt_text === "string")
                 this_imageData.alt_text = pane_fragment?.field_alt_text;
@@ -328,7 +331,7 @@ function ComposePanes(data) {
             {
               mobile: pane_fragment?.field_css_styles_mobile || "",
               tablet: pane_fragment?.field_css_styles_tablet || "",
-              desktop: pane_fragment?.field_css_styles_desktop || "",
+              desktop: pane_fragment?.field_css_styles_desktop || ""
             }
           );
           payload.css_parent = thisViewportValue(
@@ -336,7 +339,7 @@ function ComposePanes(data) {
             {
               mobile: pane_fragment?.field_css_styles_parent_mobile || "",
               tablet: pane_fragment?.field_css_styles_parent_tablet || "",
-              desktop: pane_fragment?.field_css_styles_parent_desktop || "",
+              desktop: pane_fragment?.field_css_styles_parent_desktop || ""
             }
           );
 
@@ -346,13 +349,13 @@ function ComposePanes(data) {
             mode: pane_fragment?.internal?.type,
             viewport: {
               device: data?.state?.viewport?.viewport?.key,
-              width: data?.state?.viewport?.viewport?.width,
+              width: data?.state?.viewport?.viewport?.width
             },
             z_index: pane_fragment?.field_zindex,
             children: payload?.children || {},
             css: {
               parent: payload?.css_parent || "",
-              child: payload?.css_child || "",
+              child: payload?.css_child || ""
             },
             payload: {
               imageData: payload?.imageData || [],
@@ -360,8 +363,8 @@ function ComposePanes(data) {
               hooksData: data?.hooks || {},
               videoData: payload?.videoData || {},
               paneData: payload?.paneData || {},
-              modalData: payload?.modalData || {},
-            },
+              modalData: payload?.modalData || {}
+            }
           };
 
           // generate react for this paneFragment
@@ -402,8 +405,31 @@ function ComposePanes(data) {
               );
           }
 
+          // inject modal(s) if any
+          if (Object.keys(modals).length)
+            Object.keys(modals)
+              .filter(i => modals[i]?.id === pane_fragment?.id)
+              .map(i => {
+                let this_modal = modals[i];
+                // add this modal to composedPaneFragments
+                composedPaneFragments.push(
+                  <div
+                    className={`paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`}
+                    key={`${this_modal?.id}-modal`}
+                  >
+                    <IsVisible
+                      id={`${this_modal?.id}-modal`}
+                      className="paneFragment"
+                      key={`${this_modal?.id}-visible`}
+                    >
+                      {this_modal?.fragment}
+                    </IsVisible>
+                  </div>
+                );
+              });
+          // add the composed pane
           let thisClass = `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
-          return (
+          composedPaneFragments.push(
             <div className={thisClass} key={pane_fragment?.id}>
               <IsVisible
                 id={pane_fragment?.id}
@@ -415,80 +441,23 @@ function ComposePanes(data) {
             </div>
           );
         });
-
       // skip if empty pane
-      if (Object.keys(composedPaneFragments).length === 0) return;
+      if (composedPaneFragments.length === 0) return;
 
       // now render the pane
       // prepare css for pane
       css = `${css} height: ${pane_height_css}; margin-bottom: ${height_offset};`;
       if (background_colour.length)
         css = `${css} background-color: ${background_colour[0].field_background_colour};`;
-      // inject modal(s) if any
-      if (Object.keys(modals).length)
-        Object.keys(modals).map((i) => {
-          let this_modal = modals[i];
-          console.log(this_modal?.payload?.modalData?.render);
-          css =
-            `${css} ${this_modal?.css?.parent} ` +
-            `#${this_modal?.id} svg.svg-shape-outside-left { ` +
-            `z-index: ${this_modal?.z_index - 1};` +
-            `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.cut}); ` +
-            `height: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.height}); ` +
-            `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` +
-            `margin-right: 0; ` +
-            `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` +
-            `} ` +
-            `#${this_modal?.id} svg.svg-shape-outside-right { ` +
-            `z-index: ${this_modal?.z_index - 1};` +
-            `width: calc((100vw - (var(--offset) * 1px)) / ${
-              this_modal?.payload?.modalData?.render?.viewport?.width
-            } * ${
-              this_modal?.payload?.modalData?.render?.width -
-              this_modal?.payload?.modalData?.render?.cut
-            }); ` +
-            `height: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.height}); ` +
-            `margin-left: 0; ` +
-            `margin-right: calc((100vw - (var(--offset) * 1px)) / ${
-              this_modal?.payload?.modalData?.render?.viewport?.width
-            } * ${
-              this_modal?.payload?.modalData?.render?.viewport?.width -
-              this_modal?.payload?.modalData?.render?.padding_left -
-              this_modal?.payload?.modalData?.render?.width
-            }); ` +
-            `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` +
-            `} ` +
-            `#${this_modal?.id}-svg-modal svg { ` +
-            `z-index: ${this_modal?.z_index - 1}; ` +
-            `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` +
-            `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` +
-            `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` +
-            `}`;
-          // add this modal to composedPaneFragments
-          composedPaneFragments[Object.keys(composedPaneFragments).length] = (
-            <div
-              className={`paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`}
-              key={`${this_modal?.id}-modal`}
-            >
-              <IsVisible
-                id={`${this_modal?.id}-modal`}
-                className="paneFragment"
-                key={`${this_modal?.id}-visible`}
-              >
-                {this_modal?.fragment}
-              </IsVisible>
-            </div>
-          );
-        });
       // inject imageMaskShape(s) (if any)
       if (Object.keys(imageMaskShapes).length)
-        imageMaskShapes.map((e) => {
+        imageMaskShapes.map(e => {
           if (typeof e?.shape === "object") {
             let svgString = renderToStaticMarkup(e?.shape);
             let b64 = window.btoa(svgString);
             let dataUri = `data:image/svg+xml;base64,${b64}`;
             css =
-              `${css} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+              `${css} #{e?.id} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
               ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
           }
         });
@@ -498,6 +467,35 @@ function ComposePanes(data) {
           `${css} #${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` +
           `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`;
       });
+      // add this css for modal (if any)
+      if (Object.keys(modals).length)
+        Object.keys(modals).map(i => {
+          let this_modal = modals[i];
+          css =
+            `${css} ${this_modal?.css?.parent} ` +
+            `#${this_modal?.id} svg.svg-shape-outside-left { ` +
+            `z-index: ${this_modal?.z_index - 1};` +
+            `width: calc((100vw - (var(--offset) * 1px)) / ${
+              this_modal?.payload?.modalData?.render?.viewport?.width
+            } * ${this_modal?.payload?.modalData?.render?.padding_left +
+              this_modal?.payload?.modalData?.render?.cut}); ` +
+            `} ` +
+            `#${this_modal?.id} svg.svg-shape-outside-right { ` +
+            `z-index: ${this_modal?.z_index - 1};` +
+            `width: calc((100vw - (var(--offset) * 1px)) / ${
+              this_modal?.payload?.modalData?.render?.viewport?.width
+            } * ${this_modal?.payload?.modalData?.render?.viewport?.width -
+              this_modal?.payload?.modalData?.render?.width +
+              this_modal?.payload?.modalData?.render?.cut -
+              this_modal?.payload?.modalData?.render?.padding_left}); ` +
+            `} ` +
+            `#${this_modal?.id}-svg-modal svg { ` +
+            `z-index: ${this_modal?.z_index - 1}; ` +
+            `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` +
+            `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` +
+            `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` +
+            `}`;
+        });
 
       // may we wrap this in animation?
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
@@ -507,8 +505,8 @@ function ComposePanes(data) {
               in: [
                 effects[key]?.function,
                 effects[key]?.speed,
-                effects[key]?.delay,
-              ],
+                effects[key]?.delay
+              ]
             };
             let this_effects_css = InjectCssAnimation(
               this_effects_payload,

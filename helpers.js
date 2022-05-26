@@ -298,7 +298,7 @@ const PaneFragment = (id, child, css) => {
 const InjectSvgModal = (shape, options) => {
   // react fragment, not tractStackFragment
   let this_id = `${options?.id}-svg-modal`;
-  let css = `svg { width: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.width}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.padding_left}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.padding_top}); ` + `}`;
+  let css = `svg { width: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.width}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.padding_left}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.padding_top}); ` + `z-index: ${options?.z_index - 2}; ` + `}`;
   let fragment = PaneFragment(this_id, shape, css);
   return /*#__PURE__*/React.createElement("div", {
     className: "paneFragmentModal"
@@ -408,7 +408,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       animationInDelay = payload?.in[2];
 
   if (typeof animationIn === "string") {
-    css = `${css} ${selector} { height:100%; opacity: 0; animation-fill-mode: both; ` + `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
+    css = `${css} ${selector} { height:100%; opacity:0; animation-fill-mode: both; ` + `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
 
     if (typeof animationInSpeed === "number") {
       css = `${css} animation-duration: ${animationInSpeed}s; -webkit-animation-duration: ${animationInSpeed}s; `;
