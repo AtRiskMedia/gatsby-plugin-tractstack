@@ -363,14 +363,13 @@ function ComposePanes(data) {
         let svgString = renderToStaticMarkup(e?.shape);
         let b64 = window.btoa(svgString);
         let dataUri = `data:image/svg+xml;base64,${b64}`;
-        css = `${css} #{e?.id} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+        css = `${css} ${e?.selector} {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
       }
     }); // inject textShapeOutside(s) (if any)
 
     Object.entries(textShapeOutside).forEach(([key, value]) => {
       css = `${css} #${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` + `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`;
-    });
-    console.log(css); // add this css for modal (if any)
+    }); // add this css for modal (if any)
 
     if (Object.keys(modals).length) Object.keys(modals).map(i => {
       let this_modal = modals[i];
