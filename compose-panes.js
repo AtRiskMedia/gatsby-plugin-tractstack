@@ -210,7 +210,7 @@ function ComposePanes(data) {
       if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
         payload.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
         payload.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
-      } // extract animation effects or buttonData (if any)
+      } // extract animation effects and buttonData (if any)
 
 
       if (typeof pane_fragment?.field_options === "string") {
@@ -222,14 +222,14 @@ function ComposePanes(data) {
 
           if (typeof action?.effects === "object") {
             for (const key in action?.effects) {
+              // store animation
               effects[pane_fragment?.id] = action?.effects[key];
               effects[pane_fragment?.id]["paneFragment"] = pane_fragment?.id;
-              effects[pane_fragment?.id]["pane"] = pane?.id;
+              effects[pane_fragment?.id]["pane"] = pane?.id; // clone and store animation for modal (if any)
 
               if (pane_fragment?.internal?.type === "paragraph__modal") {
-                effects[`${pane_fragment?.id}-modal`] = action?.effects[key];
+                effects[`${pane_fragment?.id}-modal`] = structuredClone(action?.effects[key]);
                 effects[`${pane_fragment?.id}-modal`]["paneFragment"] = `${pane_fragment?.id}-modal`;
-                effects[`${pane_fragment?.id}-modal`]["pane"] = pane?.id;
               }
             }
           }
@@ -374,11 +374,13 @@ function ComposePanes(data) {
     if (Object.keys(modals).length) Object.keys(modals).map(i => {
       let this_modal = modals[i];
       css = `${css} ${this_modal?.css?.parent} ` + `#${this_modal?.id} svg.svg-shape-outside-left { ` + `z-index: ${this_modal?.z_index - 1};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left + this_modal?.payload?.modalData?.render?.cut}); ` + `} ` + `#${this_modal?.id} svg.svg-shape-outside-right { ` + `z-index: ${this_modal?.z_index - 1};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.viewport?.width - this_modal?.payload?.modalData?.render?.width + this_modal?.payload?.modalData?.render?.cut - this_modal?.payload?.modalData?.render?.padding_left}); ` + `} ` + `#${this_modal?.id}-svg-modal svg { ` + `z-index: ${this_modal?.z_index - 1}; ` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` + `}`;
-    }); // may we wrap this in animation?
+    });
+    console.log(effects); // may we wrap this in animation?
 
     if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
       for (const key in effects) {
         if (effects[key]?.pane === pane?.id) {
+          console.log(key, effects[key]);
           let this_effects_payload = {
             in: [effects[key]?.function, effects[key]?.speed, effects[key]?.delay]
           };

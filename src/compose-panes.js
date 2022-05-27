@@ -274,7 +274,7 @@ function ComposePanes(data) {
                 (e) => !(e.type === "text" && e.value === "\n")
               );
           }
-          // extract animation effects or buttonData (if any)
+          // extract animation effects and buttonData (if any)
           if (typeof pane_fragment?.field_options === "string") {
             let action;
             try {
@@ -284,17 +284,19 @@ function ComposePanes(data) {
               // effects are directly injected into each pane below
               if (typeof action?.effects === "object") {
                 for (const key in action?.effects) {
+                  // store animation
                   effects[pane_fragment?.id] = action?.effects[key];
                   effects[pane_fragment?.id]["paneFragment"] =
                     pane_fragment?.id;
                   effects[pane_fragment?.id]["pane"] = pane?.id;
+                  // clone and store animation for modal (if any)
                   if (pane_fragment?.internal?.type === "paragraph__modal") {
-                    effects[`${pane_fragment?.id}-modal`] =
-                      action?.effects[key];
+                    effects[`${pane_fragment?.id}-modal`] = structuredClone(
+                      action?.effects[key]
+                    );
                     effects[`${pane_fragment?.id}-modal`][
                       "paneFragment"
                     ] = `${pane_fragment?.id}-modal`;
-                    effects[`${pane_fragment?.id}-modal`]["pane"] = pane?.id;
                   }
                 }
               }
@@ -501,10 +503,12 @@ function ComposePanes(data) {
             `}`;
         });
 
+      console.log(effects);
       // may we wrap this in animation?
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
         for (const key in effects) {
           if (effects[key]?.pane === pane?.id) {
+            console.log(key, effects[key]);
             let this_effects_payload = {
               in: [
                 effects[key]?.function,
