@@ -395,12 +395,14 @@ const getStoryStepGraph = (graph, targetId) => {
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
   let css = "",
-      selector;
+      selector_in,
+      selector_out;
 
   if (paneFragmentId !== "tractstack-controller") {
-    selector = `div#${paneFragmentId}.visible`;
+    selector_in = `div#${paneFragmentId}.visible`;
+    selector_out = `div#${paneFragmentId}.hidden`;
   } else {
-    selector = "div#tractstack-controller";
+    selector_in = "div#tractstack-controller";
   }
 
   let animationIn = payload?.in[0],
@@ -408,7 +410,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
       animationInDelay = payload?.in[2];
 
   if (typeof animationIn === "string") {
-    css = `${css} ${selector} { height:100%; opacity:0; animation-fill-mode: both; ` + `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
+    css = `${css} ${selector_in} { height:100%; opacity:0; animation-fill-mode: both; ` + `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
 
     if (typeof animationInSpeed === "number") {
       css = `${css} animation-duration: ${animationInSpeed}s; -webkit-animation-duration: ${animationInSpeed}s; `;
@@ -419,6 +421,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     }
 
     css = css + "}";
+    if (selector_out) css = `${css} ${selector_out} { height:100%; opacity:0; animation-fill-mode: both; ` + `animation-name: fadeOut; -webkit-animation-name: fadeOut; ` + `animation-duration: 1s; -webkit-animation-duration: 1s; ` + `}`;
   }
 
   return css;
