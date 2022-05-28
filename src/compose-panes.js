@@ -286,18 +286,20 @@ function ComposePanes(data) {
               if (typeof action?.effects === "object") {
                 for (const key in action?.effects) {
                   // store animation
-                  effects[pane_fragment?.id] = action?.effects[key];
-                  effects[pane_fragment?.id]["paneFragment"] =
-                    pane_fragment?.id;
-                  effects[pane_fragment?.id]["pane"] = pane?.id;
+                  effects[`fragment-${pane_fragment?.id}`] =
+                    action?.effects[key];
+                  effects[`fragment-${pane_fragment?.id}`][
+                    "paneFragment"
+                  ] = `fragment-${pane_fragment?.id}`;
+                  effects[`fragment-${pane_fragment?.id}`]["pane"] = pane?.id;
                   // clone and store animation for modal (if any)
                   if (pane_fragment?.internal?.type === "paragraph__modal") {
-                    effects[`${pane_fragment?.id}-modal`] = structuredClone(
+                    effects[`modal-${pane_fragment?.id}`] = structuredClone(
                       action?.effects[key]
                     );
-                    effects[`${pane_fragment?.id}-modal`][
+                    effects[`modal-${pane_fragment?.id}`][
                       "paneFragment"
-                    ] = `${pane_fragment?.id}-modal`;
+                    ] = `modal-${pane_fragment?.id}`;
                   }
                 }
               }
@@ -418,10 +420,10 @@ function ComposePanes(data) {
                 composedPaneFragments.push(
                   <div
                     className={`paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`}
-                    key={`${this_modal?.id}-modal`}
+                    key={`modal-${this_modal?.id}`}
                   >
                     <IsVisible
-                      id={`${this_modal?.id}-modal`}
+                      id={`modal-${this_modal?.id}`}
                       className="paneFragment"
                       key={`${this_modal?.id}-visible`}
                     >
@@ -430,12 +432,12 @@ function ComposePanes(data) {
                   </div>
                 );
               });
-          // add the composed pane
+          // add the composed pane fragment
           let thisClass = `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
           composedPaneFragments.push(
             <div className={thisClass} key={pane_fragment?.id}>
               <IsVisible
-                id={pane_fragment?.id}
+                id={`fragment-${pane_fragment?.id}`}
                 className="paneFragment"
                 key={pane_fragment?.id}
               >
@@ -476,7 +478,7 @@ function ComposePanes(data) {
           let this_modal = modals[i];
           css =
             `${css} ${this_modal?.css?.parent} ` +
-            `#${this_modal?.id} svg.svg-shape-outside-left { ` +
+            `#fragment-${this_modal?.id} svg.svg-shape-outside-left { ` +
             `z-index: ${this_modal?.z_index - 1};` +
             `width: calc((100vw - (var(--offset) * 1px)) / ${
               this_modal?.payload?.modalData?.render?.viewport?.width
@@ -485,7 +487,7 @@ function ComposePanes(data) {
               this_modal?.payload?.modalData?.render?.cut
             }); ` +
             `} ` +
-            `#${this_modal?.id} svg.svg-shape-outside-right { ` +
+            `#fragment-${this_modal?.id} svg.svg-shape-outside-right { ` +
             `z-index: ${this_modal?.z_index - 1};` +
             `width: calc((100vw - (var(--offset) * 1px)) / ${
               this_modal?.payload?.modalData?.render?.viewport?.width
