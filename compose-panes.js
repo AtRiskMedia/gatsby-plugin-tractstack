@@ -112,6 +112,7 @@ function ComposePanes(data) {
             }; // store shapeOutside to inject into pane
 
             textShapeOutside[pane_fragment?.id] = {
+              id: tempValue?.id,
               left_mask: tempValue?.left_mask,
               right_mask: tempValue?.right_mask
             };
@@ -368,19 +369,17 @@ function ComposePanes(data) {
     }); // inject textShapeOutside(s) (if any)
 
     Object.entries(textShapeOutside).forEach(([key, value]) => {
-      css = `${css} #${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` + `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`;
+      css = `${css} #svg__${value?.id}--shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` + `#svg__${value?.id}--shape-outside-right {float:right;shape-outside:url(${value?.right_mask})}`;
     }); // add this css for modal (if any)
 
     if (Object.keys(modals).length) Object.keys(modals).map(i => {
       let this_modal = modals[i];
       css = `${css} ${this_modal?.css?.parent} ` + `#${this_modal?.id} svg.svg-shape-outside-left { ` + `z-index: ${this_modal?.z_index - 1};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left + this_modal?.payload?.modalData?.render?.cut}); ` + `} ` + `#${this_modal?.id} svg.svg-shape-outside-right { ` + `z-index: ${this_modal?.z_index - 1};` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.viewport?.width - this_modal?.payload?.modalData?.render?.width + this_modal?.payload?.modalData?.render?.cut - this_modal?.payload?.modalData?.render?.padding_left}); ` + `} ` + `#${this_modal?.id}-svg-modal svg { ` + `z-index: ${this_modal?.z_index - 1}; ` + `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` + `}`;
-    });
-    console.log(effects); // may we wrap this in animation?
+    }); // may we wrap this in animation?
 
     if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
       for (const key in effects) {
         if (effects[key]?.pane === pane?.id) {
-          console.log(key, effects[key]);
           let this_effects_payload = {
             in: [effects[key]?.function, effects[key]?.speed, effects[key]?.delay]
           };

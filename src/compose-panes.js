@@ -155,6 +155,7 @@ function ComposePanes(data) {
                   };
                 // store shapeOutside to inject into pane
                 textShapeOutside[pane_fragment?.id] = {
+                  id: tempValue?.id,
                   left_mask: tempValue?.left_mask,
                   right_mask: tempValue?.right_mask,
                 };
@@ -466,8 +467,8 @@ function ComposePanes(data) {
       // inject textShapeOutside(s) (if any)
       Object.entries(textShapeOutside).forEach(([key, value]) => {
         css =
-          `${css} #${key} .paneFragmentParagraph { svg.svg-shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` +
-          `svg.svg-shape-outside-right {float:right;shape-outside:url(${value?.right_mask})} }`;
+          `${css} #svg__${value?.id}--shape-outside-left {float:left;shape-outside:url(${value?.left_mask})} ` +
+          `#svg__${value?.id}--shape-outside-right {float:right;shape-outside:url(${value?.right_mask})}`;
       });
       // add this css for modal (if any)
       if (Object.keys(modals).length)
@@ -503,12 +504,10 @@ function ComposePanes(data) {
             `}`;
         });
 
-      console.log(effects);
       // may we wrap this in animation?
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
         for (const key in effects) {
           if (effects[key]?.pane === pane?.id) {
-            console.log(key, effects[key]);
             let this_effects_payload = {
               in: [
                 effects[key]?.function,
@@ -538,7 +537,6 @@ function ComposePanes(data) {
       );
     }
   );
-
   // this is the storyFragment
   return composedPanes;
 }
