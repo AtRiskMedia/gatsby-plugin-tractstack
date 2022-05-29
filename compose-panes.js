@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import animateScrollTo from "animated-scroll-to";
 import { IsVisible } from "./is-visible.js";
 import { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, InjectSvgModal, StyledWrapperDiv, InjectCssAnimation, getCurrentPane, thisViewportValue } from "./helpers";
-import { SvgPane, SvgModal, SvgModals } from "./shapes";
+import { SvgPane, SvgModal, SvgModals, SvgShape } from "./shapes";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
@@ -18,13 +18,14 @@ function ComposePanes(data) {
 
 
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
-    let css = "",
+    let pane_css = "",
+        pane_effects = [],
+        css = "",
         textShapeOutside = {},
         modals = {},
         effects = []; // set key variables
 
-    let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour"); // compose this pane
-
+    let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour");
     let this_selector, shape;
     let pane_height_ratio = thisViewportValue(data?.state?.viewport?.viewport?.key, {
       mobile: pane?.field_height_ratio_mobile,
@@ -66,7 +67,16 @@ function ComposePanes(data) {
           if (shape && !pane_fragment?.field_modal) {
             // regular markdown paragraph; add shape outside if any
             if (shape && shape !== "none") {
-              let tempValue = SvgPane(shape, data?.state?.viewport?.viewport?.key, "shape-outside");
+              let this_options = {
+                textShapeOutside: true,
+                viewport: data?.state?.viewport?.viewport,
+                pane_height: pane_height
+              };
+              let tempValue;
+              tempValue = SvgPane(shape, data?.state?.viewport?.viewport?.key, "shape-outside");
+              console.log(2, tempValue);
+              tempValue = SvgShape(shape, this_options);
+              console.log(1, tempValue);
               if (tempValue) payload.maskData = {
                 textShapeOutside: tempValue
               }; // store shapeOutside to inject into pane
@@ -254,7 +264,6 @@ function ComposePanes(data) {
 
       switch (tractStackFragment?.mode) {
         case "paragraph__markdown":
-        case "paragraph__modal":
           react_fragment = MarkdownParagraph(tractStackFragment);
           break;
 
@@ -377,13 +386,11 @@ function ComposePanes(data) {
 
     if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
       for (const key in effects) {
-        if (effects[key]?.pane === pane?.id) {
-          let this_effects_payload = {
-            in: [effects[key]?.function, effects[key]?.speed, effects[key]?.delay]
-          };
-          let this_effects_css = InjectCssAnimation(this_effects_payload, effects[key]?.paneFragment);
-          css = `${css} ${this_effects_css} `;
-        }
+        let this_effects_payload = {
+          in: [effects[key]?.function, effects[key]?.speed, effects[key]?.delay]
+        };
+        let this_effects_css = InjectCssAnimation(this_effects_payload, effects[key]?.paneFragment);
+        css = `${css} ${this_effects_css} `;
       }
     }
 

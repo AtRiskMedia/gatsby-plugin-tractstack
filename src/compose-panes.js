@@ -14,7 +14,7 @@ import {
   getCurrentPane,
   thisViewportValue,
 } from "./helpers";
-import { SvgPane, SvgModal, SvgModals } from "./shapes";
+import { SvgPane, SvgModal, SvgModals, SvgShape } from "./shapes";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
@@ -33,7 +33,9 @@ function ComposePanes(data) {
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
-      let css = "",
+      let pane_css = "",
+        pane_effects = [],
+        css = "",
         textShapeOutside = {},
         modals = {},
         effects = [];
@@ -42,8 +44,6 @@ function ComposePanes(data) {
       let background_colour = pane?.relationships?.field_pane_fragments.filter(
         (e) => e?.internal?.type === "paragraph__background_colour"
       );
-
-      // compose this pane
       let this_selector, shape;
       let pane_height_ratio = thisViewportValue(
         data?.state?.viewport?.viewport?.key,
@@ -70,6 +70,7 @@ function ComposePanes(data) {
           desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`,
         }
       );
+
       // now compose the paneFragments for this pane
       let composedPaneFragments = [];
       pane?.relationships?.field_pane_fragments
@@ -105,11 +106,12 @@ function ComposePanes(data) {
               if (shape && !pane_fragment?.field_modal) {
                 // regular markdown paragraph; add shape outside if any
                 if (shape && shape !== "none") {
-                  let tempValue = SvgPane(
-                    shape,
-                    data?.state?.viewport?.viewport?.key,
-                    "shape-outside"
-                  );
+                  let this_options = {
+                    textShapeOutside: true,
+                    viewport: data?.state?.viewport?.viewport,
+                    pane_height: pane_height,
+                  };
+                  let tempValue = SvgShape(shape, this_options);
                   if (tempValue)
                     payload.maskData = {
                       textShapeOutside: tempValue,
@@ -509,20 +511,18 @@ function ComposePanes(data) {
       // may we wrap this in animation?
       if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
         for (const key in effects) {
-          if (effects[key]?.pane === pane?.id) {
-            let this_effects_payload = {
-              in: [
-                effects[key]?.function,
-                effects[key]?.speed,
-                effects[key]?.delay,
-              ],
-            };
-            let this_effects_css = InjectCssAnimation(
-              this_effects_payload,
-              effects[key]?.paneFragment
-            );
-            css = `${css} ${this_effects_css} `;
-          }
+          let this_effects_payload = {
+            in: [
+              effects[key]?.function,
+              effects[key]?.speed,
+              effects[key]?.delay,
+            ],
+          };
+          let this_effects_css = InjectCssAnimation(
+            this_effects_payload,
+            effects[key]?.paneFragment
+          );
+          css = `${css} ${this_effects_css} `;
         }
       }
       return (

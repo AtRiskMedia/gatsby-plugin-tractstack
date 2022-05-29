@@ -293,6 +293,155 @@ function TractStackLogo() {
   })));
 }
 
+function SvgShape(layout, options) {
+  let mode = false,
+      shapeData = {},
+      viewport,
+      textShapeOutside = false,
+      shape;
+  let this_id = uuidv4();
+
+  if (options?.mode && typeof options?.mode === "string") {
+    mode = options?.mode;
+  }
+
+  if (options?.viewport && typeof options?.viewport === "object") {
+    viewport = options?.viewport;
+  }
+
+  if (options?.textShapeOutside && typeof options?.textShapeOutside === "boolean") {
+    textShapeOutside = true;
+  }
+
+  if (!mode) {
+    shape = SvgPanes[layout][viewport?.key];
+  } else if ($mode === "modal") {
+    shape = SvgModals[layout];
+  } else {
+    return null;
+  }
+
+  let this_className = `svg svg__${layout} svg__${layout}--${viewport?.key}`;
+  shapeData.shape = /*#__PURE__*/React.createElement("svg", {
+    id: `svg__${this_id}`,
+    "data-name": `svg__${layout}--${viewport?.key}`,
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: `0 0 ${shape["viewBox"][0]} ${shape["viewBox"][1]}`,
+    className: this_className
+  }, /*#__PURE__*/React.createElement("desc", {
+    id: "desc"
+  }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
+    d: shape["path"]
+  })));
+  shapeData.id = this_id;
+
+  if (textShapeOutside) {
+    let width = parseInt(shape["viewBox"][0]);
+    let height = parseInt(shape["viewBox"][1]);
+    let cut = parseInt(shape["cut"]);
+    let pane_height = parseInt(options?.pane_height);
+    let viewBox = [];
+    let padding_left = parseInt(options?.padding_left) || 0;
+    let padding_top = parseInt(options?.padding_top) || 0;
+
+    if (mode === "modal") {
+      viewBox.left = `${-padding_left} ${-padding_top} ${cut + padding_left} ${pane_height}`;
+      viewBox.right = `${cut} ${-padding_top} ${viewport?.width - (width - cut + padding_left)} ${pane_height}`;
+      viewBox.left_mask = `${-padding_left} ${-padding_top} ${cut + padding_left} ${pane_height}`;
+      viewBox.right_mask = `${cut} ${-padding_top} ${viewport?.width - (width - cut + padding_left)} ${pane_height}`;
+      viewBox.right_mask_width = viewport?.width - (width - cut + padding_left);
+    } else {
+      viewBox.left = `0 0 ${cut} ${width}`;
+      viewBox.right = `${cut} 0 ${width - cut} ${height}`;
+      viewBox.left_mask = `0 0 ${cut} ${height}`;
+      viewBox.right_mask = `${cut} 0 ${width - cut} ${height}`;
+      viewBox.right_mask_width = viewport?.width - cut;
+    }
+
+    shapeData.left = /*#__PURE__*/React.createElement("svg", {
+      id: `svg__${this_id}--shape-outside-left`,
+      "data-name": `svg-shape-outside__${layout}--${viewport?.key}`,
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: viewBox.left,
+      className: `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left ` + `svg-shape-outside__${layout}-left--${viewport?.key}`
+    }, /*#__PURE__*/React.createElement("desc", {
+      id: "desc"
+    }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
+      d: shape["path"]
+    })));
+    shapeData.right = /*#__PURE__*/React.createElement("svg", {
+      id: `svg__${this_id}--shape-outside-right`,
+      "data-name": `svg-shape-outside__${layout}--${viewport?.key}`,
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: viewBox.right,
+      className: `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-right ` + `svg-shape-outside__${layout}-right--${viewport?.key}`
+    }, /*#__PURE__*/React.createElement("desc", {
+      id: "desc"
+    }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
+      d: shape["path"]
+    })));
+    let left_mask = /*#__PURE__*/React.createElement("svg", {
+      id: `svg__${this_id}--shape-outside-left-mask`,
+      "data-name": `svg-shape-outside-mask__${layout}-left--${viewport?.key}`,
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: viewBox.left_mask,
+      className: `svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport?.key} svg-shape-outside__${layout}-left--${viewport?.key}`
+    }, /*#__PURE__*/React.createElement("desc", {
+      id: "desc"
+    }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
+      id: `svg__${this_id}--shape-outside-left-mask-cutout`
+    }, /*#__PURE__*/React.createElement("rect", {
+      fill: "white",
+      x: -padding_left,
+      y: -padding_top,
+      width: cut + padding_left,
+      height: pane_height
+    }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
+      d: shape["path"]
+    }))), /*#__PURE__*/React.createElement("rect", {
+      mask: `url(#svg__${this_id}--shape-outside-left-mask-cutout)`,
+      x: -padding_left,
+      y: -padding_top,
+      width: cut + padding_left,
+      height: pane_height
+    }));
+    let right_mask = /*#__PURE__*/React.createElement("svg", {
+      id: `svg__${this_id}--shape-outside-right-mask`,
+      "data-name": `svg-shape-outside-mask__${layout}-right--${viewport?.key}`,
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: viewBox.right_mask,
+      className: `svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport?.key} svg-shape-outside__${layout}-right--${viewport?.key}`
+    }, /*#__PURE__*/React.createElement("desc", {
+      id: "desc"
+    }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
+      id: `svg__${this_id}--shape-outside-right-mask-cutout`
+    }, /*#__PURE__*/React.createElement("rect", {
+      fill: "white",
+      x: -padding_left,
+      y: -padding_top,
+      width: viewBox.right_mask_width,
+      height: pane_height
+    }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
+      d: shape["path"]
+    }))), /*#__PURE__*/React.createElement("rect", {
+      mask: `url(#svg__${this_id}--shape-outside-right-mask-cutout)`,
+      x: -padding_left,
+      y: -padding_top,
+      width: viewBox.right_mask_width,
+      height: pane_height
+    })); // render to base64
+
+    let svgStringLeft = renderToStaticMarkup(left_mask);
+    let b64Left = window.btoa(svgStringLeft);
+    shapeData.left_mask = `data:image/svg+xml;base64,${b64Left}`;
+    let svgStringRight = renderToStaticMarkup(right_mask);
+    let b64Right = window.btoa(svgStringRight);
+    shapeData.right_mask = `data:image/svg+xml;base64,${b64Right}`;
+  }
+
+  return shapeData;
+}
+
 function SvgModal(layout, options = {}) {
   let width = parseInt(SvgModals[layout]["viewBox"][0]);
   let height = parseInt(SvgModals[layout]["viewBox"][1]);
@@ -514,5 +663,5 @@ function SvgPane(layout, viewport, mode = false) {
   }
 }
 
-export { TractStackLogo, SvgPane, SvgModal, SvgPanes, SvgModals };
+export { TractStackLogo, SvgPane, SvgModal, SvgPanes, SvgModals, SvgShape };
 //# sourceMappingURL=shapes.js.map
