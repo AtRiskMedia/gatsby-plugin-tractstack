@@ -37,13 +37,10 @@ function ComposePanes(data) {
         textShapeOutside = {},
         modals = {},
         effects = [];
-
       // set key variables
       let background_colour = pane?.relationships?.field_pane_fragments.filter(
         (e) => e?.internal?.type === "paragraph__background_colour"
       );
-
-      // compose this pane
       let this_selector, shape;
       let pane_height_ratio = thisViewportValue(
         data?.state?.viewport?.viewport?.key,
@@ -70,14 +67,14 @@ function ComposePanes(data) {
           desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`,
         }
       );
+
       // now compose the paneFragments for this pane
       let composedPaneFragments = [];
       pane?.relationships?.field_pane_fragments
         // skip if current viewport is listed in field_hidden_viewports
         .filter(
           (e) =>
-            typeof e?.field_hidden_viewports === "string" &&
-            e?.field_hidden_viewports
+            e.field_hidden_viewports
               .replace(/\s+/g, "")
               .split(",")
               .indexOf(data?.state?.viewport?.viewport?.key) == -1
@@ -102,8 +99,8 @@ function ComposePanes(data) {
                 tablet: pane_fragment?.field_text_shape_outside_tablet,
                 desktop: pane_fragment?.field_text_shape_outside_desktop,
               });
-              if (shape && !pane_fragment?.field_modal) {
-                // regular markdown paragraph; add shape outside if any
+              if (!pane_fragment?.field_modal) {
+                // add shape outside if any
                 if (shape && shape !== "none") {
                   let tempValue = SvgPane(
                     shape,
@@ -120,78 +117,168 @@ function ComposePanes(data) {
                     left_mask: tempValue?.left_mask,
                     right_mask: tempValue?.right_mask,
                   };
-                }
-              } else if (shape && pane_fragment?.field_modal) {
-                // this is a modal
-                if (typeof pane_fragment?.field_options === "string") {
-                  let this_options,
-                    this_payload,
-                    this_fragment,
-                    this_shape,
-                    this_css,
-                    this_viewport;
-                  try {
-                    this_options = JSON.parse(pane_fragment?.field_options);
-                    if (typeof this_options?.render === "object") {
-                      this_payload =
-                        this_options?.render[
-                          data?.state?.viewport?.viewport?.key
-                        ];
-                      this_payload.id = pane_fragment?.id;
-                      this_viewport = {
-                        device: data?.state?.viewport?.viewport?.key,
-                        width: data?.state?.viewport?.viewport?.width,
-                      };
-                      this_payload.viewport = this_viewport;
-                      this_payload.cut = SvgModals[shape]["cut"];
-                      this_payload.width = SvgModals[shape]["viewBox"][0];
-                      this_payload.height = SvgModals[shape]["viewBox"][1];
-                      this_payload.pane_height = pane_height;
-                      this_payload.z_index = pane_fragment?.field_zindex;
-                      this_shape = SvgModal(shape, this_payload);
-                      // generate react fragment
-                      this_fragment = InjectSvgModal(
-                        this_shape?.modal_shape,
-                        this_payload
-                      );
-                      this_payload.shape = this_shape;
-                      this_css = thisViewportValue(
-                        data?.state?.viewport?.viewport?.key,
-                        {
-                          mobile: pane_fragment?.field_css_styles_parent_mobile,
-                          tablet: pane_fragment?.field_css_styles_parent_tablet,
-                          desktop:
-                            pane_fragment?.field_css_styles_parent_desktop,
-                        }
-                      );
-                      // add modal to inject in pane later
-                      modals[Object.keys(modals).length] = {
-                        id: pane_fragment?.id,
-                        fragment: this_fragment,
-                        z_index: pane_fragment?.field_zindex,
-                        css: {
-                          parent: this_css,
-                        },
-                        payload: {
-                          modalData: this_payload,
-                        },
-                      };
+                } else if (pane_fragment?.field_modal) {
+                  // this is a modal
+                  tempValue = thisViewportValue(
+                    data?.state?.viewport?.viewport?.key,
+                    {
+                      mobile: pane_fragment?.field_render_mobile,
+                      tablet: pane_fragment?.field_render_tablet,
+                      desktop: pane_fragment?.field_render_desktop,
                     }
-                    // store shapeOutside to inject into pane
-                    textShapeOutside[pane_fragment?.id] = {
-                      id: this_shape?.id,
-                      left_mask: this_shape?.left_mask,
-                      right_mask: this_shape?.right_mask,
-                    };
-                    payload.maskData = { textShapeOutside: this_shape };
-                  } catch (e) {
-                    if (e instanceof SyntaxError) {
-                      console.log("ERROR parsing json in {}: ", e);
+                  );
+                  if (tempValue) {
+                    let this_options,
+                      this_payload,
+                      this_fragment,
+                      this_shape,
+                      this_css,
+                      this_viewport;
+                    try {
+                      this_options = JSON.parse(tempValue);
+                      if (typeof this_options?.render === "object") {
+                        this_payload = this_options?.render;
+                        this_payload.id = pane_fragment?.id;
+                        this_viewport = {
+                          device: data?.state?.viewport?.viewport?.key,
+                          width: data?.state?.viewport?.viewport?.width,
+                        };
+                        this_payload.viewport = this_viewport;
+                        this_payload.cut =
+                          SvgModals[pane_fragment?.field_modal_shape]["cut"];
+                        this_payload.width =
+                          SvgModals[pane_fragment?.field_modal_shape][
+                            "viewBox"
+                          ][0];
+                        this_payload.height =
+                          SvgModals[pane_fragment?.field_modal_shape][
+                            "viewBox"
+                          ][1];
+                        this_payload.pane_height = pane_height;
+                        this_payload.z_index = pane_fragment?.field_zindex;
+                        this_shape = SvgModal(
+                          pane_fragment?.field_modal_shape,
+                          this_payload
+                        );
+                        this_fragment = InjectSvgModal(
+                          this_shape?.modal_shape,
+                          this_payload
+                        );
+                        this_css = thisViewportValue(
+                          data?.state?.viewport?.viewport?.key,
+                          {
+                            mobile:
+                              pane_fragment?.field_css_styles_parent_mobile,
+                            tablet:
+                              pane_fragment?.field_css_styles_parent_tablet,
+                            desktop:
+                              pane_fragment?.field_css_styles_parent_desktop,
+                          }
+                        );
+                        // add modal to inject in pane later
+                        modals[Object.keys(modals).length] = {
+                          id: pane_fragment?.id,
+                          fragment: this_fragment,
+                          z_index: pane_fragment?.field_zindex,
+                          css: {
+                            parent: this_css,
+                          },
+                          payload: {
+                            modalData: {
+                              render: this_options?.render,
+                              shape: this_shape,
+                            },
+                          },
+                        };
+                      }
+                      // store shapeOutside to inject into pane
+                      textShapeOutside[pane_fragment?.id] = this_shape;
+                      payload.maskData = { textShapeOutside: this_shape };
+                    } catch (e) {
+                      if (e instanceof SyntaxError) {
+                        console.log("ERROR parsing json in {}: ", e);
+                      }
                     }
                   }
                 }
               }
               break;
+
+            case "paragraph__modal":
+              tempValue = thisViewportValue(
+                data?.state?.viewport?.viewport?.key,
+                {
+                  mobile: pane_fragment?.field_render_mobile,
+                  tablet: pane_fragment?.field_render_tablet,
+                  desktop: pane_fragment?.field_render_desktop,
+                }
+              );
+              if (tempValue) {
+                let this_options,
+                  this_payload,
+                  this_fragment,
+                  this_shape,
+                  this_css,
+                  this_viewport;
+                try {
+                  this_options = JSON.parse(tempValue);
+                  if (typeof this_options?.render === "object") {
+                    this_payload = this_options?.render;
+                    this_payload.id = pane_fragment?.id;
+                    this_viewport = {
+                      device: data?.state?.viewport?.viewport?.key,
+                      width: data?.state?.viewport?.viewport?.width,
+                    };
+                    this_payload.viewport = this_viewport;
+                    this_payload.cut =
+                      SvgModals[pane_fragment?.field_modal_shape]["cut"];
+                    this_payload.width =
+                      SvgModals[pane_fragment?.field_modal_shape]["viewBox"][0];
+                    this_payload.height =
+                      SvgModals[pane_fragment?.field_modal_shape]["viewBox"][1];
+                    this_payload.pane_height = pane_height;
+                    this_payload.z_index = pane_fragment?.field_zindex;
+                    this_shape = SvgModal(
+                      pane_fragment?.field_modal_shape,
+                      this_payload
+                    );
+                    this_fragment = InjectSvgModal(
+                      this_shape?.modal_shape,
+                      this_payload
+                    );
+                    this_css = thisViewportValue(
+                      data?.state?.viewport?.viewport?.key,
+                      {
+                        mobile: pane_fragment?.field_css_styles_parent_mobile,
+                        tablet: pane_fragment?.field_css_styles_parent_tablet,
+                        desktop: pane_fragment?.field_css_styles_parent_desktop,
+                      }
+                    );
+                    // add modal to inject in pane later
+                    modals[Object.keys(modals).length] = {
+                      id: pane_fragment?.id,
+                      fragment: this_fragment,
+                      z_index: pane_fragment?.field_zindex,
+                      css: {
+                        parent: this_css,
+                      },
+                      payload: {
+                        modalData: {
+                          render: this_options?.render,
+                          shape: this_shape,
+                        },
+                      },
+                    };
+                  }
+                  // store shapeOutside to inject into pane
+                  textShapeOutside[pane_fragment?.id] = this_shape;
+                  payload.maskData = { textShapeOutside: this_shape };
+                } catch (e) {
+                  if (e instanceof SyntaxError) {
+                    console.log("ERROR parsing json in {}: ", e);
+                  }
+                }
+              }
 
             case "paragraph__background_pane":
               shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
@@ -248,10 +335,7 @@ function ComposePanes(data) {
                   ] = `fragment-${pane_fragment?.id}`;
                   effects[`fragment-${pane_fragment?.id}`]["pane"] = pane?.id;
                   // clone and store animation for modal (if any)
-                  if (
-                    pane_fragment?.internal?.type === "paragraph__modal" ||
-                    pane_fragment?.field_modal
-                  ) {
+                  if (pane_fragment?.internal?.type === "paragraph__modal") {
                     effects[`modal-${pane_fragment?.id}`] = structuredClone(
                       action?.effects[key]
                     );
@@ -333,6 +417,7 @@ function ComposePanes(data) {
           // generate react for this paneFragment
           switch (tractStackFragment?.mode) {
             case "paragraph__markdown":
+            case "paragraph__modal":
               react_fragment = MarkdownParagraph(tractStackFragment);
               break;
 
@@ -411,7 +496,6 @@ function ComposePanes(data) {
       css = `${css} height: ${pane_height_css}; margin-bottom: ${height_offset};`;
       if (background_colour.length)
         css = `${css} background-color: ${background_colour[0].field_background_colour};`;
-
       // inject imageMaskShape(s) (if any)
       let imageMaskShapes = pane?.relationships?.field_pane_fragments
         .map((e) => {
@@ -465,7 +549,6 @@ function ComposePanes(data) {
               ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
           }
         });
-
       // inject textShapeOutside(s) (if any)
       Object.entries(textShapeOutside).forEach(([key, value]) => {
         css =
@@ -481,28 +564,28 @@ function ComposePanes(data) {
             `#fragment-${this_modal?.id} svg.svg-shape-outside-left { ` +
             `z-index: ${this_modal?.z_index - 1};` +
             `width: calc((100vw - (var(--offset) * 1px)) / ${
-              this_modal?.payload?.modalData?.viewport?.width
+              this_modal?.payload?.modalData?.render?.viewport?.width
             } * ${
-              this_modal?.payload?.modalData?.padding_left +
-              this_modal?.payload?.modalData?.cut
+              this_modal?.payload?.modalData?.render?.padding_left +
+              this_modal?.payload?.modalData?.render?.cut
             }); ` +
             `} ` +
             `#fragment-${this_modal?.id} svg.svg-shape-outside-right { ` +
             `z-index: ${this_modal?.z_index - 1};` +
             `width: calc((100vw - (var(--offset) * 1px)) / ${
-              this_modal?.payload?.modalData?.viewport?.width
+              this_modal?.payload?.modalData?.render?.viewport?.width
             } * ${
-              this_modal?.payload?.modalData?.viewport?.width -
-              this_modal?.payload?.modalData?.width +
-              this_modal?.payload?.modalData?.cut -
-              this_modal?.payload?.modalData?.padding_left
+              this_modal?.payload?.modalData?.render?.viewport?.width -
+              this_modal?.payload?.modalData?.render?.width +
+              this_modal?.payload?.modalData?.render?.cut -
+              this_modal?.payload?.modalData?.render?.padding_left
             }); ` +
             `} ` +
             `#${this_modal?.id}-svg-modal svg { ` +
             `z-index: ${this_modal?.z_index - 1}; ` +
-            `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.viewport?.width} * ${this_modal?.payload?.modalData?.width}); ` +
-            `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.viewport?.width} * ${this_modal?.payload?.modalData?.padding_left}); ` +
-            `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.viewport?.width} * ${this_modal?.payload?.modalData?.padding_top}); ` +
+            `width: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.width}); ` +
+            `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_left}); ` +
+            `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_modal?.payload?.modalData?.render?.viewport?.width} * ${this_modal?.payload?.modalData?.render?.padding_top}); ` +
             `}`;
         });
 

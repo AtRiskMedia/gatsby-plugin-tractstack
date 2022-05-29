@@ -410,8 +410,9 @@ function SvgModal(layout, options = {}) {
 
 function SvgPane(layout, viewport, mode = false) {
   let this_id = uuidv4();
+  if (!SvgPanes[layout] || !SvgPanes[layout][viewport] || !SvgPanes[layout][viewport]["viewBox"]) return /*#__PURE__*/React.createElement(React.Fragment, null);
 
-  if (SvgPanes[layout] && SvgPanes[layout][viewport] && SvgPanes[layout][viewport]["viewBox"] && !mode) {
+  if (!mode) {
     let this_className = `svg svg__${layout} svg__${layout}--${viewport}`;
     return /*#__PURE__*/React.createElement("svg", {
       id: `svg__${this_id}`,

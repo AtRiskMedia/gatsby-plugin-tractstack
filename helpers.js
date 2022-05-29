@@ -310,7 +310,7 @@ const InjectSvgShape = fragment => {
   let this_id = `${fragment?.id}-svg-shape`;
   let css = `z-index: ${parseInt(fragment?.z_index)};`;
   if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
-  return PaneFragment(this_id, fragment?.payload?.paneData, css);
+  return PaneFragment(this_id, fragment?.payload?.shapeData, css);
 };
 
 const InjectSvg = fragment => {
