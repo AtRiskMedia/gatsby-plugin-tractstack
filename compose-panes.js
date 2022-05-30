@@ -19,7 +19,6 @@ function ComposePanes(data) {
 
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
     let pane_css = "",
-        pane_effects = [],
         effects = []; // set key variables
 
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour");
@@ -82,6 +81,12 @@ function ComposePanes(data) {
 
       switch (pane_fragment?.internal?.type) {
         case "paragraph__markdown":
+          // prepare any markdown for this paneFragment
+          if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
+            payload.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
+            payload.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
+          }
+
           shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
             mobile: pane_fragment?.field_text_shape_outside_mobile,
             tablet: pane_fragment?.field_text_shape_outside_tablet,
@@ -190,12 +195,6 @@ function ComposePanes(data) {
             alt_text: pane_fragment?.field_svg_file?.description
           }];
           break;
-      } // prepare any markdown for this paneFragment
-
-
-      if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
-        payload.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-        payload.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
       } // extract animation effects and buttonData (if any)
 
 

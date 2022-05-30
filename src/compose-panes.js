@@ -32,7 +32,6 @@ function ComposePanes(data) {
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
       let pane_css = "",
-        pane_effects = [],
         effects = [];
 
       // set key variables
@@ -123,6 +122,17 @@ function ComposePanes(data) {
           // pre-pass paneFragment based on type
           switch (pane_fragment?.internal?.type) {
             case "paragraph__markdown":
+              // prepare any markdown for this paneFragment
+              if (
+                pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst
+              ) {
+                payload.children =
+                  pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
+                payload.children.children =
+                  pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
+                    (e) => !(e.type === "text" && e.value === "\n")
+                  );
+              }
               shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
                 mobile: pane_fragment?.field_text_shape_outside_mobile,
                 tablet: pane_fragment?.field_text_shape_outside_tablet,
@@ -272,15 +282,6 @@ function ComposePanes(data) {
               break;
           }
 
-          // prepare any markdown for this paneFragment
-          if (pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst) {
-            payload.children =
-              pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst;
-            payload.children.children =
-              pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(
-                (e) => !(e.type === "text" && e.value === "\n")
-              );
-          }
           // extract animation effects and buttonData (if any)
           if (typeof pane_fragment?.field_options === "string") {
             let action;
