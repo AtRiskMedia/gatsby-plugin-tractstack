@@ -312,10 +312,6 @@ const StyledWrapperSection = styled.section`
   ${(props) => props.css};
 `;
 
-const TextShapeOutside = (shape, viewport) => {
-  return SvgPane(shape, viewport, "shape-outside");
-};
-
 const PaneFragment = (id, child, css) => {
   let this_css = `height:100%; ${css}`;
   return (
@@ -490,7 +486,6 @@ export {
   InjectSvg,
   InjectSvgShape,
   InjectSvgModal,
-  TextShapeOutside,
   StyledWrapperDiv,
   StyledWrapperSection,
   PaneFragment,

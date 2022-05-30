@@ -1,13 +1,16 @@
 import React from "react";
 import { Link } from "gatsby";
-import { SvgPane, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
+import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
 import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 
 function BuildController(data) {
-  let next, prev, link, react_fragment, effects_payload;
+  let next, prev, link, react_fragment, effects_payload, controller_pane;
   if (data?.state?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.state?.storyStep?.storyStepGraph?.next?.field_slug}`;
   if (data?.state?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.state?.storyStep?.storyStepGraph?.previous?.field_slug}`;
-  let controller_pane = SvgPane("mini", data?.state?.viewport?.viewport?.key);
+  let tempValue = SvgShape("mini", {
+    viewport: data?.state?.viewport?.viewport
+  });
+  if (tempValue) controller_pane = tempValue?.shape;
   /*
   <div className="controller__graph">
     {next ? (

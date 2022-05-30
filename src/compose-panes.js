@@ -14,7 +14,7 @@ import {
   getCurrentPane,
   thisViewportValue,
 } from "./helpers";
-import { SvgPane, SvgModal, SvgModals, SvgShape } from "./shapes";
+import { SvgModals, SvgShape } from "./shapes";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
@@ -111,7 +111,7 @@ function ComposePanes(data) {
                     viewport: data?.state?.viewport?.viewport,
                     pane_height: pane_height,
                   };
-                  let tempValue = SvgShape(shape, this_options);
+                  tempValue = SvgShape(shape, this_options);
                   if (tempValue)
                     payload.maskData = {
                       textShapeOutside: tempValue,
@@ -126,71 +126,67 @@ function ComposePanes(data) {
               } else if (shape && pane_fragment?.field_modal) {
                 // this is a modal
                 if (typeof pane_fragment?.field_options === "string") {
-                  let this_options,
-                    this_payload,
+                  let options = {},
+                    this_payload = {},
                     this_fragment,
                     this_shape,
                     this_css,
                     this_viewport;
                   try {
-                    this_options = JSON.parse(pane_fragment?.field_options);
-                    if (typeof this_options?.render === "object") {
-                      this_payload =
-                        this_options?.render[
-                          data?.state?.viewport?.viewport?.key
-                        ];
-                      this_payload.id = pane_fragment?.id;
-                      this_viewport = {
-                        device: data?.state?.viewport?.viewport?.key,
-                        width: data?.state?.viewport?.viewport?.width,
-                      };
-                      this_payload.viewport = this_viewport;
-                      this_payload.cut = SvgModals[shape]["cut"];
-                      this_payload.width = SvgModals[shape]["viewBox"][0];
-                      this_payload.height = SvgModals[shape]["viewBox"][1];
-                      this_payload.pane_height = pane_height;
-                      this_payload.z_index = pane_fragment?.field_zindex;
-                      this_shape = SvgModal(shape, this_payload);
-                      // generate react fragment
-                      this_fragment = InjectSvgModal(
-                        this_shape?.modal_shape,
-                        this_payload
-                      );
-                      this_payload.shape = this_shape;
-                      this_css = thisViewportValue(
-                        data?.state?.viewport?.viewport?.key,
-                        {
-                          mobile: pane_fragment?.field_css_styles_parent_mobile,
-                          tablet: pane_fragment?.field_css_styles_parent_tablet,
-                          desktop:
-                            pane_fragment?.field_css_styles_parent_desktop,
-                        }
-                      );
-                      // add modal to inject in pane later
-                      modals[Object.keys(modals).length] = {
-                        id: pane_fragment?.id,
-                        fragment: this_fragment,
-                        z_index: pane_fragment?.field_zindex,
-                        css: {
-                          parent: this_css,
-                        },
-                        payload: {
-                          modalData: this_payload,
-                        },
-                      };
-                    }
-                    // store shapeOutside to inject into pane
-                    textShapeOutside[pane_fragment?.id] = {
-                      id: this_shape?.id,
-                      left_mask: this_shape?.left_mask,
-                      right_mask: this_shape?.right_mask,
-                    };
-                    payload.maskData = { textShapeOutside: this_shape };
+                    options = JSON.parse(pane_fragment?.field_options);
                   } catch (e) {
                     if (e instanceof SyntaxError) {
                       console.log("ERROR parsing json in {}: ", e);
                     }
                   }
+                  if (typeof options?.render === "object") {
+                    this_payload = {
+                      id: pane_fragment?.id,
+                      mode: "modal",
+                      textShapeOutside: true,
+                      viewport: data?.state?.viewport?.viewport,
+                      cut: SvgModals[shape]["cut"],
+                      width: SvgModals[shape]["viewBox"][0],
+                      height: SvgModals[shape]["viewBox"][1],
+                      pane_height: pane_height,
+                      z_index: pane_fragment?.field_zindex,
+                      ...options?.render[data?.state?.viewport?.viewport?.key],
+                    };
+                    this_shape = SvgShape(shape, this_payload);
+                    // generate react fragment
+                    this_fragment = InjectSvgModal(
+                      this_shape?.shape,
+                      this_payload
+                    );
+                    this_payload.shape = this_shape;
+                    this_css = thisViewportValue(
+                      data?.state?.viewport?.viewport?.key,
+                      {
+                        mobile: pane_fragment?.field_css_styles_parent_mobile,
+                        tablet: pane_fragment?.field_css_styles_parent_tablet,
+                        desktop: pane_fragment?.field_css_styles_parent_desktop,
+                      }
+                    );
+                    // add modal to inject in pane later
+                    modals[Object.keys(modals).length] = {
+                      id: pane_fragment?.id,
+                      fragment: this_fragment,
+                      z_index: pane_fragment?.field_zindex,
+                      css: {
+                        parent: this_css,
+                      },
+                      payload: {
+                        modalData: this_payload,
+                      },
+                    };
+                  }
+                  // store shapeOutside to inject into pane
+                  textShapeOutside[pane_fragment?.id] = {
+                    id: this_shape?.id,
+                    left_mask: this_shape?.left_mask,
+                    right_mask: this_shape?.right_mask,
+                  };
+                  payload.maskData = { textShapeOutside: this_shape };
                 }
               }
               break;
@@ -201,8 +197,12 @@ function ComposePanes(data) {
                 tablet: pane_fragment?.field_shape_tablet,
                 desktop: pane_fragment?.field_shape_desktop,
               });
-              tempValue = SvgPane(shape, data?.state?.viewport?.viewport?.key);
-              if (tempValue) payload.shapeData = tempValue;
+              let this_options = {
+                viewport: data?.state?.viewport?.viewport,
+                pane_height: pane_height,
+              };
+              tempValue = SvgShape(shape, this_options);
+              if (tempValue) payload.shapeData = tempValue.shape;
               break;
 
             case "paragraph__background_video":
@@ -427,7 +427,12 @@ function ComposePanes(data) {
             }
           );
           if (typeof this_pane === "string" && this_pane !== "none") {
-            shape = SvgPane(this_pane, data?.state?.viewport?.viewport?.key);
+            let this_options = {
+              viewport: data?.state?.viewport?.viewport,
+              pane_height: pane_height,
+            };
+            let tempValue = SvgShape(this_pane, this_options);
+            if (tempValue) shape = tempValue.shape;
             switch (e?.internal?.type) {
               case "paragraph__background_video":
                 imageMaskShapeSelector = ".paneFragmentVideo";

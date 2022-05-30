@@ -283,10 +283,6 @@ const StyledWrapperSection = styled.section`
   ${props => props.css};
 `;
 
-const TextShapeOutside = (shape, viewport) => {
-  return SvgPane(shape, viewport, "shape-outside");
-};
-
 const PaneFragment = (id, child, css) => {
   let this_css = `height:100%; ${css}`;
   return /*#__PURE__*/React.createElement(StyledWrapperDiv, {
@@ -427,5 +423,5 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, InjectSvgModal, TextShapeOutside, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
+export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, InjectSvgModal, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
 //# sourceMappingURL=helpers.js.map
