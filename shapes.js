@@ -417,7 +417,7 @@ function SvgShape(layout, options) {
       id: `svg__${this_id}--shape-outside-right-mask-cutout`
     }, /*#__PURE__*/React.createElement("rect", {
       fill: "white",
-      x: -padding_left,
+      x: cut,
       y: -padding_top,
       width: viewBox.right_mask_width,
       height: pane_height
@@ -425,7 +425,7 @@ function SvgShape(layout, options) {
       d: shape["path"]
     }))), /*#__PURE__*/React.createElement("rect", {
       mask: `url(#svg__${this_id}--shape-outside-right-mask-cutout)`,
-      x: -padding_left,
+      x: cut,
       y: -padding_top,
       width: viewBox.right_mask_width,
       height: pane_height

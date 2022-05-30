@@ -449,7 +449,7 @@ function SvgShape(layout, options) {
         <mask id={`svg__${this_id}--shape-outside-right-mask-cutout`}>
           <rect
             fill="white"
-            x={-padding_left}
+            x={cut}
             y={-padding_top}
             width={viewBox.right_mask_width}
             height={pane_height}
@@ -460,7 +460,7 @@ function SvgShape(layout, options) {
         </mask>
         <rect
           mask={`url(#svg__${this_id}--shape-outside-right-mask-cutout)`}
-          x={-padding_left}
+          x={cut}
           y={-padding_top}
           width={viewBox.right_mask_width}
           height={pane_height}
