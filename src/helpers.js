@@ -335,112 +335,6 @@ const InjectSvgModal = (shape, options) => {
   return <div className="paneFragmentModal">{fragment}</div>;
 };
 
-const InjectSvgShape = (fragment) => {
-  if (!validateSchema(fragment)) return <></>;
-  let this_id = `${fragment?.id}-svg-shape`;
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof fragment?.css?.parent === "string")
-    css = `${css} ${fragment?.css?.parent}`;
-  return PaneFragment(this_id, fragment?.payload?.shapeData, css);
-};
-
-const InjectSvg = (fragment) => {
-  if (!validateSchema(fragment)) return <></>;
-  let this_id = `${fragment?.id}-svg`;
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof fragment?.css?.parent === "string")
-    css = `${css} ${fragment?.css?.parent}`;
-  let child = (
-    <img
-      src={fragment?.payload?.imageData[0]?.url}
-      alt={fragment?.payload?.imageData[0]?.alt_text}
-      className="paneFragmentSvg"
-    />
-  );
-  return PaneFragment(this_id, child, css);
-};
-
-const InjectGatsbyBackgroundImage = (fragment) => {
-  if (!validateSchema(fragment)) return <></>;
-  // always uses the first image only
-  let this_id = `${fragment?.id}-background-image`;
-  const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
-  const bgImage = convertToBgImage(this_imageData);
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof parent_css === "string")
-    css = `${css} img {${fragment?.css?.parent}}`;
-  let child = (
-    <div className="paneFragmentImage">
-      <BackgroundImage
-        Tag="section"
-        {...bgImage}
-        objectFit="cover"
-        preserveStackingContext
-      >
-        <div>
-          <GatsbyImage
-            image={this_imageData}
-            alt={fragment?.payload?.imageData[0]?.alt_text}
-            objectFit="cover"
-          />
-        </div>
-      </BackgroundImage>
-    </div>
-  );
-  return PaneFragment(this_id, child, css);
-};
-
-const InjectGatsbyBackgroundVideo = (fragment) => {
-  if (!validateSchema(fragment)) return <></>;
-  let this_id = `${fragment?.id}-background-video`;
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof parent_css === "string") css = `${css} ${fragment?.parent_css}`;
-  if (typeof child_css === "string") css = `${css} ${fragment?.child_css}`;
-  let child = (
-    <video
-      autoPlay={true}
-      muted
-      loop
-      title={fragment?.payload?.videoData?.alt_text}
-      className="paneFragmentVideo"
-    >
-      <source src={fragment?.payload?.videoData?.url} type="video/mp4" />
-    </video>
-  );
-  return PaneFragment(this_id, child, css);
-};
-
-const MarkdownParagraph = (fragment) => {
-  if (!validateSchema(fragment)) return <></>;
-  let this_id = `${fragment?.id}-paragraph`;
-  const paragraph = HtmlAstToReact(fragment);
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof fragment?.css?.parent === "string")
-    css = `${css} ${fragment?.css?.parent}`;
-  if (typeof fragment?.css?.child === "string")
-    css = `${css} ${fragment?.css?.child}`;
-  let composed = PaneFragment(this_id, paragraph, css);
-  // inject textShapeOutside(s) (if available)
-  if (
-    fragment?.payload?.maskData &&
-    Object.keys(fragment?.payload?.maskData).length &&
-    typeof fragment?.payload?.maskData?.textShapeOutside?.left_mask ===
-      "string" &&
-    typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask ===
-      "string"
-  ) {
-    return (
-      <div className="paneFragmentParagraph">
-        {fragment?.payload?.maskData?.textShapeOutside?.left}
-        {fragment?.payload?.maskData?.textShapeOutside?.right}
-        {composed}
-      </div>
-    );
-  }
-  // else render paragraph with shapeOutside
-  return <div className="paneFragmentParagraph">{composed}</div>;
-};
-
 const getStoryStepGraph = (graph, targetId) => {
   return graph?.edges?.filter((e) => e?.node?.id === targetId)[0];
 };
@@ -479,18 +373,137 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
+const InjectPaneFragment = (fragment, mode) => {
+  if (!validateSchema(fragment)) return <></>;
+  let this_id, css, child;
+
+  switch (mode) {
+    case "MarkdownParagraph":
+      this_id = `${fragment?.id}-paragraph`;
+      const paragraph = HtmlAstToReact(fragment);
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof fragment?.css?.parent === "string")
+        css = `${css} ${fragment?.css?.parent}`;
+      if (typeof fragment?.css?.child === "string")
+        css = `${css} ${fragment?.css?.child}`;
+      let composed = PaneFragment(this_id, paragraph, css);
+      // inject textShapeOutside(s) (if available)
+      if (
+        fragment?.payload?.maskData &&
+        Object.keys(fragment?.payload?.maskData).length &&
+        typeof fragment?.payload?.maskData?.textShapeOutside?.left_mask ===
+          "string" &&
+        typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask ===
+          "string"
+      ) {
+        return (
+          <div className="paneFragmentParagraph">
+            {fragment?.payload?.maskData?.textShapeOutside?.left}
+            {fragment?.payload?.maskData?.textShapeOutside?.right}
+            {composed}
+          </div>
+        );
+      }
+      // else render paragraph with shapeOutside
+      return <div className="paneFragmentParagraph">{composed}</div>;
+
+    case "Shape":
+      this_id = `${fragment?.id}-svg-shape`;
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof fragment?.css?.parent === "string")
+        css = `${css} ${fragment?.css?.parent}`;
+      return PaneFragment(this_id, fragment?.payload?.shapeData, css);
+
+    case "BackgroundImage":
+      // always uses the first image only
+      this_id = `${fragment?.id}-background-image`;
+      const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
+      const bgImage = convertToBgImage(this_imageData);
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof parent_css === "string")
+        css = `${css} img {${fragment?.css?.parent}}`;
+      let child = (
+        <div className="paneFragmentImage">
+          <BackgroundImage
+            Tag="section"
+            {...bgImage}
+            objectFit="cover"
+            preserveStackingContext
+          >
+            <div>
+              <GatsbyImage
+                image={this_imageData}
+                alt={fragment?.payload?.imageData[0]?.alt_text}
+                objectFit="cover"
+              />
+            </div>
+          </BackgroundImage>
+        </div>
+      );
+      return PaneFragment(this_id, child, css);
+
+    case "BackgroundVideo":
+      this_id = `${fragment?.id}-background-video`;
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof parent_css === "string")
+        css = `${css} ${fragment?.parent_css}`;
+      if (typeof child_css === "string") css = `${css} ${fragment?.child_css}`;
+      child = (
+        <video
+          autoPlay={true}
+          muted
+          loop
+          title={fragment?.payload?.videoData?.alt_text}
+          className="paneFragmentVideo"
+        >
+          <source src={fragment?.payload?.videoData?.url} type="video/mp4" />
+        </video>
+      );
+      return PaneFragment(this_id, child, css);
+
+    case "SvgSource":
+      this_id = `${fragment?.id}-svg`;
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof fragment?.css?.parent === "string")
+        css = `${css} ${fragment?.css?.parent}`;
+      child = (
+        <img
+          src={fragment?.payload?.imageData[0]?.url}
+          alt={fragment?.payload?.imageData[0]?.alt_text}
+          className="paneFragmentSvg"
+        />
+      );
+      return PaneFragment(this_id, child, css);
+  }
+};
+
+const HasImageMask = {
+  paragraph__background_video: ".paneFragmentVideo",
+  paragraph__background_image: ".paneFragmentImage",
+  paragraph__svg: ".paneFragmentSvg",
+  paragraph__markdown: ".paneFragmentParagraph",
+};
+
+const HasPaneFragmentType = {
+  paragraph__markdown: "MarkdownParagraph",
+  paragraph__background_pane: "Shape",
+  paragraph__background_image: "BackgroundImage",
+  paragraph__background_video: "BackgroundVideo",
+  paragraph__svg: "SvgSource",
+  paragraph__d3: null,
+  paragraph__h5p: null,
+};
+
 export {
-  MarkdownParagraph,
-  InjectGatsbyBackgroundImage,
-  InjectGatsbyBackgroundVideo,
-  InjectSvg,
-  InjectSvgShape,
   InjectSvgModal,
+  InjectCssAnimation,
   StyledWrapperDiv,
   StyledWrapperSection,
   PaneFragment,
+  HasImageMask,
+  HasPaneFragmentType,
+  InjectPaneFragment,
   getStoryStepGraph,
-  InjectCssAnimation,
   lispCallback,
   getCurrentPane,
   getScrollbarSize,

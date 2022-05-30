@@ -301,90 +301,6 @@ const InjectSvgModal = (shape, options) => {
   }, fragment);
 };
 
-const InjectSvgShape = fragment => {
-  if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
-  let this_id = `${fragment?.id}-svg-shape`;
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
-  return PaneFragment(this_id, fragment?.payload?.shapeData, css);
-};
-
-const InjectSvg = fragment => {
-  if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
-  let this_id = `${fragment?.id}-svg`;
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
-  let child = /*#__PURE__*/React.createElement("img", {
-    src: fragment?.payload?.imageData[0]?.url,
-    alt: fragment?.payload?.imageData[0]?.alt_text,
-    className: "paneFragmentSvg"
-  });
-  return PaneFragment(this_id, child, css);
-};
-
-const InjectGatsbyBackgroundImage = fragment => {
-  if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null); // always uses the first image only
-
-  let this_id = `${fragment?.id}-background-image`;
-  const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
-  const bgImage = convertToBgImage(this_imageData);
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof parent_css === "string") css = `${css} img {${fragment?.css?.parent}}`;
-  let child = /*#__PURE__*/React.createElement("div", {
-    className: "paneFragmentImage"
-  }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
-    Tag: "section"
-  }, bgImage, {
-    objectFit: "cover",
-    preserveStackingContext: true
-  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
-    image: this_imageData,
-    alt: fragment?.payload?.imageData[0]?.alt_text,
-    objectFit: "cover"
-  }))));
-  return PaneFragment(this_id, child, css);
-};
-
-const InjectGatsbyBackgroundVideo = fragment => {
-  if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
-  let this_id = `${fragment?.id}-background-video`;
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof parent_css === "string") css = `${css} ${fragment?.parent_css}`;
-  if (typeof child_css === "string") css = `${css} ${fragment?.child_css}`;
-  let child = /*#__PURE__*/React.createElement("video", {
-    autoPlay: true,
-    muted: true,
-    loop: true,
-    title: fragment?.payload?.videoData?.alt_text,
-    className: "paneFragmentVideo"
-  }, /*#__PURE__*/React.createElement("source", {
-    src: fragment?.payload?.videoData?.url,
-    type: "video/mp4"
-  }));
-  return PaneFragment(this_id, child, css);
-};
-
-const MarkdownParagraph = fragment => {
-  if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
-  let this_id = `${fragment?.id}-paragraph`;
-  const paragraph = HtmlAstToReact(fragment);
-  let css = `z-index: ${parseInt(fragment?.z_index)};`;
-  if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
-  if (typeof fragment?.css?.child === "string") css = `${css} ${fragment?.css?.child}`;
-  let composed = PaneFragment(this_id, paragraph, css); // inject textShapeOutside(s) (if available)
-
-  if (fragment?.payload?.maskData && Object.keys(fragment?.payload?.maskData).length && typeof fragment?.payload?.maskData?.textShapeOutside?.left_mask === "string" && typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask === "string") {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "paneFragmentParagraph"
-    }, fragment?.payload?.maskData?.textShapeOutside?.left, fragment?.payload?.maskData?.textShapeOutside?.right, composed);
-  } // else render paragraph with shapeOutside
-
-
-  return /*#__PURE__*/React.createElement("div", {
-    className: "paneFragmentParagraph"
-  }, composed);
-};
-
 const getStoryStepGraph = (graph, targetId) => {
   return graph?.edges?.filter(e => e?.node?.id === targetId)[0];
 };
@@ -423,5 +339,101 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   return css;
 };
 
-export { MarkdownParagraph, InjectGatsbyBackgroundImage, InjectGatsbyBackgroundVideo, InjectSvg, InjectSvgShape, InjectSvgModal, StyledWrapperDiv, StyledWrapperSection, PaneFragment, getStoryStepGraph, InjectCssAnimation, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
+const InjectPaneFragment = (fragment, mode) => {
+  if (!validateSchema(fragment)) return /*#__PURE__*/React.createElement(React.Fragment, null);
+  let this_id, css, child;
+
+  switch (mode) {
+    case "MarkdownParagraph":
+      this_id = `${fragment?.id}-paragraph`;
+      const paragraph = HtmlAstToReact(fragment);
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
+      if (typeof fragment?.css?.child === "string") css = `${css} ${fragment?.css?.child}`;
+      let composed = PaneFragment(this_id, paragraph, css); // inject textShapeOutside(s) (if available)
+
+      if (fragment?.payload?.maskData && Object.keys(fragment?.payload?.maskData).length && typeof fragment?.payload?.maskData?.textShapeOutside?.left_mask === "string" && typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask === "string") {
+        return /*#__PURE__*/React.createElement("div", {
+          className: "paneFragmentParagraph"
+        }, fragment?.payload?.maskData?.textShapeOutside?.left, fragment?.payload?.maskData?.textShapeOutside?.right, composed);
+      } // else render paragraph with shapeOutside
+
+
+      return /*#__PURE__*/React.createElement("div", {
+        className: "paneFragmentParagraph"
+      }, composed);
+
+    case "Shape":
+      this_id = `${fragment?.id}-svg-shape`;
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
+      return PaneFragment(this_id, fragment?.payload?.shapeData, css);
+
+    case "BackgroundImage":
+      // always uses the first image only
+      this_id = `${fragment?.id}-background-image`;
+      const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
+      const bgImage = convertToBgImage(this_imageData);
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof parent_css === "string") css = `${css} img {${fragment?.css?.parent}}`;
+      let child = /*#__PURE__*/React.createElement("div", {
+        className: "paneFragmentImage"
+      }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
+        Tag: "section"
+      }, bgImage, {
+        objectFit: "cover",
+        preserveStackingContext: true
+      }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
+        image: this_imageData,
+        alt: fragment?.payload?.imageData[0]?.alt_text,
+        objectFit: "cover"
+      }))));
+      return PaneFragment(this_id, child, css);
+
+    case "BackgroundVideo":
+      this_id = `${fragment?.id}-background-video`;
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof parent_css === "string") css = `${css} ${fragment?.parent_css}`;
+      if (typeof child_css === "string") css = `${css} ${fragment?.child_css}`;
+      child = /*#__PURE__*/React.createElement("video", {
+        autoPlay: true,
+        muted: true,
+        loop: true,
+        title: fragment?.payload?.videoData?.alt_text,
+        className: "paneFragmentVideo"
+      }, /*#__PURE__*/React.createElement("source", {
+        src: fragment?.payload?.videoData?.url,
+        type: "video/mp4"
+      }));
+      return PaneFragment(this_id, child, css);
+
+    case "SvgSource":
+      this_id = `${fragment?.id}-svg`;
+      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
+      child = /*#__PURE__*/React.createElement("img", {
+        src: fragment?.payload?.imageData[0]?.url,
+        alt: fragment?.payload?.imageData[0]?.alt_text,
+        className: "paneFragmentSvg"
+      });
+      return PaneFragment(this_id, child, css);
+  }
+};
+
+const HasImageMask = {
+  paragraph__background_video: ".paneFragmentVideo",
+  paragraph__background_image: ".paneFragmentImage",
+  paragraph__svg: ".paneFragmentSvg",
+  paragraph__markdown: ".paneFragmentParagraph"
+};
+const HasPaneFragmentType = {
+  paragraph__markdown: "MarkdownParagraph",
+  paragraph__background_pane: "Shape",
+  paragraph__background_image: "BackgroundImage",
+  paragraph__background_video: "BackgroundVideo",
+  paragraph__svg: "SvgSource",
+  paragraph__d3: null,
+  paragraph__h5p: null
+};
+export { InjectSvgModal, InjectCssAnimation, StyledWrapperDiv, StyledWrapperSection, PaneFragment, HasImageMask, HasPaneFragmentType, InjectPaneFragment, getStoryStepGraph, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
 //# sourceMappingURL=helpers.js.map
