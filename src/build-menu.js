@@ -9,7 +9,26 @@ const NavLink = ({ children, to }) => (
   </Link>
 );
 
-function MenuItems(items, index = 0) {
+function CountChildrenOffset(items, index = 0, level = 0) {
+  while (1) {
+    let next = items[index + 1] && items[index + 1]?.field_level;
+    console.log(`i${index} cur ${level} next ${next}`);
+    index = index + 1;
+    if (index + 1 === items.length && items[index]?.field_level === level) {
+      console.log("gives", index);
+      return index;
+    }
+    if (next === level) {
+      console.log("-gives", index);
+      return index;
+    }
+    if (index > items.length) {
+      return false;
+    }
+  }
+}
+
+function ParseMenuItems(items, index = 0, level = 0) {
   if (typeof items === "undefined") return <></>;
   let recurse,
     this_menu_item = (
@@ -17,50 +36,50 @@ function MenuItems(items, index = 0) {
         {items[index]?.field_title}
       </NavLink>
     );
-  if (index) {
-    if (
-      (items[index]?.field_level === items[index - 1]?.field_level &&
-        items[index]?.field_level > items[index + 1]?.field_level) ||
-      items?.length === index + 1
-    ) {
-      return <li>{this_menu_item}</li>;
-    }
-    if (
-      items[index]?.field_level === items[index - 1]?.field_level &&
-      items[index]?.field_level <= items[index + 1]?.field_level
-    ) {
-      recurse = MenuItems(items, index + 1);
-      return (
-        <>
-          <li>{this_menu_item}</li>
-          {recurse}
-        </>
-      );
-    }
-    if (items[index]?.field_level > items[index - 1]?.field_level) {
-      // smart split sub-menu from remainder
-      let sub = MenuItems(items, index + 1);
-      if (items?.length >= sub?.props?.children?.length + index + 1)
-        recurse = MenuItems(items, sub?.props?.children?.length + index + 1);
-      return (
-        <>
-          <ul>
-            <li>{this_menu_item}</li>
-            {sub}
-          </ul>
-          {recurse}
-        </>
-      );
-    }
+
+  if (index === 0 && level === 0) {
+    // initial bootstrap of menu ul
+    if (items.length) recurse = ParseMenuItems(items, 0, 1);
+    return <ul>{recurse}</ul>;
   }
-  if (index === 0) {
-    if (items.length) recurse = MenuItems(items, index + 1);
-    return (
-      <ul>
-        <li>{this_menu_item}</li>
-        {recurse}
-      </ul>
-    );
+  if (level) {
+    let this_level = items[index]?.field_level - level;
+    let next =
+      items[index + 1] &&
+      items[index + 1]?.field_level - items[index]?.field_level;
+
+    if (next === 0) {
+      recurse = ParseMenuItems(items, index + 1, level);
+      return (
+        <>
+          <li>{this_menu_item}</li> {recurse}
+        </>
+      );
+    } else if (next === -1 || typeof next === "undefined") {
+      return <li>{this_menu_item}</li>;
+    } else if (next === 1) {
+      // smart split sub-menu from remainder
+      let sub = ParseMenuItems(items, index + 1, level);
+      let skip_children = CountChildrenOffset(
+        items,
+        index,
+        items[index]?.field_level
+      );
+      if (skip_children) {
+        recurse = ParseMenuItems(
+          items,
+          skip_children,
+          items[skip_children]?.field_level
+        );
+        return (
+          <>
+            <li>{this_menu_item}</li>
+            <ul>{sub}</ul>
+            {recurse}
+          </>
+        );
+      }
+    }
   }
 }
 
@@ -107,7 +126,9 @@ function BuildMenu(data) {
     //console.log("MenuItem", i);
   });
 
-  let menuItems = MenuItems(data?.payload?.relationships?.field_menu_items);
+  let menuItems = ParseMenuItems(
+    data?.payload?.relationships?.field_menu_items
+  );
 
   return <div>{menuItems}</div>;
 }

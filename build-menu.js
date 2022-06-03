@@ -11,34 +11,60 @@ const NavLink = ({
   activeClassName: "is-active"
 }, children);
 
-function MenuItems(items, index = 0) {
+function CountChildrenOffset(items, index = 0, level = 0) {
+  while (1) {
+    let next = items[index + 1] && items[index + 1]?.field_level;
+    console.log(`i${index} cur ${level} next ${next}`);
+    index = index + 1;
+
+    if (index + 1 === items.length && items[index]?.field_level === level) {
+      console.log("gives", index);
+      return index;
+    }
+
+    if (next === level) {
+      console.log("-gives", index);
+      return index;
+    }
+
+    if (index > items.length) {
+      return false;
+    }
+  }
+}
+
+function ParseMenuItems(items, index = 0, level = 0) {
   if (typeof items === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null);
   let recurse,
       this_menu_item = /*#__PURE__*/React.createElement(NavLink, {
     to: `/${items[index]?.field_slug}`
   }, items[index]?.field_title);
 
-  if (index) {
-    if (items[index]?.field_level === items[index - 1]?.field_level && items[index]?.field_level > items[index + 1]?.field_level || items?.length === index + 1) {
-      return /*#__PURE__*/React.createElement("li", null, this_menu_item);
-    }
-
-    if (items[index]?.field_level === items[index - 1]?.field_level && items[index]?.field_level <= items[index + 1]?.field_level) {
-      recurse = MenuItems(items, index + 1);
-      return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item), recurse);
-    }
-
-    if (items[index]?.field_level > items[index - 1]?.field_level) {
-      // smart split sub-menu from remainder
-      let sub = MenuItems(items, index + 1);
-      if (items?.length >= sub?.props?.children?.length + index + 1) recurse = MenuItems(items, sub?.props?.children?.length + index + 1);
-      return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("li", null, this_menu_item), sub), recurse);
-    }
+  if (index === 0 && level === 0) {
+    // initial bootstrap of menu ul
+    if (items.length) recurse = ParseMenuItems(items, 0, 1);
+    return /*#__PURE__*/React.createElement("ul", null, recurse);
   }
 
-  if (index === 0) {
-    if (items.length) recurse = MenuItems(items, index + 1);
-    return /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("li", null, this_menu_item), recurse);
+  if (level) {
+    let this_level = items[index]?.field_level - level;
+    let next = items[index + 1] && items[index + 1]?.field_level - items[index]?.field_level;
+
+    if (next === 0) {
+      recurse = ParseMenuItems(items, index + 1, level);
+      return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item), " ", recurse);
+    } else if (next === -1 || typeof next === "undefined") {
+      return /*#__PURE__*/React.createElement("li", null, this_menu_item);
+    } else if (next === 1) {
+      // smart split sub-menu from remainder
+      let sub = ParseMenuItems(items, index + 1, level);
+      let skip_children = CountChildrenOffset(items, index, items[index]?.field_level);
+
+      if (skip_children) {
+        recurse = ParseMenuItems(items, skip_children, items[skip_children]?.field_level);
+        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item), /*#__PURE__*/React.createElement("ul", null, sub), recurse);
+      }
+    }
   }
 }
 
@@ -73,7 +99,7 @@ function BuildMenu(data) {
 
   data?.payload?.relationships?.field_menu_items.map(i => {//console.log("MenuItem", i);
   });
-  let menuItems = MenuItems(data?.payload?.relationships?.field_menu_items);
+  let menuItems = ParseMenuItems(data?.payload?.relationships?.field_menu_items);
   return /*#__PURE__*/React.createElement("div", null, menuItems);
 }
 
