@@ -199,28 +199,27 @@ function ComposePanes(data) {
 
 
       if (typeof pane_fragment?.field_options === "string") {
-        let action;
-
         try {
-          action = JSON.parse(pane_fragment?.field_options);
-          if (typeof tempValue?.buttons === "object") payload.buttonData = tempValue?.buttons; // effects are directly injected into each pane below
-
-          if (typeof action?.effects === "object") {
-            for (const key in action?.effects) {
-              // store animation
-              effects[`fragment-${pane_fragment?.id}`] = action?.effects[key];
-              effects[`fragment-${pane_fragment?.id}`]["paneFragment"] = `fragment-${pane_fragment?.id}`;
-              effects[`fragment-${pane_fragment?.id}`]["pane"] = pane?.id; // clone and store animation for modal (if any)
-
-              if (pane_fragment?.internal?.type === "paragraph__modal" || pane_fragment?.field_modal) {
-                effects[`modal-${pane_fragment?.id}`] = structuredClone(action?.effects[key]);
-                effects[`modal-${pane_fragment?.id}`]["paneFragment"] = `modal-${pane_fragment?.id}`;
-              }
-            }
-          }
+          tempValue = JSON.parse(pane_fragment?.field_options);
         } catch (e) {
           if (e instanceof SyntaxError) {
             console.log("ERROR parsing json in compose-panes.js: ", e);
+          }
+        }
+
+        if (typeof tempValue?.buttons === "object") payload.buttonData = tempValue?.buttons; // effects are directly injected into each pane below
+
+        if (typeof tempValue?.effects === "object") {
+          for (const key in tempValue?.effects) {
+            // store animation
+            effects[`fragment-${pane_fragment?.id}`] = tempValue?.effects[key];
+            effects[`fragment-${pane_fragment?.id}`]["paneFragment"] = `fragment-${pane_fragment?.id}`;
+            effects[`fragment-${pane_fragment?.id}`]["pane"] = pane?.id; // clone and store animation for modal (if any)
+
+            if (pane_fragment?.internal?.type === "paragraph__modal" || pane_fragment?.field_modal) {
+              effects[`modal-${pane_fragment?.id}`] = structuredClone(tempValue?.effects[key]);
+              effects[`modal-${pane_fragment?.id}`]["paneFragment"] = `modal-${pane_fragment?.id}`;
+            }
           }
         }
       } // prepare any images from this paneFragment
@@ -274,7 +273,8 @@ function ComposePanes(data) {
           hooksData: data?.hooks || {},
           videoData: payload?.videoData || {},
           shapeData: payload?.shapeData || {},
-          modalData: payload?.modalData || {}
+          modalData: payload?.modalData || {},
+          buttonData: payload?.buttonData || {}
         }
       };
       let this_pane_fragment_type = HasPaneFragmentType[tractStackFragment?.mode];
