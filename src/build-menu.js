@@ -71,7 +71,9 @@ function ParseMenuItems(items, index = 0, level = 0) {
         return (
           <>
             <li>{this_menu_item}</li>
-            <ul>{sub}</ul>
+            <li>
+              <ul>{sub}</ul>
+            </li>
             {recurse}
           </>
         );
@@ -79,7 +81,9 @@ function ParseMenuItems(items, index = 0, level = 0) {
         return (
           <>
             <li>{this_menu_item}</li>
-            <ul>{sub}</ul>
+            <li>
+              <ul>{sub}</ul>
+            </li>
           </>
         );
       }
@@ -97,14 +101,11 @@ function BuildMenu(data) {
       ?.publicURL === "string"
   ) {
     // svg logo
-    //console.log("svg", data?.payload?.relationships?.field_svg_logo);
     let this_image_id = data?.payload?.relationships?.field_svg_logo?.id;
-    let this_image = data?.payload?.relationships?.field_svg_logo?.publicURL;
-    logo = <img src={this_image} alt="Logo" />;
-    //console.log("svg", logo);
-  }
-  //else
-  if (
+    let this_image =
+      data?.payload?.relationships?.field_svg_logo?.localFile?.publicURL;
+    logo = <img src={this_image} className="menu__logo" alt="Logo" />;
+  } else if (
     typeof data?.payload?.relationships?.field_image_logo?.localFile
       ?.childImageSharp[data?.state?.viewport?.viewport?.key] !== "undefined"
   ) {
@@ -116,25 +117,33 @@ function BuildMenu(data) {
     logo = (
       <GatsbyImage
         key={this_image_id}
+        className="menu__logo"
         alt="Logo"
         image={this_image}
         objectFit="contain"
       />
     );
-    //console.log("img", logo);
-  } else {
-    // no logo
   }
-
-  data?.payload?.relationships?.field_menu_items.map((i) => {
-    //console.log("MenuItem", i);
-  });
-
   let menuItems = ParseMenuItems(
     data?.payload?.relationships?.field_menu_items
   );
 
-  return <div>{menuItems}</div>;
+  return (
+    <>
+      <header role="banner">
+        {logo}
+        <input type="checkbox" id="nav-toggle" className="nav-toggle" />
+        <nav role="navigation" className="menu-default">
+          {menuItems}
+        </nav>
+        <label htmlFor="nav-toggle" className="nav-toggle-label">
+          <div className="innernav__toggle">menu</div>
+          <span></span>
+        </label>
+      </header>
+    </>
+  );
+  //<div>{menuItems}</div>;
 }
 
 export { BuildMenu };
