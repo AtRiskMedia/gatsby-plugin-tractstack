@@ -14,16 +14,13 @@ const NavLink = ({
 function CountChildrenOffset(items, index = 0, level = 0) {
   while (1) {
     let next = items[index + 1] && items[index + 1]?.field_level;
-    console.log(`i${index} cur ${level} next ${next}`);
     index = index + 1;
 
     if (index + 1 === items.length && items[index]?.field_level === level) {
-      console.log("gives", index);
       return index;
     }
 
     if (next === level) {
-      console.log("-gives", index);
       return index;
     }
 
@@ -63,6 +60,8 @@ function ParseMenuItems(items, index = 0, level = 0) {
       if (skip_children) {
         recurse = ParseMenuItems(items, skip_children, items[skip_children]?.field_level);
         return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item), /*#__PURE__*/React.createElement("ul", null, sub), recurse);
+      } else {
+        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item), /*#__PURE__*/React.createElement("ul", null, sub));
       }
     }
   }

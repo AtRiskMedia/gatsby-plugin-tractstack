@@ -12,14 +12,11 @@ const NavLink = ({ children, to }) => (
 function CountChildrenOffset(items, index = 0, level = 0) {
   while (1) {
     let next = items[index + 1] && items[index + 1]?.field_level;
-    console.log(`i${index} cur ${level} next ${next}`);
     index = index + 1;
     if (index + 1 === items.length && items[index]?.field_level === level) {
-      console.log("gives", index);
       return index;
     }
     if (next === level) {
-      console.log("-gives", index);
       return index;
     }
     if (index > items.length) {
@@ -76,6 +73,13 @@ function ParseMenuItems(items, index = 0, level = 0) {
             <li>{this_menu_item}</li>
             <ul>{sub}</ul>
             {recurse}
+          </>
+        );
+      } else {
+        return (
+          <>
+            <li>{this_menu_item}</li>
+            <ul>{sub}</ul>
           </>
         );
       }
