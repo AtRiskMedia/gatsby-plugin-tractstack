@@ -70,8 +70,8 @@ function ParseMenuItems(items, index = 0, level = 0) {
         );
         return (
           <>
-            <li>{this_menu_item}</li>
             <li>
+              {this_menu_item}
               <ul>{sub}</ul>
             </li>
             {recurse}
@@ -80,8 +80,8 @@ function ParseMenuItems(items, index = 0, level = 0) {
       } else {
         return (
           <>
-            <li>{this_menu_item}</li>
             <li>
+              {this_menu_item}
               <ul>{sub}</ul>
             </li>
           </>

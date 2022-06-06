@@ -59,9 +59,9 @@ function ParseMenuItems(items, index = 0, level = 0) {
 
       if (skip_children) {
         recurse = ParseMenuItems(items, skip_children, items[skip_children]?.field_level);
-        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("ul", null, sub)), recurse);
+        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item, /*#__PURE__*/React.createElement("ul", null, sub)), recurse);
       } else {
-        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("ul", null, sub)));
+        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("li", null, this_menu_item, /*#__PURE__*/React.createElement("ul", null, sub)));
       }
     }
   }
