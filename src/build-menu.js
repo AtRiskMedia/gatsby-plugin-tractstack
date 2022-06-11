@@ -94,6 +94,8 @@ function ParseMenuItems(items, index = 0, level = 0) {
 function BuildMenu(data) {
   //console.log("BuildMenu", data?.payload, data?.state, data?.hooks);
 
+  if (!data?.state?.viewport?.viewport?.key) return <></>;
+
   let logo;
   // svg or image logo?
   if (
@@ -104,7 +106,13 @@ function BuildMenu(data) {
     let this_image_id = data?.payload?.relationships?.field_svg_logo?.id;
     let this_image =
       data?.payload?.relationships?.field_svg_logo?.localFile?.publicURL;
-    logo = <img src={this_image} className="menu__logo" alt="Logo" />;
+    logo = (
+      <img
+        src={this_image}
+        className={`menu__logo menu__logo--${data?.state?.viewport?.viewport?.key}`}
+        alt="Logo"
+      />
+    );
   } else if (
     typeof data?.payload?.relationships?.field_image_logo?.localFile
       ?.childImageSharp[data?.state?.viewport?.viewport?.key] !== "undefined"
@@ -117,7 +125,7 @@ function BuildMenu(data) {
     logo = (
       <GatsbyImage
         key={this_image_id}
-        className="menu__logo"
+        className={`menu__logo menu__logo--${data?.state?.viewport?.viewport?.key}`}
         alt="Logo"
         image={this_image}
         objectFit="contain"
@@ -131,19 +139,19 @@ function BuildMenu(data) {
   return (
     <>
       <header role="banner">
-        {logo}
-        <input type="checkbox" id="nav-toggle" className="nav-toggle" />
-        <nav role="navigation" className="menu-default">
-          {menuItems}
+        <nav
+          role="navigation"
+          className={`menu-default menu-default-${data?.state?.viewport?.viewport?.key}`}
+        >
+          <div className="menu__main">{logo}</div>
+          <div className="menu__side">
+            <p>Checking your &quot;tech game&quot;</p>
+            {menuItems}
+          </div>
         </nav>
-        <label htmlFor="nav-toggle" className="nav-toggle-label">
-          <div className="innernav__toggle">menu</div>
-          <span></span>
-        </label>
       </header>
     </>
   );
-  //<div>{menuItems}</div>;
 }
 
 export { BuildMenu };

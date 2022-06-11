@@ -69,6 +69,7 @@ function ParseMenuItems(items, index = 0, level = 0) {
 
 function BuildMenu(data) {
   //console.log("BuildMenu", data?.payload, data?.state, data?.hooks);
+  if (!data?.state?.viewport?.viewport?.key) return /*#__PURE__*/React.createElement(React.Fragment, null);
   let logo; // svg or image logo?
 
   if (typeof data?.payload?.relationships?.field_svg_logo?.localFile?.publicURL === "string") {
@@ -77,7 +78,7 @@ function BuildMenu(data) {
     let this_image = data?.payload?.relationships?.field_svg_logo?.localFile?.publicURL;
     logo = /*#__PURE__*/React.createElement("img", {
       src: this_image,
-      className: "menu__logo",
+      className: `menu__logo menu__logo--${data?.state?.viewport?.viewport?.key}`,
       alt: "Logo"
     });
   } else if (typeof data?.payload?.relationships?.field_image_logo?.localFile?.childImageSharp[data?.state?.viewport?.viewport?.key] !== "undefined") {
@@ -86,7 +87,7 @@ function BuildMenu(data) {
 
     logo = /*#__PURE__*/React.createElement(GatsbyImage, {
       key: this_image_id,
-      className: "menu__logo",
+      className: `menu__logo menu__logo--${data?.state?.viewport?.viewport?.key}`,
       alt: "Logo",
       image: this_image,
       objectFit: "contain"
@@ -96,19 +97,14 @@ function BuildMenu(data) {
   let menuItems = ParseMenuItems(data?.payload?.relationships?.field_menu_items);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("header", {
     role: "banner"
-  }, logo, /*#__PURE__*/React.createElement("input", {
-    type: "checkbox",
-    id: "nav-toggle",
-    className: "nav-toggle"
-  }), /*#__PURE__*/React.createElement("nav", {
+  }, /*#__PURE__*/React.createElement("nav", {
     role: "navigation",
-    className: "menu-default"
-  }, menuItems), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "nav-toggle",
-    className: "nav-toggle-label"
+    className: `menu-default menu-default-${data?.state?.viewport?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {
-    className: "innernav__toggle"
-  }, "menu"), /*#__PURE__*/React.createElement("span", null)))); //<div>{menuItems}</div>;
+    className: "menu__main"
+  }, logo), /*#__PURE__*/React.createElement("div", {
+    className: "menu__side"
+  }, /*#__PURE__*/React.createElement("p", null, "Checking your \"tech game\""), menuItems))));
 }
 
 export { BuildMenu };
