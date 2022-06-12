@@ -426,6 +426,7 @@ const InjectPaneFragment = (fragment, mode) => {
         <div className="paneFragmentImage">
           <BackgroundImage
             Tag="section"
+            style={{ backgroundPosition: "center" }}
             {...bgImage}
             objectFit="cover"
             preserveStackingContext
@@ -434,6 +435,7 @@ const InjectPaneFragment = (fragment, mode) => {
               <GatsbyImage
                 image={this_imageData}
                 alt={fragment?.payload?.imageData[0]?.alt_text}
+                style={{ backgroundPosition: "center" }}
                 objectFit="cover"
               />
             </div>

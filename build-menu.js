@@ -102,9 +102,13 @@ function BuildMenu(data) {
     className: `menu-default menu-default-${data?.state?.viewport?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "menu__main"
-  }, logo), /*#__PURE__*/React.createElement("div", {
+  }, logo, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
+    className: "menu__main--wordmark wordmark wordmark__ARm"
+  }, "At Risk Media")), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
+    className: "menu__main--slogan"
+  }, "Power-ups for creatives since 2002."))), /*#__PURE__*/React.createElement("div", {
     className: "menu__side"
-  }, /*#__PURE__*/React.createElement("p", null, "Checking your \"tech game\""), menuItems))));
+  }, menuItems))));
 }
 
 export { BuildMenu };

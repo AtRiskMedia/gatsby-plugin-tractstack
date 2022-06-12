@@ -379,13 +379,19 @@ const InjectPaneFragment = (fragment, mode) => {
       let child = /*#__PURE__*/React.createElement("div", {
         className: "paneFragmentImage"
       }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
-        Tag: "section"
+        Tag: "section",
+        style: {
+          backgroundPosition: "center"
+        }
       }, bgImage, {
         objectFit: "cover",
         preserveStackingContext: true
       }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
         image: this_imageData,
         alt: fragment?.payload?.imageData[0]?.alt_text,
+        style: {
+          backgroundPosition: "center"
+        },
         objectFit: "cover"
       }))));
       return PaneFragment(this_id, child, css);

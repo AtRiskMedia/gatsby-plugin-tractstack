@@ -143,11 +143,20 @@ function BuildMenu(data) {
           role="navigation"
           className={`menu-default menu-default-${data?.state?.viewport?.viewport?.key}`}
         >
-          <div className="menu__main">{logo}</div>
-          <div className="menu__side">
-            <p>Checking your &quot;tech game&quot;</p>
-            {menuItems}
+          <div className="menu__main">
+            {logo}
+            <p>
+              <span className="menu__main--wordmark wordmark wordmark__ARm">
+                At Risk Media
+              </span>
+            </p>
+            <p>
+              <span className="menu__main--slogan">
+                Power-ups for creatives since 2002.
+              </span>
+            </p>
           </div>
+          <div className="menu__side">{menuItems}</div>
         </nav>
       </header>
     </>
