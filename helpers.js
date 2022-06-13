@@ -374,8 +374,8 @@ const InjectPaneFragment = (fragment, mode) => {
       this_id = `${fragment?.id}-background-image`;
       const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
       const bgImage = convertToBgImage(this_imageData);
-      css = `z-index: ${parseInt(fragment?.z_index)};`;
-      if (typeof parent_css === "string") css = `${css} img {${fragment?.css?.parent}}`;
+      css = `z-index: ${parseInt(fragment?.z_index)}; section { height:100%; } `;
+      if (typeof parent_css === "string") css = `${css} img {${fragment?.css?.parent}; }`;
       let child = /*#__PURE__*/React.createElement("div", {
         className: "paneFragmentImage"
       }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
@@ -386,7 +386,9 @@ const InjectPaneFragment = (fragment, mode) => {
       }, bgImage, {
         objectFit: "cover",
         preserveStackingContext: true
-      }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(GatsbyImage, {
+      }), /*#__PURE__*/React.createElement("div", {
+        className: "paneFragmentImage__inner"
+      }, /*#__PURE__*/React.createElement(GatsbyImage, {
         image: this_imageData,
         alt: fragment?.payload?.imageData[0]?.alt_text,
         style: {

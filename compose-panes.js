@@ -257,6 +257,7 @@ function ComposePanes(data) {
       tractStackFragment = {
         id: pane_fragment?.id,
         mode: pane_fragment?.internal?.type,
+        pane_height_css: pane_height_css,
         viewport: {
           device: data?.state?.viewport?.viewport?.key,
           width: data?.state?.viewport?.viewport?.width

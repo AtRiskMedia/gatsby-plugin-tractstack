@@ -419,9 +419,11 @@ const InjectPaneFragment = (fragment, mode) => {
       this_id = `${fragment?.id}-background-image`;
       const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
       const bgImage = convertToBgImage(this_imageData);
-      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      css = `z-index: ${parseInt(
+        fragment?.z_index
+      )}; section { height:100%; } `;
       if (typeof parent_css === "string")
-        css = `${css} img {${fragment?.css?.parent}}`;
+        css = `${css} img {${fragment?.css?.parent}; }`;
       let child = (
         <div className="paneFragmentImage">
           <BackgroundImage
@@ -431,7 +433,7 @@ const InjectPaneFragment = (fragment, mode) => {
             objectFit="cover"
             preserveStackingContext
           >
-            <div>
+            <div className="paneFragmentImage__inner">
               <GatsbyImage
                 image={this_imageData}
                 alt={fragment?.payload?.imageData[0]?.alt_text}

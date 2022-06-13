@@ -5,6 +5,7 @@ const tractStackFragmentSchema = {
     mode: { type: "string" },
     children: { type: "object" },
     z_index: { type: "number" },
+    pane_height_css: { type: "string" },
     viewport: {
       type: "object",
       properties: {

@@ -13,6 +13,9 @@ const tractStackFragmentSchema = {
     z_index: {
       type: "number"
     },
+    pane_height_css: {
+      type: "string"
+    },
     viewport: {
       type: "object",
       properties: {
