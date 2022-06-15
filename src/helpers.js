@@ -424,21 +424,25 @@ const InjectPaneFragment = (fragment, mode) => {
       )}; section { height:100%; } `;
       if (typeof parent_css === "string")
         css = `${css} img {${fragment?.css?.parent}; }`;
+      let this_object_fit = "cover";
+      let this_background_position =
+        fragment?.payload?.imageData[0]?.backgroundPosition || "center";
+      // TODO: background position isn't actually working
       let child = (
         <div className="paneFragmentImage">
           <BackgroundImage
             Tag="section"
-            style={{ backgroundPosition: "center" }}
+            style={{ backgroundPosition: this_background_position }}
             {...bgImage}
-            objectFit="cover"
+            objectFit={this_object_fit}
             preserveStackingContext
           >
             <div className="paneFragmentImage__inner">
               <GatsbyImage
                 image={this_imageData}
                 alt={fragment?.payload?.imageData[0]?.alt_text}
-                style={{ backgroundPosition: "center" }}
-                objectFit="cover"
+                style={{ backgroundPosition: this_background_position }}
+                objectFit={this_object_fit}
               />
             </div>
           </BackgroundImage>

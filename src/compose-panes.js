@@ -333,6 +333,8 @@ function ComposePanes(data) {
                 id: e?.id,
                 filename: e?.filename,
                 data: this_image,
+                backgroundPosition:
+                  pane_fragment?.field_background_position || null,
               };
               if (typeof pane_fragment?.field_alt_text === "string")
                 this_imageData.alt_text = pane_fragment?.field_alt_text;

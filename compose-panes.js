@@ -236,7 +236,8 @@ function ComposePanes(data) {
           let this_imageData = {
             id: e?.id,
             filename: e?.filename,
-            data: this_image
+            data: this_image,
+            backgroundPosition: pane_fragment?.field_background_position || null
           };
           if (typeof pane_fragment?.field_alt_text === "string") this_imageData.alt_text = pane_fragment?.field_alt_text;
           payload.imageData.push(this_imageData);

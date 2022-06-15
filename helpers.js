@@ -376,15 +376,18 @@ const InjectPaneFragment = (fragment, mode) => {
       const bgImage = convertToBgImage(this_imageData);
       css = `z-index: ${parseInt(fragment?.z_index)}; section { height:100%; } `;
       if (typeof parent_css === "string") css = `${css} img {${fragment?.css?.parent}; }`;
+      let this_object_fit = "cover";
+      let this_background_position = fragment?.payload?.imageData[0]?.backgroundPosition || "center"; // TODO: background position isn't actually working
+
       let child = /*#__PURE__*/React.createElement("div", {
         className: "paneFragmentImage"
       }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
         Tag: "section",
         style: {
-          backgroundPosition: "center"
+          backgroundPosition: this_background_position
         }
       }, bgImage, {
-        objectFit: "cover",
+        objectFit: this_object_fit,
         preserveStackingContext: true
       }), /*#__PURE__*/React.createElement("div", {
         className: "paneFragmentImage__inner"
@@ -392,9 +395,9 @@ const InjectPaneFragment = (fragment, mode) => {
         image: this_imageData,
         alt: fragment?.payload?.imageData[0]?.alt_text,
         style: {
-          backgroundPosition: "center"
+          backgroundPosition: this_background_position
         },
-        objectFit: "cover"
+        objectFit: this_object_fit
       }))));
       return PaneFragment(this_id, child, css);
 
