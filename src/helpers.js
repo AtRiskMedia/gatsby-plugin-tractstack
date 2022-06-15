@@ -112,7 +112,6 @@ const lispCallback = (payload, context = "", hooks = []) => {
       break;
 
     case "goto":
-      // calls hooks.hookGotoStoryFragment for gatsby navigate
       if (
         parameter_one === "storyFragment" &&
         typeof parameter_two === "string"

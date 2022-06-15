@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "gatsby";
 import { GatsbyImage } from "gatsby-plugin-image";
-import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
+import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
+import { lispLexer } from "./lexer";
 
 const NavLink = ({
   children,
@@ -30,11 +31,42 @@ function CountChildrenOffset(items, index = 0, level = 0) {
   }
 }
 
+function PreParseMenuItems(items, hooks) {
+  // pre-parses menu items and injects hooks, if any
+  let options;
+  return items?.map(e => {
+    try {
+      options = JSON.parse(e?.field_options);
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        console.log("ERROR parsing json in {}: ", e);
+      }
+    }
+
+    if (typeof options?.callbackPayload === "string") {
+      e.callbackPayload = options.callbackPayload;
+      e.hooksData = hooks;
+    } else {
+      e.callbackPayload = false;
+      e.hooksData = false;
+    }
+
+    return e;
+  });
+}
+
 function ParseMenuItems(items, index = 0, level = 0) {
   if (typeof items === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null);
-  let recurse,
-      this_menu_item = /*#__PURE__*/React.createElement(NavLink, {
-    to: `/${items[index]?.field_slug}`
+  let recurse;
+  let payload_ast = lispLexer(items[index]?.callbackPayload);
+
+  function injectPayload() {
+    lispCallback(payload_ast[0], "", items[index]?.hooksData);
+  }
+
+  let this_menu_item = /*#__PURE__*/React.createElement("a", {
+    key: index,
+    onClick: () => injectPayload()
   }, items[index]?.field_title);
 
   if (index === 0 && level === 0) {
@@ -68,7 +100,6 @@ function ParseMenuItems(items, index = 0, level = 0) {
 }
 
 function BuildMenu(data) {
-  //console.log("BuildMenu", data?.payload, data?.state, data?.hooks);
   if (!data?.state?.viewport?.viewport?.key) return /*#__PURE__*/React.createElement(React.Fragment, null);
   let logo; // svg or image logo?
 
@@ -94,7 +125,8 @@ function BuildMenu(data) {
     });
   }
 
-  let menuItems = ParseMenuItems(data?.payload?.relationships?.field_menu_items);
+  let menuItemsRaw = PreParseMenuItems(data?.payload?.relationships?.field_menu_items, data?.hooks);
+  let menuItems = ParseMenuItems(menuItemsRaw);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("header", {
     role: "banner"
   }, /*#__PURE__*/React.createElement("nav", {
