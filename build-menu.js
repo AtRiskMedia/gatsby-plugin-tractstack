@@ -4,14 +4,6 @@ import { GatsbyImage } from "gatsby-plugin-image";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
 
-const NavLink = ({
-  children,
-  to
-}) => /*#__PURE__*/React.createElement(Link, {
-  to: to,
-  activeClassName: "is-active"
-}, children);
-
 function CountChildrenOffset(items, index = 0, level = 0) {
   while (1) {
     let next = items[index + 1] && items[index + 1]?.field_level;
@@ -66,6 +58,7 @@ function ParseMenuItems(items, index = 0, level = 0) {
 
   let this_menu_item = /*#__PURE__*/React.createElement("a", {
     key: index,
+    href: "#",
     onClick: () => injectPayload()
   }, items[index]?.field_title);
 

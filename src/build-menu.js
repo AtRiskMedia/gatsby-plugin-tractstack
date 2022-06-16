@@ -4,12 +4,6 @@ import { GatsbyImage } from "gatsby-plugin-image";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
 
-const NavLink = ({ children, to }) => (
-  <Link to={to} activeClassName="is-active">
-    {children}
-  </Link>
-);
-
 function CountChildrenOffset(items, index = 0, level = 0) {
   while (1) {
     let next = items[index + 1] && items[index + 1]?.field_level;
@@ -56,7 +50,7 @@ function ParseMenuItems(items, index = 0, level = 0) {
     lispCallback(payload_ast[0], "", items[index]?.hooksData);
   }
   let this_menu_item = (
-    <a key={index} onClick={() => injectPayload()}>
+    <a key={index} href="#" onClick={() => injectPayload()}>
       {items[index]?.field_title}
     </a>
   );
