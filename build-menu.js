@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "gatsby";
 import { GatsbyImage } from "gatsby-plugin-image";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
@@ -120,21 +119,51 @@ function BuildMenu(data) {
 
   let menuItemsRaw = PreParseMenuItems(data?.payload?.relationships?.field_menu_items, data?.hooks);
   let menuItems = ParseMenuItems(menuItemsRaw);
+  let slogan = /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", null, "Power-ups for creatives since 2002."));
+  let branding = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", null, logo), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
+    className: "menu__main--wordmark wordmark wordmark__ARm"
+  }, "At Risk Media")));
+  let viewport = data?.state?.viewport?.viewport?.key;
+  let contents;
+
+  switch (viewport) {
+    case "mobile":
+    case "tablet":
+      contents = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "menu__left menu__left--a"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "menu__branding"
+      }, branding), /*#__PURE__*/React.createElement("div", {
+        className: "menu__slogan"
+      }, slogan)), /*#__PURE__*/React.createElement("div", {
+        className: "menu__right menu__right--a"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "menu__menuitems"
+      }, menuItems)));
+      break;
+
+    case "desktop":
+      contents = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "menu__left menu__left--b"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "menu__branding"
+      }, branding)), /*#__PURE__*/React.createElement("div", {
+        className: "menu__right menu__right--b"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "menu__slogan"
+      }, slogan), /*#__PURE__*/React.createElement("div", {
+        className: "menu__menuitems"
+      }, menuItems)));
+      break;
+  }
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("header", {
     role: "banner"
   }, /*#__PURE__*/React.createElement("nav", {
     role: "navigation",
-    className: `menu-default menu-default-${data?.state?.viewport?.viewport?.key}`
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "menu__main"
-  }, logo, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
-    className: "menu__main--wordmark wordmark wordmark__ARm"
-  }, "At Risk Media")), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
-    className: "menu__main--slogan"
-  }, "Power-ups for creatives since 2002."))), /*#__PURE__*/React.createElement("div", {
-    className: "menu__side"
-  }, menuItems))));
+    className: `menu menu-default ${viewport}`
+  }, contents)));
 }
 
-export { BuildMenu };
+export { PreParseMenuItems, ParseMenuItems };
 //# sourceMappingURL=build-menu.js.map

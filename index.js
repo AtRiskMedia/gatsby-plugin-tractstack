@@ -1,6 +1,6 @@
 import { ComposePanes } from "./compose-panes";
 import { BuildController } from "./build-controller";
-import { BuildMenu } from "./build-menu";
+import { PreParseMenuItems, ParseMenuItems } from "./build-menu";
 import { getStoryStepGraph, lispCallback, getScrollbarSize } from "./helpers";
 import { lispLexer } from "./lexer";
 import animateScrollTo from "animated-scroll-to";
@@ -9,5 +9,5 @@ const viewportWidths = {
   tablet: 1080,
   desktop: 1920
 };
-export { ComposePanes, BuildController, BuildMenu, getStoryStepGraph, viewportWidths, lispLexer, lispCallback, getScrollbarSize, animateScrollTo };
+export { ComposePanes, BuildController, getStoryStepGraph, viewportWidths, lispLexer, lispCallback, getScrollbarSize, animateScrollTo, PreParseMenuItems, ParseMenuItems };
 //# sourceMappingURL=index.js.map

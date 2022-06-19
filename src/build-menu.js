@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "gatsby";
 import { GatsbyImage } from "gatsby-plugin-image";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
@@ -112,76 +111,4 @@ function ParseMenuItems(items, index = 0, level = 0) {
   }
 }
 
-function BuildMenu(data) {
-  if (!data?.state?.viewport?.viewport?.key) return <></>;
-
-  let logo;
-  // svg or image logo?
-  if (
-    typeof data?.payload?.relationships?.field_svg_logo?.localFile
-      ?.publicURL === "string"
-  ) {
-    // svg logo
-    let this_image_id = data?.payload?.relationships?.field_svg_logo?.id;
-    let this_image =
-      data?.payload?.relationships?.field_svg_logo?.localFile?.publicURL;
-    logo = (
-      <img
-        src={this_image}
-        className={`menu__logo menu__logo--${data?.state?.viewport?.viewport?.key}`}
-        alt="Logo"
-      />
-    );
-  } else if (
-    typeof data?.payload?.relationships?.field_image_logo?.localFile
-      ?.childImageSharp[data?.state?.viewport?.viewport?.key] !== "undefined"
-  ) {
-    let this_image_id = data?.payload?.relationships?.field_image_logo?.id;
-    let this_image =
-      data?.payload?.relationships?.field_image_logo?.localFile
-        ?.childImageSharp[data?.state?.viewport?.viewport?.key];
-    // image logo
-    logo = (
-      <GatsbyImage
-        key={this_image_id}
-        className={`menu__logo menu__logo--${data?.state?.viewport?.viewport?.key}`}
-        alt="Logo"
-        image={this_image}
-        objectFit="contain"
-      />
-    );
-  }
-  let menuItemsRaw = PreParseMenuItems(
-    data?.payload?.relationships?.field_menu_items,
-    data?.hooks
-  );
-  let menuItems = ParseMenuItems(menuItemsRaw);
-
-  return (
-    <>
-      <header role="banner">
-        <nav
-          role="navigation"
-          className={`menu-default menu-default-${data?.state?.viewport?.viewport?.key}`}
-        >
-          <div className="menu__main">
-            {logo}
-            <p>
-              <span className="menu__main--wordmark wordmark wordmark__ARm">
-                At Risk Media
-              </span>
-            </p>
-            <p>
-              <span className="menu__main--slogan">
-                Power-ups for creatives since 2002.
-              </span>
-            </p>
-          </div>
-          <div className="menu__side">{menuItems}</div>
-        </nav>
-      </header>
-    </>
-  );
-}
-
-export { BuildMenu };
+export { PreParseMenuItems, ParseMenuItems };
