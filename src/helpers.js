@@ -451,10 +451,13 @@ const InjectPaneFragment = (fragment, mode) => {
 
     case "BackgroundVideo":
       this_id = `${fragment?.id}-background-video`;
-      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      css = `z-index: ${parseInt(
+        fragment?.z_index
+      )}; video{ object-fit: cover; } `;
       if (typeof parent_css === "string")
-        css = `${css} ${fragment?.parent_css}`;
+        css = `${css} ${fragment?.parent_css} `;
       if (typeof child_css === "string") css = `${css} ${fragment?.child_css}`;
+      console.log(css);
       child = (
         <video
           autoPlay={true}
