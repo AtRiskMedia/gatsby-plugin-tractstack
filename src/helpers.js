@@ -457,7 +457,6 @@ const InjectPaneFragment = (fragment, mode) => {
       if (typeof parent_css === "string")
         css = `${css} ${fragment?.parent_css} `;
       if (typeof child_css === "string") css = `${css} ${fragment?.child_css}`;
-      console.log(css);
       child = (
         <video
           autoPlay={true}
