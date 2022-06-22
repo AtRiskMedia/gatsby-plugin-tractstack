@@ -3,7 +3,6 @@ import { BuildController } from "./build-controller";
 import { PreParseMenuItems, ParseMenuItems } from "./build-menu";
 import { getStoryStepGraph, lispCallback, getScrollbarSize } from "./helpers";
 import { lispLexer } from "./lexer";
-import animateScrollTo from "animated-scroll-to";
 
 const viewportWidths = {
   mobile: 600,
@@ -19,7 +18,6 @@ export {
   lispLexer,
   lispCallback,
   getScrollbarSize,
-  animateScrollTo,
   PreParseMenuItems,
   ParseMenuItems,
 };

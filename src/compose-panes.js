@@ -448,6 +448,7 @@ function ComposePanes(data) {
     }
   );
   // this is the storyFragment
+  if (typeof composedPanes === "undefined") return <></>;
   return composedPanes;
 }
 

@@ -317,6 +317,7 @@ function ComposePanes(data) {
     }, composedPaneFragments)));
   }); // this is the storyFragment
 
+  if (typeof composedPanes === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null);
   return composedPanes;
 }
 
