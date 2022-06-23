@@ -305,7 +305,8 @@ function ComposePanes(data) {
       key: pane?.id
     }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
       className: `pane pane__view pane__view--${data?.state?.viewport?.viewport?.key}`,
-      css: pane_css
+      css: pane_css,
+      id: pane?.id
     }, composedPaneFragments));
   }); // this is the storyFragment
 

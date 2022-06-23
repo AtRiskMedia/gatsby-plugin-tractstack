@@ -430,6 +430,7 @@ function ComposePanes(data) {
           <StyledWrapperDiv
             className={`pane pane__view pane__view--${data?.state?.viewport?.viewport?.key}`}
             css={pane_css}
+            id={pane?.id}
           >
             {composedPaneFragments}
           </StyledWrapperDiv>
