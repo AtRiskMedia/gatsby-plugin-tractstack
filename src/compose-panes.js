@@ -226,6 +226,7 @@ function ComposePanes(data) {
                       key={`modal-${this_shape?.id}`}
                     >
                       <IsVisible
+                        once
                         id={`modal-${this_shape?.id}`}
                         className="paneFragment"
                         key={`${this_shape?.id}-visible`}
@@ -391,6 +392,7 @@ function ComposePanes(data) {
           composedPaneFragments.push(
             <div className={thisClass} key={pane_fragment?.id}>
               <IsVisible
+                once
                 id={`fragment-${pane_fragment?.id}`}
                 className="paneFragment"
                 key={`fragment-${pane_fragment?.id}`}

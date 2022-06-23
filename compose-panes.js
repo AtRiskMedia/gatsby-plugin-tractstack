@@ -150,6 +150,7 @@ function ComposePanes(data) {
                 className: `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`,
                 key: `modal-${this_shape?.id}`
               }, /*#__PURE__*/React.createElement(IsVisible, {
+                once: true,
                 id: `modal-${this_shape?.id}`,
                 className: "paneFragment",
                 key: `${this_shape?.id}-visible`,
@@ -279,6 +280,7 @@ function ComposePanes(data) {
         className: thisClass,
         key: pane_fragment?.id
       }, /*#__PURE__*/React.createElement(IsVisible, {
+        once: true,
         id: `fragment-${pane_fragment?.id}`,
         className: "paneFragment",
         key: `fragment-${pane_fragment?.id}`,

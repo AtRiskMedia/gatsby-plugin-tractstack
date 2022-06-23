@@ -92,7 +92,7 @@ const lispCallback = (payload, context = "", hooks = []) => {
           parameter_one = parameter_two[1];
           parameter_two = parameter_three;
           parameter_three = false;
-          console.log(`todo: remove ${icon} icon to controller`); // TODO: do something with the icon
+          console.log(`todo: remove ${icon} icon from controller`); // TODO: do something with the icon
 
           break;
       }
