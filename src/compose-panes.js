@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import animateScrollTo from "animated-scroll-to";
 import { IsVisible } from "./is-visible.js";
 import {
   InjectPaneFragment,
@@ -9,7 +8,6 @@ import {
   InjectCssAnimation,
   HasImageMask,
   HasPaneFragmentType,
-  getCurrentPane,
   thisViewportValue,
 } from "./helpers";
 import { SvgModals, SvgShape } from "./shapes";
@@ -17,16 +15,6 @@ import { SvgModals, SvgShape } from "./shapes";
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
-
-  // is there a current pane to scroll to?
-  let visiblePane = getCurrentPane(
-    data?.state?.viewport?.currentPane,
-    data?.state?.viewport?.panes
-  );
-  if (visiblePane) {
-    let ref = document.getElementById(visiblePane);
-    if (ref) animateScrollTo(ref);
-  }
 
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
@@ -241,6 +229,7 @@ function ComposePanes(data) {
                         id={`modal-${this_shape?.id}`}
                         className="paneFragment"
                         key={`${this_shape?.id}-visible`}
+                        hooks={data?.hooks}
                       >
                         {this_fragment}
                       </IsVisible>
@@ -404,7 +393,8 @@ function ComposePanes(data) {
               <IsVisible
                 id={`fragment-${pane_fragment?.id}`}
                 className="paneFragment"
-                key={pane_fragment?.id}
+                key={`fragment-${pane_fragment?.id}`}
+                hooks={data?.hooks}
               >
                 {react_fragment}
               </IsVisible>
@@ -435,14 +425,12 @@ function ComposePanes(data) {
       }
       return (
         <section key={pane?.id}>
-          <IsVisible id={pane?.id} hooks={data?.hooks}>
-            <StyledWrapperDiv
-              className={`pane pane__view pane__view--${data?.state?.viewport?.viewport?.key}`}
-              css={pane_css}
-            >
-              {composedPaneFragments}
-            </StyledWrapperDiv>
-          </IsVisible>
+          <StyledWrapperDiv
+            className={`pane pane__view pane__view--${data?.state?.viewport?.viewport?.key}`}
+            css={pane_css}
+          >
+            {composedPaneFragments}
+          </StyledWrapperDiv>
         </section>
       );
     }

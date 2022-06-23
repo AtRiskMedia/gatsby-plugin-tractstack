@@ -33,12 +33,6 @@ const validateSchema = fragment => {
 
 const thisViewportValue = (viewport, value) => {
   return value[viewport];
-};
-
-const getCurrentPane = (paneId = "", panes = []) => {
-  if (!paneId) return panes[0]; // return first element in panes
-
-  return paneId;
 }; // from https://tobbelindstrom.com/blog/measure-scrollbar-width-and-height/
 
 
@@ -445,5 +439,5 @@ const HasPaneFragmentType = {
   paragraph__d3: null,
   paragraph__h5p: null
 };
-export { InjectSvgModal, InjectCssAnimation, StyledWrapperDiv, StyledWrapperSection, PaneFragment, HasImageMask, HasPaneFragmentType, InjectPaneFragment, getStoryStepGraph, lispCallback, getCurrentPane, getScrollbarSize, thisViewportValue, viewportWidth };
+export { InjectSvgModal, InjectCssAnimation, StyledWrapperDiv, StyledWrapperSection, PaneFragment, HasImageMask, HasPaneFragmentType, InjectPaneFragment, getStoryStepGraph, lispCallback, getScrollbarSize, thisViewportValue, viewportWidth };
 //# sourceMappingURL=helpers.js.map

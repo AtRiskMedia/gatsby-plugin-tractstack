@@ -1,21 +1,12 @@
 import React, { useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import animateScrollTo from "animated-scroll-to";
 import { IsVisible } from "./is-visible.js";
-import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimation, HasImageMask, HasPaneFragmentType, getCurrentPane, thisViewportValue } from "./helpers";
+import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimation, HasImageMask, HasPaneFragmentType, thisViewportValue } from "./helpers";
 import { SvgModals, SvgShape } from "./shapes";
 
 function ComposePanes(data) {
   // if viewport is not yet defined, return empty fragment
-  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // is there a current pane to scroll to?
-
-  let visiblePane = getCurrentPane(data?.state?.viewport?.currentPane, data?.state?.viewport?.panes);
-
-  if (visiblePane) {
-    let ref = document.getElementById(visiblePane);
-    if (ref) animateScrollTo(ref);
-  } // loop through the panes in view and render each pane fragment
-
+  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
     let pane_css = "",
@@ -161,7 +152,8 @@ function ComposePanes(data) {
               }, /*#__PURE__*/React.createElement(IsVisible, {
                 id: `modal-${this_shape?.id}`,
                 className: "paneFragment",
-                key: `${this_shape?.id}-visible`
+                key: `${this_shape?.id}-visible`,
+                hooks: data?.hooks
               }, this_fragment)));
             }
           }
@@ -289,7 +281,8 @@ function ComposePanes(data) {
       }, /*#__PURE__*/React.createElement(IsVisible, {
         id: `fragment-${pane_fragment?.id}`,
         className: "paneFragment",
-        key: pane_fragment?.id
+        key: `fragment-${pane_fragment?.id}`,
+        hooks: data?.hooks
       }, react_fragment)));
     }); // skip if empty pane
 
@@ -308,13 +301,10 @@ function ComposePanes(data) {
 
     return /*#__PURE__*/React.createElement("section", {
       key: pane?.id
-    }, /*#__PURE__*/React.createElement(IsVisible, {
-      id: pane?.id,
-      hooks: data?.hooks
     }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
       className: `pane pane__view pane__view--${data?.state?.viewport?.viewport?.key}`,
       css: pane_css
-    }, composedPaneFragments)));
+    }, composedPaneFragments));
   }); // this is the storyFragment
 
   if (typeof composedPanes === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null);

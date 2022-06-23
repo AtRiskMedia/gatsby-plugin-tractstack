@@ -36,12 +36,6 @@ const thisViewportValue = (viewport, value) => {
   return value[viewport];
 };
 
-const getCurrentPane = (paneId = "", panes = []) => {
-  if (!paneId) return panes[0];
-  // return first element in panes
-  return paneId;
-};
-
 // from https://tobbelindstrom.com/blog/measure-scrollbar-width-and-height/
 const getScrollbarSize = () => {
   if (typeof window !== "undefined") {
@@ -514,7 +508,6 @@ export {
   InjectPaneFragment,
   getStoryStepGraph,
   lispCallback,
-  getCurrentPane,
   getScrollbarSize,
   thisViewportValue,
   viewportWidth,

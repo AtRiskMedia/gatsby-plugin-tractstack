@@ -5,7 +5,6 @@ const IsVisible = (props) => {
   const nodeRef = useRef();
   const isVisible = useIsVisible(nodeRef);
   let state;
-  // set active panes in redux
   if (isVisible) {
     state = "visible";
     props?.hooks?.hookPaneVisible(props?.id);

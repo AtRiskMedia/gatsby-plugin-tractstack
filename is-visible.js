@@ -4,7 +4,7 @@ import { useIsVisible } from "react-is-visible";
 const IsVisible = props => {
   const nodeRef = useRef();
   const isVisible = useIsVisible(nodeRef);
-  let state; // set active panes in redux
+  let state;
 
   if (isVisible) {
     state = "visible";
