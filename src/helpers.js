@@ -84,8 +84,8 @@ const lispCallback = (payload, context = "", hooks = []) => {
           parameter_one = parameter_two[1];
           parameter_two = parameter_three;
           parameter_three = false;
-          console.log(`todo: add ${icon} icon to controller`);
           // TODO: do something with the icon
+          console.log(`todo: add ${icon} icon to controller`);
           break;
 
         case "paneHidden":
@@ -95,8 +95,8 @@ const lispCallback = (payload, context = "", hooks = []) => {
           parameter_one = parameter_two[1];
           parameter_two = parameter_three;
           parameter_three = false;
-          console.log(`todo: remove ${icon} icon from controller`);
           // TODO: do something with the icon
+          console.log(`todo: remove ${icon} icon from controller`);
           break;
       }
       break;
@@ -111,8 +111,13 @@ const lispCallback = (payload, context = "", hooks = []) => {
         typeof parameter_two === "string"
       )
         hooks.hookGotoStoryFragment(`/${parameter_two}`);
-      if (parameter_one === "pane" && typeof parameter_two === "string")
+      if (parameter_one === "pane" && typeof parameter_two === "string") {
         hooks.hookSetCurrentPane(parameter_two);
+        setTimeout(function () {
+          console.log(hooks.hookScrolled);
+          hooks.hookScrolled();
+        }, 100);
+      }
       break;
 
     default:

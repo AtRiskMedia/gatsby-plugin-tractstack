@@ -37,7 +37,22 @@ function BuildController(data) {
     };
   }
 
-  let css = InjectCssAnimation(effects_payload, "tractstack-controller");
+  let css = InjectCssAnimation(effects_payload, "tractstack-controller"); // add debounced scroll listener for controller
+
+  function throttle(hook, limit, parameter) {
+    let wait = false;
+    return function () {
+      if (!wait) {
+        hook(parameter);
+        wait = true;
+        setTimeout(function () {
+          wait = false;
+        }, limit);
+      }
+    };
+  }
+
+  window.addEventListener("scroll", throttle(data?.hooks?.hookScrolled, 1000));
   return /*#__PURE__*/React.createElement("section", {
     key: data?.state?.storyStep?.storyStepGraph?.current?.id,
     className: "controller"

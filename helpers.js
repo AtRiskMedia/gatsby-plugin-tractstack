@@ -1,4 +1,4 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 import React from "react";
 import { sanitize } from "hast-util-sanitize";
@@ -80,9 +80,11 @@ const lispCallback = (payload, context = "", hooks = []) => {
           command = parameter_two[0];
           parameter_one = parameter_two[1];
           parameter_two = parameter_three;
-          parameter_three = false;
-          console.log(`todo: add ${icon} icon to controller`); // TODO: do something with the icon
+          parameter_three = false; // TODO: do something with the icon
 
+          setTimeout(function () {
+            console.log(`todo: add ${icon} icon to controller`);
+          }, 1000);
           break;
 
         case "paneHidden":
@@ -91,9 +93,11 @@ const lispCallback = (payload, context = "", hooks = []) => {
           command = parameter_two[0];
           parameter_one = parameter_two[1];
           parameter_two = parameter_three;
-          parameter_three = false;
-          console.log(`todo: remove ${icon} icon from controller`); // TODO: do something with the icon
+          parameter_three = false; // TODO: do something with the icon
 
+          setTimeout(function () {
+            console.log(`todo: remove ${icon} icon from controller`);
+          }, 1000);
           break;
       }
 
@@ -105,7 +109,15 @@ const lispCallback = (payload, context = "", hooks = []) => {
 
     case "goto":
       if (parameter_one === "storyFragment" && typeof parameter_two === "string") hooks.hookGotoStoryFragment(`/${parameter_two}`);
-      if (parameter_one === "pane" && typeof parameter_two === "string") hooks.hookSetCurrentPane(parameter_two);
+
+      if (parameter_one === "pane" && typeof parameter_two === "string") {
+        hooks.hookSetCurrentPane(parameter_two);
+        setTimeout(function () {
+          console.log(hooks.hookScrolled);
+          hooks.hookScrolled();
+        }, 100);
+      }
+
       break;
 
     default:

@@ -7,10 +7,8 @@ const IsVisible = (props) => {
   let state;
   if (isVisible) {
     state = "visible";
-    props?.hooks?.hookPaneVisible(props?.id);
   } else {
     state = "hidden";
-    props?.hooks?.hookPaneHidden(props?.id);
   }
   return (
     <div ref={nodeRef} id={props?.id} key={props?.id} className={state}>

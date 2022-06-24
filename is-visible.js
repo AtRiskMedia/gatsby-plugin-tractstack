@@ -8,10 +8,8 @@ const IsVisible = props => {
 
   if (isVisible) {
     state = "visible";
-    props?.hooks?.hookPaneVisible(props?.id);
   } else {
     state = "hidden";
-    props?.hooks?.hookPaneHidden(props?.id);
   }
 
   return /*#__PURE__*/React.createElement("div", {
