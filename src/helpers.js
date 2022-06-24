@@ -114,7 +114,6 @@ const lispCallback = (payload, context = "", hooks = []) => {
       if (parameter_one === "pane" && typeof parameter_two === "string") {
         hooks.hookSetCurrentPane(parameter_two);
         setTimeout(function () {
-          console.log(hooks.hookScrolled);
           hooks.hookScrolled();
         }, 100);
       }

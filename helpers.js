@@ -82,9 +82,7 @@ const lispCallback = (payload, context = "", hooks = []) => {
           parameter_two = parameter_three;
           parameter_three = false; // TODO: do something with the icon
 
-          setTimeout(function () {
-            console.log(`todo: add ${icon} icon to controller`);
-          }, 1000);
+          console.log(`todo: add ${icon} icon to controller`);
           break;
 
         case "paneHidden":
@@ -95,9 +93,7 @@ const lispCallback = (payload, context = "", hooks = []) => {
           parameter_two = parameter_three;
           parameter_three = false; // TODO: do something with the icon
 
-          setTimeout(function () {
-            console.log(`todo: remove ${icon} icon from controller`);
-          }, 1000);
+          console.log(`todo: remove ${icon} icon from controller`);
           break;
       }
 
@@ -113,7 +109,6 @@ const lispCallback = (payload, context = "", hooks = []) => {
       if (parameter_one === "pane" && typeof parameter_two === "string") {
         hooks.hookSetCurrentPane(parameter_two);
         setTimeout(function () {
-          console.log(hooks.hookScrolled);
           hooks.hookScrolled();
         }, 100);
       }
