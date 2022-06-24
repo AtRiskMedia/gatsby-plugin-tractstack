@@ -4,28 +4,28 @@ import { IsVisible } from "./is-visible.js";
 import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimation, HasImageMask, HasPaneFragmentType, thisViewportValue } from "./helpers";
 import { SvgModals, SvgShape } from "./shapes";
 
-function ComposePanes(data) {
-  // if viewport is not yet defined, return empty fragment
-  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
-
-  const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
+class ComposedPane extends React.Component {
+  render() {
+    const pane = this?.props?.data?.pane;
+    const state = this?.props?.data?.state;
+    const hooks = this?.props?.data?.hooks;
     let pane_css = "",
         effects = []; // set key variables
 
     let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour");
     let this_selector, shape;
-    let pane_height_ratio = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+    let pane_height_ratio = thisViewportValue(state?.viewport?.viewport?.key, {
       mobile: pane?.field_height_ratio_mobile,
       tablet: pane?.field_height_ratio_tablet,
       desktop: pane?.field_height_ratio_desktop
     });
-    let pane_height = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+    let pane_height = thisViewportValue(state?.viewport?.viewport?.key, {
       mobile: 600 * pane_height_ratio / 100,
       tablet: 1080 * pane_height_ratio / 100,
       desktop: 1920 * pane_height_ratio / 100
     });
     let pane_height_css = `calc((100vw - (var(--offset) * 1px)) * ${pane_height_ratio} / 100)`;
-    let height_offset = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+    let height_offset = thisViewportValue(state?.viewport?.viewport?.key, {
       mobile: `calc((100vw - (var(--offset) * 1px)) / 600 * ${pane?.field_height_offset_mobile})`,
       tablet: `calc((100vw - (var(--offset) * 1px)) / 1080 * ${pane?.field_height_offset_tablet})`,
       desktop: `calc((100vw - (var(--offset) * 1px)) / 1920 * ${pane?.field_height_offset_desktop})`
@@ -36,7 +36,7 @@ function ComposePanes(data) {
 
     let composedPaneFragments = [];
     pane?.relationships?.field_pane_fragments // skip if current viewport is listed in field_hidden_viewports
-    .filter(e => typeof e?.field_hidden_viewports === "string" && e?.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(data?.state?.viewport?.viewport?.key) == -1) // already processed background_colour
+    .filter(e => typeof e?.field_hidden_viewports === "string" && e?.field_hidden_viewports.replace(/\s+/g, "").split(",").indexOf(state?.viewport?.viewport?.key) == -1) // already processed background_colour
     .filter(e => e?.internal?.type !== "paragraph__background_colour") // sort by zIndex ***important
     .sort((a, b) => a?.field_zindex > b?.field_zindex ? 1 : -1).map((pane_fragment, index) => {
       let react_fragment,
@@ -46,7 +46,7 @@ function ComposePanes(data) {
           shape;
       payload.imageData = []; // check for imageMasks
 
-      shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+      shape = thisViewportValue(state?.viewport?.viewport?.key, {
         mobile: pane_fragment?.field_image_mask_shape_mobile,
         tablet: pane_fragment?.field_image_mask_shape_tablet,
         desktop: pane_fragment?.field_image_mask_shape_desktop
@@ -54,7 +54,7 @@ function ComposePanes(data) {
 
       if (typeof shape === "string" && shape !== "none") {
         let this_options = {
-          viewport: data?.state?.viewport?.viewport,
+          viewport: state?.viewport?.viewport,
           pane_height: pane_height
         };
         let tempValue = SvgShape(shape, this_options);
@@ -78,7 +78,7 @@ function ComposePanes(data) {
             payload.children.children = pane_fragment?.childPaneFragment?.childMarkdownRemark?.htmlAst?.children?.filter(e => !(e.type === "text" && e.value === "\n"));
           }
 
-          shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+          shape = thisViewportValue(state?.viewport?.viewport?.key, {
             mobile: pane_fragment?.field_text_shape_outside_mobile,
             tablet: pane_fragment?.field_text_shape_outside_tablet,
             desktop: pane_fragment?.field_text_shape_outside_desktop
@@ -89,7 +89,7 @@ function ComposePanes(data) {
             if (shape && shape !== "none") {
               let this_options = {
                 textShapeOutside: true,
-                viewport: data?.state?.viewport?.viewport,
+                viewport: state?.viewport?.viewport,
                 pane_height: pane_height
               };
               tempValue = SvgShape(shape, this_options);
@@ -121,19 +121,19 @@ function ComposePanes(data) {
                   id: pane_fragment?.id,
                   mode: "modal",
                   textShapeOutside: true,
-                  viewport: data?.state?.viewport?.viewport,
+                  viewport: state?.viewport?.viewport,
                   cut: SvgModals[shape]["cut"],
                   width: SvgModals[shape]["viewBox"][0],
                   height: SvgModals[shape]["viewBox"][1],
                   pane_height: pane_height,
                   z_index: pane_fragment?.field_zindex,
-                  ...options?.render[data?.state?.viewport?.viewport?.key]
+                  ...options?.render[state?.viewport?.viewport?.key]
                 };
                 this_shape = SvgShape(shape, this_payload); // generate react fragment
 
                 this_fragment = InjectSvgModal(this_shape?.shape, this_payload);
                 this_payload.shape = this_shape;
-                this_css = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+                this_css = thisViewportValue(state?.viewport?.viewport?.key, {
                   mobile: pane_fragment?.field_css_styles_parent_mobile,
                   tablet: pane_fragment?.field_css_styles_parent_tablet,
                   desktop: pane_fragment?.field_css_styles_parent_desktop
@@ -147,14 +147,14 @@ function ComposePanes(data) {
               pane_css = `${pane_css} #svg__${this_shape?.id}--shape-outside-left {float:left;shape-outside:url(${this_shape?.left_mask})} ` + `#svg__${this_shape?.id}--shape-outside-right {float:right;shape-outside:url(${this_shape?.right_mask})}`; // add modal shape to stack
 
               composedPaneFragments.push( /*#__PURE__*/React.createElement("div", {
-                className: `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`,
+                className: `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`,
                 key: `modal-${this_shape?.id}`
               }, /*#__PURE__*/React.createElement(IsVisible, {
                 once: true,
                 id: `modal-${this_shape?.id}`,
                 className: "paneFragment",
                 key: `${this_shape?.id}-visible`,
-                hooks: data?.hooks
+                hooks: hooks
               }, this_fragment)));
             }
           }
@@ -162,13 +162,13 @@ function ComposePanes(data) {
           break;
 
         case "paragraph__background_pane":
-          shape = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+          shape = thisViewportValue(state?.viewport?.viewport?.key, {
             mobile: pane_fragment?.field_shape_mobile,
             tablet: pane_fragment?.field_shape_tablet,
             desktop: pane_fragment?.field_shape_desktop
           });
           let this_options = {
-            viewport: data?.state?.viewport?.viewport,
+            viewport: state?.viewport?.viewport,
             pane_height: pane_height
           };
           tempValue = SvgShape(shape, this_options);
@@ -219,7 +219,7 @@ function ComposePanes(data) {
 
 
       pane_fragment?.relationships?.field_image?.map(e => {
-        let this_image = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+        let this_image = thisViewportValue(state?.viewport?.viewport?.key, {
           mobile: e?.mobile,
           tablet: e?.tablet,
           desktop: e?.desktop
@@ -237,12 +237,12 @@ function ComposePanes(data) {
         }
       }); // select css for viewport
 
-      payload.css_child = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+      payload.css_child = thisViewportValue(state?.viewport?.viewport?.key, {
         mobile: pane_fragment?.field_css_styles_mobile || "",
         tablet: pane_fragment?.field_css_styles_tablet || "",
         desktop: pane_fragment?.field_css_styles_desktop || ""
       });
-      payload.css_parent = thisViewportValue(data?.state?.viewport?.viewport?.key, {
+      payload.css_parent = thisViewportValue(state?.viewport?.viewport?.key, {
         mobile: pane_fragment?.field_css_styles_parent_mobile || "",
         tablet: pane_fragment?.field_css_styles_parent_tablet || "",
         desktop: pane_fragment?.field_css_styles_parent_desktop || ""
@@ -253,8 +253,8 @@ function ComposePanes(data) {
         mode: pane_fragment?.internal?.type,
         pane_height_css: pane_height_css,
         viewport: {
-          device: data?.state?.viewport?.viewport?.key,
-          width: data?.state?.viewport?.viewport?.width
+          device: state?.viewport?.viewport?.key,
+          width: state?.viewport?.viewport?.width
         },
         z_index: pane_fragment?.field_zindex,
         children: payload?.children || {},
@@ -265,7 +265,7 @@ function ComposePanes(data) {
         payload: {
           imageData: payload?.imageData || [],
           maskData: payload?.maskData || {},
-          hooksData: data?.hooks || {},
+          hooksData: hooks || {},
           videoData: payload?.videoData || {},
           shapeData: payload?.shapeData || {},
           modalData: payload?.modalData || {},
@@ -274,16 +274,16 @@ function ComposePanes(data) {
       };
       let this_pane_fragment_type = HasPaneFragmentType[tractStackFragment?.mode];
       if (this_pane_fragment_type) react_fragment = InjectPaneFragment(tractStackFragment, this_pane_fragment_type);else console.log("ERROR in compose-panes.js: pane fragment type not found.");
-      let thisClass = `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
+      let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`;
       let renderedPaneFragment; // are there effects?
 
-      if (typeof effects[`fragment-${pane_fragment?.id}`] === "objectq") {
+      if (typeof effects[`fragment-${pane_fragment?.id}`] === "object") {
         renderedPaneFragment = /*#__PURE__*/React.createElement(IsVisible, {
           once: true,
           id: `fragment-${pane_fragment?.id}`,
           className: "paneFragment",
           key: `fragment-${pane_fragment?.id}`,
-          hooks: data?.hooks
+          hooks: hooks
         }, react_fragment);
       } else renderedPaneFragment = /*#__PURE__*/React.createElement("div", {
         id: `fragment-${pane_fragment?.id}`,
@@ -301,7 +301,7 @@ function ComposePanes(data) {
     if (composedPaneFragments.length === 0) return; // now render the pane
     // may we wrap this in animation?
 
-    if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
+    if (state?.prefersReducedMotion?.prefersReducedMotion === false) {
       for (const key in effects) {
         let this_effects_payload = {
           in: [effects[key]?.function, effects[key]?.speed, effects[key]?.delay]
@@ -314,15 +314,32 @@ function ComposePanes(data) {
     return /*#__PURE__*/React.createElement("section", {
       key: pane?.id
     }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
-      className: `pane pane__view pane__view--${data?.state?.viewport?.viewport?.key}`,
+      className: `pane pane__view pane__view--${state?.viewport?.viewport?.key}`,
       css: pane_css,
       id: pane?.id
     }, composedPaneFragments));
+  }
+
+}
+
+const ComposePanes = data => {
+  // if viewport is not yet defined, return empty fragment
+  if (typeof data?.state?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
+
+  const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
+    return /*#__PURE__*/React.createElement(ComposedPane, {
+      key: i,
+      data: {
+        pane: pane,
+        state: data?.state,
+        hooks: data?.hooks
+      }
+    });
   }); // this is the storyFragment
 
   if (typeof composedPanes === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null);
   return composedPanes;
-}
+};
 
 export { ComposePanes };
 //# sourceMappingURL=compose-panes.js.map
