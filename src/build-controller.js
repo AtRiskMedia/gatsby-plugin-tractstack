@@ -54,7 +54,7 @@ function BuildController(data) {
       }
     };
   }
-  window.addEventListener("scroll", throttle(data?.hooks?.hookScrolled, 1000));
+  //window.addEventListener("scroll", throttle(data?.hooks?.hookScrolled, 100));
 
   return (
     <section

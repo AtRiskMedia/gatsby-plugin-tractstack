@@ -387,10 +387,12 @@ function ComposePanes(data) {
               "ERROR in compose-panes.js: pane fragment type not found."
             );
 
-          // add the composed pane fragment
           let thisClass = `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
-          composedPaneFragments.push(
-            <div className={thisClass} key={pane_fragment?.id}>
+          let renderedPaneFragment;
+
+          // are there effects?
+          if (typeof effects[`fragment-${pane_fragment?.id}`] === "object") {
+            renderedPaneFragment = (
               <IsVisible
                 once
                 id={`fragment-${pane_fragment?.id}`}
@@ -400,6 +402,22 @@ function ComposePanes(data) {
               >
                 {react_fragment}
               </IsVisible>
+            );
+          } else
+            renderedPaneFragment = (
+              <div
+                id={`fragment-${pane_fragment?.id}`}
+                className="paneFragment"
+                key={`fragment-${pane_fragment?.id}`}
+              >
+                {react_fragment}
+              </div>
+            );
+
+          // add the composed pane fragment
+          composedPaneFragments.push(
+            <div className={thisClass} key={pane_fragment?.id}>
+              {renderedPaneFragment}
             </div>
           );
         });

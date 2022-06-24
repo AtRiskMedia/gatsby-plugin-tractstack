@@ -273,19 +273,29 @@ function ComposePanes(data) {
         }
       };
       let this_pane_fragment_type = HasPaneFragmentType[tractStackFragment?.mode];
-      if (this_pane_fragment_type) react_fragment = InjectPaneFragment(tractStackFragment, this_pane_fragment_type);else console.log("ERROR in compose-panes.js: pane fragment type not found."); // add the composed pane fragment
-
+      if (this_pane_fragment_type) react_fragment = InjectPaneFragment(tractStackFragment, this_pane_fragment_type);else console.log("ERROR in compose-panes.js: pane fragment type not found.");
       let thisClass = `paneFragment paneFragment__view paneFragment__view--${data?.state?.viewport?.viewport?.key}`;
+      let renderedPaneFragment; // are there effects?
+
+      if (typeof effects[`fragment-${pane_fragment?.id}`] === "objectq") {
+        renderedPaneFragment = /*#__PURE__*/React.createElement(IsVisible, {
+          once: true,
+          id: `fragment-${pane_fragment?.id}`,
+          className: "paneFragment",
+          key: `fragment-${pane_fragment?.id}`,
+          hooks: data?.hooks
+        }, react_fragment);
+      } else renderedPaneFragment = /*#__PURE__*/React.createElement("div", {
+        id: `fragment-${pane_fragment?.id}`,
+        className: "paneFragment",
+        key: `fragment-${pane_fragment?.id}`
+      }, react_fragment); // add the composed pane fragment
+
+
       composedPaneFragments.push( /*#__PURE__*/React.createElement("div", {
         className: thisClass,
         key: pane_fragment?.id
-      }, /*#__PURE__*/React.createElement(IsVisible, {
-        once: true,
-        id: `fragment-${pane_fragment?.id}`,
-        className: "paneFragment",
-        key: `fragment-${pane_fragment?.id}`,
-        hooks: data?.hooks
-      }, react_fragment)));
+      }, renderedPaneFragment));
     }); // skip if empty pane
 
     if (composedPaneFragments.length === 0) return; // now render the pane

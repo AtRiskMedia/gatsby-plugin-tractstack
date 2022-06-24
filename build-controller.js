@@ -50,9 +50,9 @@ function BuildController(data) {
         }, limit);
       }
     };
-  }
+  } //window.addEventListener("scroll", throttle(data?.hooks?.hookScrolled, 100));
 
-  window.addEventListener("scroll", throttle(data?.hooks?.hookScrolled, 1000));
+
   return /*#__PURE__*/React.createElement("section", {
     key: data?.state?.storyStep?.storyStepGraph?.current?.id,
     className: "controller"
