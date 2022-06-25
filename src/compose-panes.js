@@ -445,6 +445,13 @@ const ComposePanes = (data) => {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
 
+  // pre-parse field_options for buttonData and effects
+  data?.fragments?.relationships?.field_panes?.map((e) => {
+    e?.relationships?.field_pane_fragments?.map((f) => {
+      console.log(f.id, e.id, f.field_options);
+    });
+  });
+
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
     (pane, i) => {
