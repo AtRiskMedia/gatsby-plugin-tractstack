@@ -321,6 +321,7 @@ function SvgShape(layout, options) {
     return null;
   }
 
+  if (!shape) return null;
   let this_className = `svg svg__${layout} svg__${layout}--${viewport?.key}`;
   shapeData.shape = /*#__PURE__*/React.createElement("svg", {
     id: `svg__${this_id}`,
