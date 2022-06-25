@@ -131,99 +131,93 @@ const ComposedPane = (data) => {
             }
           } else if (shape && pane_fragment?.field_modal) {
             // this is a modal
-            if (typeof pane_fragment?.field_options === "string") {
-              let options = {},
-                this_payload = {},
-                this_fragment,
-                this_shape,
-                this_css,
-                this_viewport;
-              try {
-                options = JSON.parse(pane_fragment?.field_options);
-              } catch (e) {
-                if (e instanceof SyntaxError) {
-                  console.log("ERROR parsing json in {}: ", e);
-                }
-              }
-              if (typeof options?.render === "object") {
-                this_payload = {
-                  id: pane_fragment?.id,
-                  mode: "modal",
-                  textShapeOutside: true,
-                  viewport: state?.viewport?.viewport,
-                  cut: SvgModals[shape]["cut"],
-                  width: SvgModals[shape]["viewBox"][0],
-                  height: SvgModals[shape]["viewBox"][1],
-                  pane_height: pane_height,
-                  z_index: pane_fragment?.field_zindex,
-                  ...options?.render[state?.viewport?.viewport?.key],
-                };
-                this_shape = SvgShape(shape, this_payload);
-                // generate react fragment
-                this_fragment = InjectSvgModal(this_shape?.shape, this_payload);
-                this_payload.shape = this_shape;
-                this_css = thisViewportValue(state?.viewport?.viewport?.key, {
-                  mobile: pane_fragment?.field_css_styles_parent_mobile,
-                  tablet: pane_fragment?.field_css_styles_parent_tablet,
-                  desktop: pane_fragment?.field_css_styles_parent_desktop,
-                });
-                pane_css =
-                  `${pane_css} ${this_css} ` +
-                  `#fragment-${pane_fragment?.id} svg.svg-shape-outside-left { ` +
-                  `z-index: ${pane_fragment?.z_index - 1};` +
-                  `width: calc((100vw - (var(--offset) * 1px)) / ${
-                    this_payload?.viewport?.width
-                  } * ${this_payload?.padding_left + this_payload?.cut}); ` +
-                  `} ` +
-                  `#fragment-${pane_fragment?.id} svg.svg-shape-outside-right { ` +
-                  `z-index: ${pane_fragment?.z_index - 1};` +
-                  `width: calc((100vw - (var(--offset) * 1px)) / ${
-                    this_payload?.viewport?.width
-                  } * ${
-                    this_payload?.viewport?.width -
-                    this_payload?.width +
-                    this_payload?.cut -
-                    this_payload?.padding_left
-                  }); ` +
-                  `} ` +
-                  `#${pane_fragment?.id}-svg-modal svg { ` +
-                  `z-index: ${pane_fragment?.z_index - 1}; ` +
-                  `width: calc((100vw - (var(--offset) * 1px)) / ${this_payload?.viewport?.width} * ${this_payload?.width}); ` +
-                  `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_payload?.viewport?.width} * ${this_payload?.padding_left}); ` +
-                  `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_payload?.viewport?.width} * ${this_payload?.padding_top}); ` +
-                  `}`;
-              }
-              payload.maskData = { textShapeOutside: this_shape };
-              pane_css =
-                `${pane_css} #svg__${this_shape?.id}--shape-outside-left {float:left;shape-outside:url(${this_shape?.left_mask})} ` +
-                `#svg__${this_shape?.id}--shape-outside-right {float:right;shape-outside:url(${this_shape?.right_mask})}`;
-              let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`;
-
-              // add inView observer to trigger animation
-              const { observe, inView } = useInView({
-                unobserveOnEnter: true,
-                rootMargin: "-100px 0px",
+            let options =
+                state?.controller?.payload?.render[pane?.id][pane_fragment?.id][
+                  state?.viewport?.viewport?.key
+                ],
+              this_payload = {},
+              this_fragment,
+              this_shape,
+              this_css,
+              this_viewport;
+            if (Object.keys(options).length !== 0) {
+              this_payload = {
+                id: pane_fragment?.id,
+                mode: "modal",
+                textShapeOutside: true,
+                viewport: state?.viewport?.viewport,
+                cut: SvgModals[shape]["cut"],
+                width: SvgModals[shape]["viewBox"][0],
+                height: SvgModals[shape]["viewBox"][1],
+                pane_height: pane_height,
+                z_index: pane_fragment?.field_zindex,
+                ...options,
+              };
+              this_shape = SvgShape(shape, this_payload);
+              // generate react fragment
+              this_fragment = InjectSvgModal(this_shape?.shape, this_payload);
+              this_payload.shape = this_shape;
+              this_css = thisViewportValue(state?.viewport?.viewport?.key, {
+                mobile: pane_fragment?.field_css_styles_parent_mobile,
+                tablet: pane_fragment?.field_css_styles_parent_tablet,
+                desktop: pane_fragment?.field_css_styles_parent_desktop,
               });
-              let renderedModal = (
-                <div
-                  ref={observe}
-                  id={`modal-${pane_fragment?.id}`}
-                  className={
-                    inView ? "paneFragment visible" : "paneFragment hidden"
-                  }
-                  key={`modal-${pane_fragment?.id}`}
-                >
-                  {this_fragment}
-                </div>
-              );
-
-              // add modal shape to stack
-              composedPaneFragments.push(
-                <div className={thisClass} key={`modal-${pane_fragment?.id}`}>
-                  {renderedModal}
-                </div>
-              );
+              pane_css =
+                `${pane_css} ${this_css} ` +
+                `#fragment-${pane_fragment?.id} svg.svg-shape-outside-left { ` +
+                `z-index: ${pane_fragment?.z_index - 1};` +
+                `width: calc((100vw - (var(--offset) * 1px)) / ${
+                  this_payload?.viewport?.width
+                } * ${this_payload?.padding_left + this_payload?.cut}); ` +
+                `} ` +
+                `#fragment-${pane_fragment?.id} svg.svg-shape-outside-right { ` +
+                `z-index: ${pane_fragment?.z_index - 1};` +
+                `width: calc((100vw - (var(--offset) * 1px)) / ${
+                  this_payload?.viewport?.width
+                } * ${
+                  this_payload?.viewport?.width -
+                  this_payload?.width +
+                  this_payload?.cut -
+                  this_payload?.padding_left
+                }); ` +
+                `} ` +
+                `#${pane_fragment?.id}-svg-modal svg { ` +
+                `z-index: ${pane_fragment?.z_index - 1}; ` +
+                `width: calc((100vw - (var(--offset) * 1px)) / ${this_payload?.viewport?.width} * ${this_payload?.width}); ` +
+                `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_payload?.viewport?.width} * ${this_payload?.padding_left}); ` +
+                `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_payload?.viewport?.width} * ${this_payload?.padding_top}); ` +
+                `}`;
             }
+            payload.maskData = { textShapeOutside: this_shape };
+            pane_css =
+              `${pane_css} #svg__${this_shape?.id}--shape-outside-left {float:left;shape-outside:url(${this_shape?.left_mask})} ` +
+              `#svg__${this_shape?.id}--shape-outside-right {float:right;shape-outside:url(${this_shape?.right_mask})}`;
+            let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`;
+
+            // add inView observer to trigger animation
+            const { observe, inView } = useInView({
+              unobserveOnEnter: true,
+              rootMargin: "-100px 0px",
+            });
+            let renderedModal = (
+              <div
+                ref={observe}
+                id={`modal-${pane_fragment?.id}`}
+                className={
+                  inView ? "paneFragment visible" : "paneFragment hidden"
+                }
+                key={`modal-${pane_fragment?.id}`}
+              >
+                {this_fragment}
+              </div>
+            );
+
+            // add modal shape to stack
+            composedPaneFragments.push(
+              <div className={thisClass} key={`modal-${pane_fragment?.id}`}>
+                {renderedModal}
+              </div>
+            );
           }
           break;
 
@@ -259,41 +253,44 @@ const ComposedPane = (data) => {
           break;
       }
 
-      // extract animation effects and buttonData (if any)
-      if (typeof pane_fragment?.field_options === "string") {
-        try {
-          tempValue = JSON.parse(pane_fragment?.field_options);
-        } catch (e) {
-          if (e instanceof SyntaxError) {
-            console.log("ERROR parsing json in compose-panes.js: ", e);
-          }
-        }
-        if (typeof tempValue?.buttons === "object")
-          payload.buttonData = tempValue?.buttons;
-        // effects are directly injected into each pane below
-        if (typeof tempValue?.effects === "object") {
-          for (const key in tempValue?.effects) {
-            // store animation
-            effects[`fragment-${pane_fragment?.id}`] = tempValue?.effects[key];
-            effects[`fragment-${pane_fragment?.id}`][
+      // extract buttonData (if any)
+      if (
+        state?.controller?.payload?.buttons[pane?.id] &&
+        state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id]
+      )
+        payload.buttonData =
+          state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id];
+
+      // extract animation effects (if any)
+      if (
+        state?.controller?.payload?.effects[pane?.id] &&
+        state?.controller?.payload?.effects[pane?.id][pane_fragment?.id]
+      )
+        tempValue =
+          state?.controller?.payload?.effects[pane?.id][pane_fragment?.id];
+      if (tempValue && Object.keys(tempValue).length) {
+        for (const key in tempValue) {
+          // store animation
+          effects[`fragment-${pane_fragment?.id}`] = tempValue[key];
+          effects[`fragment-${pane_fragment?.id}`][
+            "paneFragment"
+          ] = `fragment-${pane_fragment?.id}`;
+          effects[`fragment-${pane_fragment?.id}`]["pane"] = pane?.id;
+          // clone and store animation for modal (if any)
+          if (
+            pane_fragment?.internal?.type === "paragraph__modal" ||
+            pane_fragment?.field_modal
+          ) {
+            effects[`modal-${pane_fragment?.id}`] = structuredClone(
+              tempValue[key]
+            );
+            effects[`modal-${pane_fragment?.id}`][
               "paneFragment"
-            ] = `fragment-${pane_fragment?.id}`;
-            effects[`fragment-${pane_fragment?.id}`]["pane"] = pane?.id;
-            // clone and store animation for modal (if any)
-            if (
-              pane_fragment?.internal?.type === "paragraph__modal" ||
-              pane_fragment?.field_modal
-            ) {
-              effects[`modal-${pane_fragment?.id}`] = structuredClone(
-                tempValue?.effects[key]
-              );
-              effects[`modal-${pane_fragment?.id}`][
-                "paneFragment"
-              ] = `modal-${pane_fragment?.id}`;
-            }
+            ] = `modal-${pane_fragment?.id}`;
           }
         }
       }
+
       // prepare any images from this paneFragment
       pane_fragment?.relationships?.field_image?.map((e) => {
         let this_image = thisViewportValue(state?.viewport?.viewport?.key, {
@@ -444,13 +441,6 @@ const ComposedPane = (data) => {
 const ComposePanes = (data) => {
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.state?.viewport?.viewport?.key === "undefined") return <></>;
-
-  // pre-parse field_options for buttonData and effects
-  data?.fragments?.relationships?.field_panes?.map((e) => {
-    e?.relationships?.field_pane_fragments?.map((f) => {
-      console.log(f.id, e.id, f.field_options);
-    });
-  });
 
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.fragments?.relationships?.field_panes.map(
