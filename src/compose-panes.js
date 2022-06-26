@@ -13,13 +13,25 @@ import {
 import { SvgModals, SvgShape } from "./shapes";
 
 const ComposedPane = (data) => {
+  // set key variables
   const pane = data?.data?.pane;
   const state = data?.data?.state;
   const hooks = data?.data?.hooks;
+
+  // useInView hook
+  const { observe, inView } = useInView({
+    rootMargin: "-100px 0px",
+    // threshold: 0.25,
+    onEnter: ({}) => {
+      hooks?.hookPaneVisible(pane?.id);
+    },
+    onLeave: ({}) => {
+      hooks?.hookPaneHidden(pane?.id);
+    },
+  });
+
   let pane_css = "",
     effects = [];
-
-  // set key variables
   let background_colour = pane?.relationships?.field_pane_fragments.filter(
     (e) => e?.internal?.type === "paragraph__background_colour"
   );
@@ -194,28 +206,18 @@ const ComposedPane = (data) => {
               `#svg__${this_shape?.id}--shape-outside-right {float:right;shape-outside:url(${this_shape?.right_mask})}`;
             let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`;
 
-            // add inView observer to trigger animation
-            const { observe, inView } = useInView({
-              unobserveOnEnter: true,
-              rootMargin: "-100px 0px",
-            });
-            let renderedModal = (
-              <div
-                ref={observe}
-                id={`modal-${pane_fragment?.id}`}
-                className={
-                  inView ? "paneFragment visible" : "paneFragment hidden"
-                }
-                key={`modal-${pane_fragment?.id}`}
-              >
-                {this_fragment}
-              </div>
-            );
-
             // add modal shape to stack
             composedPaneFragments.push(
               <div className={thisClass} key={`modal-${pane_fragment?.id}`}>
-                {renderedModal}
+                <div
+                  id={`modal-${pane_fragment?.id}`}
+                  className={
+                    inView ? "paneFragment visible" : "paneFragment hidden"
+                  }
+                  key={`modal-${pane_fragment?.id}`}
+                >
+                  {this_fragment}
+                </div>
               </div>
             );
           }
@@ -362,38 +364,16 @@ const ComposedPane = (data) => {
       let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`;
       let renderedPaneFragment;
 
-      // are there effects?
-      if (typeof effects[`fragment-${pane_fragment?.id}`] === "object") {
-        const { observe, inView } = useInView({
-          unobserveOnEnter: true,
-          rootMargin: "-100px 0px",
-        });
-
-        renderedPaneFragment = (
+      // add the composed pane fragment
+      composedPaneFragments.push(
+        <div className={thisClass} key={pane_fragment?.id}>
           <div
-            ref={observe}
             id={`fragment-${pane_fragment?.id}`}
             className={inView ? "paneFragment visible" : "paneFragment hidden"}
             key={`fragment-${pane_fragment?.id}`}
           >
             {react_fragment}
           </div>
-        );
-      } else
-        renderedPaneFragment = (
-          <div
-            id={`fragment-${pane_fragment?.id}`}
-            className="paneFragment"
-            key={`fragment-${pane_fragment?.id}`}
-          >
-            {react_fragment}
-          </div>
-        );
-
-      // add the composed pane fragment
-      composedPaneFragments.push(
-        <div className={thisClass} key={pane_fragment?.id}>
-          {renderedPaneFragment}
         </div>
       );
     });
@@ -413,16 +393,6 @@ const ComposedPane = (data) => {
       pane_css = `${pane_css} ${this_effects_css} `;
     }
   }
-
-  const { observe, inView } = useInView({
-    threshold: 0.25,
-    onEnter: ({}) => {
-      hooks?.hookPaneVisible(pane?.id);
-    },
-    onLeave: ({}) => {
-      hooks?.hookPaneHidden(pane?.id);
-    },
-  });
 
   return (
     <section key={pane?.id}>

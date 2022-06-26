@@ -5,12 +5,26 @@ import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimatio
 import { SvgModals, SvgShape } from "./shapes";
 
 const ComposedPane = data => {
+  // set key variables
   const pane = data?.data?.pane;
   const state = data?.data?.state;
-  const hooks = data?.data?.hooks;
-  let pane_css = "",
-      effects = []; // set key variables
+  const hooks = data?.data?.hooks; // useInView hook
 
+  const {
+    observe,
+    inView
+  } = useInView({
+    rootMargin: "-100px 0px",
+    // threshold: 0.25,
+    onEnter: ({}) => {
+      hooks?.hookPaneVisible(pane?.id);
+    },
+    onLeave: ({}) => {
+      hooks?.hookPaneHidden(pane?.id);
+    }
+  });
+  let pane_css = "",
+      effects = [];
   let background_colour = pane?.relationships?.field_pane_fragments.filter(e => e?.internal?.type === "paragraph__background_colour");
   let this_selector, shape;
   let pane_height_ratio = thisViewportValue(state?.viewport?.viewport?.key, {
@@ -135,26 +149,16 @@ const ComposedPane = data => {
             textShapeOutside: this_shape
           };
           pane_css = `${pane_css} #svg__${this_shape?.id}--shape-outside-left {float:left;shape-outside:url(${this_shape?.left_mask})} ` + `#svg__${this_shape?.id}--shape-outside-right {float:right;shape-outside:url(${this_shape?.right_mask})}`;
-          let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`; // add inView observer to trigger animation
-
-          const {
-            observe,
-            inView
-          } = useInView({
-            unobserveOnEnter: true,
-            rootMargin: "-100px 0px"
-          });
-          let renderedModal = /*#__PURE__*/React.createElement("div", {
-            ref: observe,
-            id: `modal-${pane_fragment?.id}`,
-            className: inView ? "paneFragment visible" : "paneFragment hidden",
-            key: `modal-${pane_fragment?.id}`
-          }, this_fragment); // add modal shape to stack
+          let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`; // add modal shape to stack
 
           composedPaneFragments.push( /*#__PURE__*/React.createElement("div", {
             className: thisClass,
             key: `modal-${pane_fragment?.id}`
-          }, renderedModal));
+          }, /*#__PURE__*/React.createElement("div", {
+            id: `modal-${pane_fragment?.id}`,
+            className: inView ? "paneFragment visible" : "paneFragment hidden",
+            key: `modal-${pane_fragment?.id}`
+          }, this_fragment)));
         }
 
         break;
@@ -265,33 +269,16 @@ const ComposedPane = data => {
     let this_pane_fragment_type = HasPaneFragmentType[tractStackFragment?.mode];
     if (this_pane_fragment_type) react_fragment = InjectPaneFragment(tractStackFragment, this_pane_fragment_type);else console.log("ERROR in compose-panes.js: pane fragment type not found.");
     let thisClass = `paneFragment paneFragment__view paneFragment__view--${state?.viewport?.viewport?.key}`;
-    let renderedPaneFragment; // are there effects?
-
-    if (typeof effects[`fragment-${pane_fragment?.id}`] === "object") {
-      const {
-        observe,
-        inView
-      } = useInView({
-        unobserveOnEnter: true,
-        rootMargin: "-100px 0px"
-      });
-      renderedPaneFragment = /*#__PURE__*/React.createElement("div", {
-        ref: observe,
-        id: `fragment-${pane_fragment?.id}`,
-        className: inView ? "paneFragment visible" : "paneFragment hidden",
-        key: `fragment-${pane_fragment?.id}`
-      }, react_fragment);
-    } else renderedPaneFragment = /*#__PURE__*/React.createElement("div", {
-      id: `fragment-${pane_fragment?.id}`,
-      className: "paneFragment",
-      key: `fragment-${pane_fragment?.id}`
-    }, react_fragment); // add the composed pane fragment
-
+    let renderedPaneFragment; // add the composed pane fragment
 
     composedPaneFragments.push( /*#__PURE__*/React.createElement("div", {
       className: thisClass,
       key: pane_fragment?.id
-    }, renderedPaneFragment));
+    }, /*#__PURE__*/React.createElement("div", {
+      id: `fragment-${pane_fragment?.id}`,
+      className: inView ? "paneFragment visible" : "paneFragment hidden",
+      key: `fragment-${pane_fragment?.id}`
+    }, react_fragment)));
   }); // skip if empty pane
 
   if (composedPaneFragments.length === 0) return; // may we wrap this in animation?
@@ -306,18 +293,6 @@ const ComposedPane = data => {
     }
   }
 
-  const {
-    observe,
-    inView
-  } = useInView({
-    threshold: 0.25,
-    onEnter: ({}) => {
-      hooks?.hookPaneVisible(pane?.id);
-    },
-    onLeave: ({}) => {
-      hooks?.hookPaneHidden(pane?.id);
-    }
-  });
   return /*#__PURE__*/React.createElement("section", {
     key: pane?.id
   }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
