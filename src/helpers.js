@@ -62,7 +62,7 @@ const getScrollbarSize = () => {
   return 12;
 };
 
-const lispCallback = (payload, context = "", hooks = []) => {
+const lispCallback = (payload, context = "", hookEndPoint = []) => {
   let icon;
   let lisp_data = payload[Object.keys(payload)[0]];
   let command = lisp_data[0] || false;
@@ -110,12 +110,14 @@ const lispCallback = (payload, context = "", hooks = []) => {
         parameter_one === "storyFragment" &&
         typeof parameter_two === "string"
       )
-        hooks.hookGotoStoryFragment(`/${parameter_two}`);
+        hookEndPoint("hookGotoStoryFragment", `/${parameter_two}`);
       if (parameter_one === "pane" && typeof parameter_two === "string") {
-        hooks.hookSetCurrentPane(parameter_two);
+        hookEndPoint("hookSetCurrentPane", parameter_two);
+        /*
         setTimeout(function () {
-          hooks.hookScrolled();
+          hookEndPoint( hookScrolled );
         }, 100);
+        */
       }
       break;
 
@@ -197,7 +199,7 @@ const HtmlAstToReact = (fragment, element = false) => {
               lispCallback(
                 payload_ast[0],
                 "button",
-                fragment?.payload?.hooksData
+                fragment?.payload?.hookEndPoint
               );
             }
             return (
@@ -215,7 +217,8 @@ const HtmlAstToReact = (fragment, element = false) => {
           return (
             <a
               onClick={() =>
-                fragment?.payload?.hooksData?.hookGotoStoryFragment(
+                fragment?.payload?.hookEndPoint(
+                  "hookGotoStoryFragment",
                   e?.properties?.href
                 )
               }

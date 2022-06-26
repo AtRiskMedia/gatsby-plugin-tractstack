@@ -8,7 +8,7 @@ const ComposedPane = data => {
   // set key variables
   const pane = data?.data?.pane;
   const state = data?.data?.state;
-  const hooks = data?.data?.hooks; // useInView hook
+  const hookEndPoint = data?.data?.hookEndPoint; // useInView hook
 
   const {
     observe,
@@ -17,10 +17,10 @@ const ComposedPane = data => {
     rootMargin: "-100px 0px",
     // threshold: 0.25,
     onEnter: ({}) => {
-      hooks?.hookPaneVisible(pane?.id);
+      hookEndPoint("hookPaneVisible", pane?.id);
     },
     onLeave: ({}) => {
-      hooks?.hookPaneHidden(pane?.id);
+      hookEndPoint("hookPaneHidden", pane?.id);
     }
   });
   let pane_css = "",
@@ -259,7 +259,7 @@ const ComposedPane = data => {
       payload: {
         imageData: payload?.imageData || [],
         maskData: payload?.maskData || {},
-        hooksData: hooks || {},
+        hookEndPoint: hookEndPoint || {},
         videoData: payload?.videoData || {},
         shapeData: payload?.shapeData || {},
         modalData: payload?.modalData || {},
@@ -313,7 +313,7 @@ const ComposePanes = data => {
       data: {
         pane: pane,
         state: data?.state,
-        hooks: data?.hooks
+        hookEndPoint: data?.hookEndPoint
       }
     });
   }); // this is the storyFragment

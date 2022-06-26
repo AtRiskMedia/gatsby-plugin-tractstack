@@ -57,7 +57,7 @@ const getScrollbarSize = () => {
   return 12;
 };
 
-const lispCallback = (payload, context = "", hooks = []) => {
+const lispCallback = (payload, context = "", hookEndPoint = []) => {
   let icon;
   let lisp_data = payload[Object.keys(payload)[0]];
   let command = lisp_data[0] || false;
@@ -104,13 +104,15 @@ const lispCallback = (payload, context = "", hooks = []) => {
       break;
 
     case "goto":
-      if (parameter_one === "storyFragment" && typeof parameter_two === "string") hooks.hookGotoStoryFragment(`/${parameter_two}`);
+      if (parameter_one === "storyFragment" && typeof parameter_two === "string") hookEndPoint("hookGotoStoryFragment", `/${parameter_two}`);
 
       if (parameter_one === "pane" && typeof parameter_two === "string") {
-        hooks.hookSetCurrentPane(parameter_two);
+        hookEndPoint("hookSetCurrentPane", parameter_two);
+        /*
         setTimeout(function () {
-          hooks.hookScrolled();
+          hookEndPoint( hookScrolled );
         }, 100);
+        */
       }
 
       break;
@@ -173,7 +175,7 @@ const HtmlAstToReact = (fragment, element = false) => {
             let payload_ast = lispLexer(payload);
 
             function injectPayload() {
-              lispCallback(payload_ast[0], "button", fragment?.payload?.hooksData);
+              lispCallback(payload_ast[0], "button", fragment?.payload?.hookEndPoint);
             }
 
             return /*#__PURE__*/React.createElement("button", {
@@ -186,7 +188,7 @@ const HtmlAstToReact = (fragment, element = false) => {
 
 
           return /*#__PURE__*/React.createElement("a", {
-            onClick: () => fragment?.payload?.hooksData?.hookGotoStoryFragment(e?.properties?.href),
+            onClick: () => fragment?.payload?.hookEndPoint("hookGotoStoryFragment", e?.properties?.href),
             key: this_id
           }, e?.children[0]?.value);
         }

@@ -16,17 +16,16 @@ const ComposedPane = (data) => {
   // set key variables
   const pane = data?.data?.pane;
   const state = data?.data?.state;
-  const hooks = data?.data?.hooks;
-
+  const hookEndPoint = data?.data?.hookEndPoint;
   // useInView hook
   const { observe, inView } = useInView({
     rootMargin: "-100px 0px",
     // threshold: 0.25,
     onEnter: ({}) => {
-      hooks?.hookPaneVisible(pane?.id);
+      hookEndPoint("hookPaneVisible", pane?.id);
     },
     onLeave: ({}) => {
-      hooks?.hookPaneHidden(pane?.id);
+      hookEndPoint("hookPaneHidden", pane?.id);
     },
   });
 
@@ -343,7 +342,7 @@ const ComposedPane = (data) => {
         payload: {
           imageData: payload?.imageData || [],
           maskData: payload?.maskData || {},
-          hooksData: hooks || {},
+          hookEndPoint: hookEndPoint || {},
           videoData: payload?.videoData || {},
           shapeData: payload?.shapeData || {},
           modalData: payload?.modalData || {},
@@ -418,7 +417,11 @@ const ComposePanes = (data) => {
       return (
         <ComposedPane
           key={i}
-          data={{ pane: pane, state: data?.state, hooks: data?.hooks }}
+          data={{
+            pane: pane,
+            state: data?.state,
+            hookEndPoint: data?.hookEndPoint,
+          }}
         />
       );
     }

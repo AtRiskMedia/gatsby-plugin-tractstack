@@ -36,10 +36,10 @@ function PreParseMenuItems(items, hooks) {
 
     if (typeof options?.callbackPayload === "string") {
       e.callbackPayload = options.callbackPayload;
-      e.hooksData = hooks;
+      e.hookEndPoint = hooks;
     } else {
       e.callbackPayload = false;
-      e.hooksData = false;
+      e.hookEndPoint = false;
     }
 
     return e;
@@ -52,7 +52,7 @@ function ParseMenuItems(items, index = 0, level = 0) {
   let payload_ast = lispLexer(items[index]?.callbackPayload);
 
   function injectPayload() {
-    lispCallback(payload_ast[0], "", items[index]?.hooksData);
+    lispCallback(payload_ast[0], "", items[index]?.hookEndPoint);
   }
 
   let this_menu_item = /*#__PURE__*/React.createElement("a", {

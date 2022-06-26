@@ -29,7 +29,7 @@ const tractStackFragmentSchema = {
         shapeData: { type: "object" },
         videoData: { type: "object" },
         modalData: { type: "object" },
-        hooksData: { type: "object" },
+        hookEndPoint: {},
         paneData: { type: "object" },
       },
     },
