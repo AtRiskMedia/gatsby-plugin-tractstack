@@ -22,7 +22,7 @@ function CountChildrenOffset(items, index = 0, level = 0) {
   }
 }
 
-function PreParseMenuItems(items, hooks) {
+function PreParseMenuItems(items, hookEndPoint) {
   // pre-parses menu items and injects hooks, if any
   let options;
   return items?.map(e => {
@@ -36,7 +36,7 @@ function PreParseMenuItems(items, hooks) {
 
     if (typeof options?.callbackPayload === "string") {
       e.callbackPayload = options.callbackPayload;
-      e.hookEndPoint = hooks;
+      e.hookEndPoint = hookEndPoint;
     } else {
       e.callbackPayload = false;
       e.hookEndPoint = false;

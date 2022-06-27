@@ -62,12 +62,12 @@ const getScrollbarSize = () => {
   return 12;
 };
 
-const lispCallback = (payload, context = "", hookEndPoint = []) => {
+const lispCallback = (payload, context = "", hookEndPoint) => {
   let icon;
   let lisp_data = payload[Object.keys(payload)[0]];
-  let command = lisp_data[0] || false;
+  let command = (lisp_data && lisp_data[0]) || false;
   let parameter_one, parameter_two, parameter_three;
-  if (typeof lisp_data[1] === "object") {
+  if (lisp_data && typeof lisp_data[1] === "object") {
     parameter_one = lisp_data[1][0] || false;
     parameter_two = lisp_data[1][1] || false;
     parameter_three = lisp_data[1][2] || false;
