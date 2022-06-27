@@ -42,25 +42,28 @@ function BuildController(data) {
   let css = InjectCssAnimation(effects_payload, "tractstack-controller");
 
   return (
-    <section
-      key={data?.state?.storyStep?.storyStepGraph?.current?.id}
-      className="controller"
-    >
-      <StyledWrapperDiv css={css}>
-        <div id="tractstack-controller" className="controller__container">
-          <div
-            className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
-          >
-            <div id="calls-to-action"></div>
+    <>
+      <section
+        key={data?.state?.storyStep?.storyStepGraph?.current?.id}
+        className="controller"
+      >
+        <StyledWrapperDiv css={css}>
+          <div id="tractstack-controller" className="controller__container">
+            <div
+              className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
+            >
+              <div id="calls-to-action"></div>
+            </div>
+            <div
+              className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
+            >
+              {controller_pane}
+            </div>
           </div>
-          <div
-            className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
-          >
-            {controller_pane}
-          </div>
-        </div>
-      </StyledWrapperDiv>
-    </section>
+        </StyledWrapperDiv>
+      </section>
+      <div className="controller-minimized"></div>
+    </>
   );
 }
 

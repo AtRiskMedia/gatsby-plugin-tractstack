@@ -38,7 +38,7 @@ function BuildController(data) {
   }
 
   let css = InjectCssAnimation(effects_payload, "tractstack-controller");
-  return /*#__PURE__*/React.createElement("section", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("section", {
     key: data?.state?.storyStep?.storyStepGraph?.current?.id,
     className: "controller"
   }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
@@ -52,7 +52,9 @@ function BuildController(data) {
     id: "calls-to-action"
   })), /*#__PURE__*/React.createElement("div", {
     className: `controller__view controller__view--${data?.state?.viewport?.viewport?.key}`
-  }, controller_pane))));
+  }, controller_pane)))), /*#__PURE__*/React.createElement("div", {
+    className: "controller-minimized"
+  }));
 }
 
 export { BuildController };
