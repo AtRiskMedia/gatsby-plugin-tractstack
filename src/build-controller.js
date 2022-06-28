@@ -4,15 +4,23 @@ import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
 import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 
 function BuildController(data) {
-  let next, prev, link, react_fragment, effects_payload, controller_pane;
+  let next,
+    prev,
+    link,
+    react_fragment,
+    effects_payload,
+    controller_pane,
+    controller_pane_minimized;
   if (data?.state?.storyStep?.storyStepGraph?.next?.field_slug)
     next = `/${data?.state?.storyStep?.storyStepGraph?.next?.field_slug}`;
   if (data?.state?.storyStep?.storyStepGraph?.previous?.field_slug)
     prev = `/${data?.state?.storyStep?.storyStepGraph?.previous?.field_slug}`;
-  let tempValue = SvgShape("mini", {
+  controller_pane = SvgShape("controller", {
     viewport: data?.state?.viewport?.viewport,
-  });
-  if (tempValue) controller_pane = tempValue?.shape;
+  }).shape;
+  controller_pane_minimized = SvgShape("mini", {
+    viewport: data?.state?.viewport?.viewport,
+  }).shape;
 
   /*
   <div className="controller__graph">
@@ -39,30 +47,18 @@ function BuildController(data) {
       in: ["fadeInRight", 2, 1],
     };
   }
-  let css = InjectCssAnimation(effects_payload, "tractstack-controller");
-
+  let css = InjectCssAnimation(effects_payload, "controller");
   return (
     <>
       <section
         key={data?.state?.storyStep?.storyStepGraph?.current?.id}
-        className="controller"
+        id="controller"
       >
         <StyledWrapperDiv css={css}>
-          <div id="tractstack-controller" className="controller__container">
-            <div
-              className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
-            >
-              <div id="calls-to-action"></div>
-            </div>
-            <div
-              className={`controller__view controller__view--${data?.state?.viewport?.viewport?.key}`}
-            >
-              {controller_pane}
-            </div>
-          </div>
+          <div id="controller-expanded">{controller_pane}</div>
+          <div id="controller-minimized">{controller_pane_minimized}</div>
         </StyledWrapperDiv>
       </section>
-      <div className="controller-minimized"></div>
     </>
   );
 }

@@ -193,9 +193,9 @@ const ComposedPane = data => {
     } // extract buttonData (if any)
 
 
-    if (state?.controller?.payload?.buttons[pane?.id] && state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id]) payload.buttonData = state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id]; // extract animation effects (if any)
+    if (state?.controller?.payload?.buttons && state?.controller?.payload?.buttons[pane?.id] && state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id]) payload.buttonData = state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id]; // extract animation effects (if any)
 
-    if (state?.controller?.payload?.effects[pane?.id] && state?.controller?.payload?.effects[pane?.id][pane_fragment?.id]) tempValue = state?.controller?.payload?.effects[pane?.id][pane_fragment?.id];
+    if (state?.controller?.payload?.effects && state?.controller?.payload?.effects[pane?.id] && state?.controller?.payload?.effects[pane?.id][pane_fragment?.id]) tempValue = state?.controller?.payload?.effects[pane?.id][pane_fragment?.id];
 
     if (tempValue && Object.keys(tempValue).length) {
       for (const key in tempValue) {

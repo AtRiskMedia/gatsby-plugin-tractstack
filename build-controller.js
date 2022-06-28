@@ -4,13 +4,15 @@ import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
 import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 
 function BuildController(data) {
-  let next, prev, link, react_fragment, effects_payload, controller_pane;
+  let next, prev, link, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
   if (data?.state?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.state?.storyStep?.storyStepGraph?.next?.field_slug}`;
   if (data?.state?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.state?.storyStep?.storyStepGraph?.previous?.field_slug}`;
-  let tempValue = SvgShape("mini", {
+  controller_pane = SvgShape("controller", {
     viewport: data?.state?.viewport?.viewport
-  });
-  if (tempValue) controller_pane = tempValue?.shape;
+  }).shape;
+  controller_pane_minimized = SvgShape("mini", {
+    viewport: data?.state?.viewport?.viewport
+  }).shape;
   /*
   <div className="controller__graph">
     {next ? (
@@ -37,24 +39,17 @@ function BuildController(data) {
     };
   }
 
-  let css = InjectCssAnimation(effects_payload, "tractstack-controller");
+  let css = InjectCssAnimation(effects_payload, "controller");
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("section", {
     key: data?.state?.storyStep?.storyStepGraph?.current?.id,
-    className: "controller"
+    id: "controller"
   }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css
   }, /*#__PURE__*/React.createElement("div", {
-    id: "tractstack-controller",
-    className: "controller__container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: `controller__view controller__view--${data?.state?.viewport?.viewport?.key}`
-  }, /*#__PURE__*/React.createElement("div", {
-    id: "calls-to-action"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: `controller__view controller__view--${data?.state?.viewport?.viewport?.key}`
-  }, controller_pane)))), /*#__PURE__*/React.createElement("div", {
-    className: "controller-minimized"
-  }));
+    id: "controller-expanded"
+  }, controller_pane), /*#__PURE__*/React.createElement("div", {
+    id: "controller-minimized"
+  }, controller_pane_minimized))));
 }
 
 export { BuildController };

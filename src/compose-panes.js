@@ -256,6 +256,7 @@ const ComposedPane = (data) => {
 
       // extract buttonData (if any)
       if (
+        state?.controller?.payload?.buttons &&
         state?.controller?.payload?.buttons[pane?.id] &&
         state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id]
       )
@@ -264,6 +265,7 @@ const ComposedPane = (data) => {
 
       // extract animation effects (if any)
       if (
+        state?.controller?.payload?.effects &&
         state?.controller?.payload?.effects[pane?.id] &&
         state?.controller?.payload?.effects[pane?.id][pane_fragment?.id]
       )
