@@ -1,7 +1,10 @@
 import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import styled from "styled-components";
 import { Link } from "gatsby";
 import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
-import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
+import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
+import { lispLexer } from "./lexer";
 
 function BuildController(data) {
   let next,
@@ -22,6 +25,14 @@ function BuildController(data) {
     viewport: data?.state?.viewport?.viewport,
   }).shape;
 
+  let svgString = renderToStaticMarkup(controller_pane_minimized);
+  let b64 = window.btoa(svgString);
+  let dataUri = `data:image/svg+xml;base64,${b64}`;
+  let css,
+    mask_css =
+      `.controller__container {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+      ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+
   /*
   <div className="controller__graph">
     {next ? (
@@ -40,14 +51,29 @@ function BuildController(data) {
     )}
   </div>
   */
+  let payload = "(controller (expand))";
+  let payload_ast = lispLexer(payload);
+  function injectPayloadExpand() {
+    lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
+  }
 
   // can we wrap this in animation?
   if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
       in: ["fadeInRight", 2, 1],
     };
+    let animateController = InjectCssAnimation(effects_payload, "controller");
+    effects_payload = {
+      in: ["pulseExpand", 2, 10],
+    };
+    let animateControllerExpand = InjectCssAnimation(
+      effects_payload,
+      "controller-expand"
+    );
+    css = `${animateController} ${animateControllerExpand}`;
   }
-  let css = InjectCssAnimation(effects_payload, "controller");
+  css = `${css} ${mask_css}`;
+
   return (
     <>
       <section
@@ -56,7 +82,27 @@ function BuildController(data) {
       >
         <StyledWrapperDiv css={css}>
           <div id="controller-expanded">{controller_pane}</div>
-          <div id="controller-minimized">{controller_pane_minimized}</div>
+          <div id="controller-minimized">
+            <div className="controller">
+              <div className="controller__container">
+                {controller_pane_minimized}
+              </div>
+              <div className="controller__container">
+                <div className="controller__container--expand-bg">&gt;</div>
+              </div>
+              <div className="controller__container">
+                <div className="controller__container--expand">
+                  <a
+                    href="#"
+                    onClick={() => injectPayloadExpand()}
+                    title="Toggle Full Controller"
+                  >
+                    &nbsp;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </StyledWrapperDiv>
       </section>
     </>

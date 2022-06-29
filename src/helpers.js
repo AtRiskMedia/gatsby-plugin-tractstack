@@ -74,6 +74,14 @@ const lispCallback = (payload, context = "", hookEndPoint) => {
   }
   // now process the command
   switch (command) {
+    case "controller":
+      switch (parameter_one) {
+        case "expand":
+        case "minimize":
+          hookEndPoint("hookController", parameter_one);
+          break;
+      }
+
     case "icon":
       // pre-process on context
       switch (context) {
@@ -341,21 +349,27 @@ const getStoryStepGraph = (graph, targetId) => {
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
   let css = "",
+    looped = "",
+    opacity = "opacity:0;",
     selector_in,
     selector_out;
-  if (paneFragmentId !== "controller") {
-    selector_in = `div#${paneFragmentId}.visible`;
-    selector_out = `div#${paneFragmentId}.hidden`;
-  } else {
+  if (paneFragmentId === "controller") {
     selector_in =
       "div#controller-minimized.visible,div#controller-expanded.visible";
+  } else if (paneFragmentId === "controller-expand") {
+    selector_in = "div.controller__container--expand-bg";
+    opacity = "";
+    looped = "animation-iteration-count: infinite;";
+  } else {
+    selector_in = `div#${paneFragmentId}.visible`;
+    selector_out = `div#${paneFragmentId}.hidden`;
   }
   let animationIn = payload?.in[0],
     animationInSpeed = payload?.in[1],
     animationInDelay = payload?.in[2];
   if (typeof animationIn === "string") {
     css =
-      `${css} ${selector_in} { opacity:0; animation-fill-mode: both; ` +
+      `${css} ${selector_in} { ${opacity} ${looped} animation-fill-mode: both; ` +
       `animation-name: ${animationIn}; -webkit-animation-name: ${animationIn}; `;
     if (typeof animationInSpeed === "number") {
       css = `${css} animation-duration: ${animationInSpeed}s; -webkit-animation-duration: ${animationInSpeed}s; `;
@@ -366,7 +380,7 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     css = css + "}";
     if (selector_out)
       css =
-        `${css} ${selector_out} { opacity:0; animation-fill-mode: both; ` +
+        `${css} ${selector_out} { ${opacity} animation-fill-mode: both; ` +
         `animation-name: fadeOut; -webkit-animation-name: fadeOut; ` +
         `animation-duration: 2s; -webkit-animation-duration: 2s; ` +
         `}`;

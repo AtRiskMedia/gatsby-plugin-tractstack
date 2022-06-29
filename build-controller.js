@@ -1,7 +1,10 @@
 import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import styled from "styled-components";
 import { Link } from "gatsby";
 import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
-import { StyledWrapperDiv, InjectCssAnimation } from "./helpers";
+import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
+import { lispLexer } from "./lexer";
 
 function BuildController(data) {
   let next, prev, link, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
@@ -13,6 +16,11 @@ function BuildController(data) {
   controller_pane_minimized = SvgShape("mini", {
     viewport: data?.state?.viewport?.viewport
   }).shape;
+  let svgString = renderToStaticMarkup(controller_pane_minimized);
+  let b64 = window.btoa(svgString);
+  let dataUri = `data:image/svg+xml;base64,${b64}`;
+  let css,
+      mask_css = `.controller__container {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
   /*
   <div className="controller__graph">
     {next ? (
@@ -31,15 +39,28 @@ function BuildController(data) {
     )}
   </div>
   */
-  // can we wrap this in animation?
+
+  let payload = "(controller (expand))";
+  let payload_ast = lispLexer(payload);
+
+  function injectPayloadExpand() {
+    lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
+  } // can we wrap this in animation?
+
 
   if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
       in: ["fadeInRight", 2, 1]
     };
+    let animateController = InjectCssAnimation(effects_payload, "controller");
+    effects_payload = {
+      in: ["pulseExpand", 2, 10]
+    };
+    let animateControllerExpand = InjectCssAnimation(effects_payload, "controller-expand");
+    css = `${animateController} ${animateControllerExpand}`;
   }
 
-  let css = InjectCssAnimation(effects_payload, "controller");
+  css = `${css} ${mask_css}`;
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("section", {
     key: data?.state?.storyStep?.storyStepGraph?.current?.id,
     id: "controller"
@@ -49,7 +70,23 @@ function BuildController(data) {
     id: "controller-expanded"
   }, controller_pane), /*#__PURE__*/React.createElement("div", {
     id: "controller-minimized"
-  }, controller_pane_minimized))));
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "controller"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "controller__container"
+  }, controller_pane_minimized), /*#__PURE__*/React.createElement("div", {
+    className: "controller__container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "controller__container--expand-bg"
+  }, ">")), /*#__PURE__*/React.createElement("div", {
+    className: "controller__container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "controller__container--expand"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "#",
+    onClick: () => injectPayloadExpand(),
+    title: "Toggle Full Controller"
+  }, "\xA0"))))))));
 }
 
 export { BuildController };

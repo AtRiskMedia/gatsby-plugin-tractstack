@@ -1,2 +1,0 @@
-
-//# sourceMappingURL=waypoint.js.map
