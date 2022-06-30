@@ -30,7 +30,7 @@ function BuildController(data) {
   let dataUri = `data:image/svg+xml;base64,${b64}`;
   let css,
     mask_css =
-      `.controller__container {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+      `.controller__container--minimized {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
       ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
 
   /*
@@ -51,9 +51,14 @@ function BuildController(data) {
     )}
   </div>
   */
-  let payload = "(controller (expand))";
-  let payload_ast = lispLexer(payload);
   function injectPayloadExpand() {
+    let payload = "(controller (expand))";
+    let payload_ast = lispLexer(payload);
+    lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
+  }
+  function injectPayloadMinimize() {
+    let payload = "(controller (minimize))";
+    let payload_ast = lispLexer(payload);
     lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
   }
 
@@ -73,7 +78,8 @@ function BuildController(data) {
     css = `${animateController} ${animateControllerExpand}`;
   }
   css = `${css} ${mask_css}`;
-
+  console.log("hit");
+  console.log(data.state);
   return (
     <>
       <section
@@ -81,16 +87,33 @@ function BuildController(data) {
         id="controller"
       >
         <StyledWrapperDiv css={css}>
-          <div id="controller-expanded">{controller_pane}</div>
+          <div id="controller-expanded">
+            <div className="controller">
+              <div className="controller__container controller__container--expanded">
+                {controller_pane}
+              </div>
+              <div className="controller__container controller__container--expanded">
+                <div className="controller__container--expand">
+                  <a
+                    href="#"
+                    onClick={() => injectPayloadMinimize()}
+                    title="Minimize the Controller"
+                  >
+                    &lt;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
           <div id="controller-minimized">
             <div className="controller">
-              <div className="controller__container">
+              <div className="controller__container controller__container--minimized">
                 {controller_pane_minimized}
               </div>
-              <div className="controller__container">
+              <div className="controller__container controller__container--minimized">
                 <div className="controller__container--expand-bg">&gt;</div>
               </div>
-              <div className="controller__container">
+              <div className="controller__container controller__container--minimized">
                 <div className="controller__container--expand">
                   <a
                     href="#"

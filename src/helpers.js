@@ -360,6 +360,10 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
     selector_in = "div.controller__container--expand-bg";
     opacity = "";
     looped = "animation-iteration-count: infinite;";
+  } else if (paneFragmentId === "controller-minimized") {
+    selector_in = "div.controller__container--minimized-bg";
+    opacity = "";
+    looped = "animation-iteration-count: infinite;";
   } else {
     selector_in = `div#${paneFragmentId}.visible`;
     selector_out = `div#${paneFragmentId}.hidden`;

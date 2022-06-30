@@ -143,7 +143,7 @@ const ComposedPane = (data) => {
           } else if (shape && pane_fragment?.field_modal) {
             // this is a modal
             let options =
-                state?.controller?.payload?.render[pane?.id][pane_fragment?.id][
+                state?.storyStep?.payload?.modal[pane?.id][pane_fragment?.id][
                   state?.viewport?.viewport?.key
                 ],
               this_payload = {},
@@ -256,21 +256,21 @@ const ComposedPane = (data) => {
 
       // extract buttonData (if any)
       if (
-        state?.controller?.payload?.buttons &&
-        state?.controller?.payload?.buttons[pane?.id] &&
-        state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id]
+        state?.storyStep?.payload?.buttons &&
+        state?.storyStep?.payload?.buttons[pane?.id] &&
+        state?.storyStep?.payload?.buttons[pane?.id][pane_fragment?.id]
       )
         payload.buttonData =
-          state?.controller?.payload?.buttons[pane?.id][pane_fragment?.id];
+          state?.storyStep?.payload?.buttons[pane?.id][pane_fragment?.id];
 
       // extract animation effects (if any)
       if (
-        state?.controller?.payload?.effects &&
-        state?.controller?.payload?.effects[pane?.id] &&
-        state?.controller?.payload?.effects[pane?.id][pane_fragment?.id]
+        state?.storyStep?.payload?.effects &&
+        state?.storyStep?.payload?.effects[pane?.id] &&
+        state?.storyStep?.payload?.effects[pane?.id][pane_fragment?.id]
       )
         tempValue =
-          state?.controller?.payload?.effects[pane?.id][pane_fragment?.id];
+          state?.storyStep?.payload?.effects[pane?.id][pane_fragment?.id];
       if (tempValue && Object.keys(tempValue).length) {
         for (const key in tempValue) {
           // store animation
