@@ -51,17 +51,17 @@ function BuildController(data) {
     )}
   </div>
   */
-  function injectPayloadExpand() {
-    let payload = "(controller (expand))";
-    let payload_ast = lispLexer(payload);
-    lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
-  }
   function injectPayloadMinimize() {
     let payload = "(controller (minimize))";
     let payload_ast = lispLexer(payload);
     lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
   }
 
+  function injectPayloadExpand() {
+    let payload = "(controller (expand))";
+    let payload_ast = lispLexer(payload);
+    lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
+  }
   // can we wrap this in animation?
   if (data?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
@@ -91,14 +91,12 @@ function BuildController(data) {
                 {controller_pane}
               </div>
               <div className="controller__container controller__container--expanded">
-                <div className="controller__container--expand">
-                  <a
-                    href="#"
-                    onClick={() => injectPayloadMinimize()}
-                    title="Minimize the Controller"
-                  >
-                    &lt;
-                  </a>
+                <div
+                  className="controller__container--minimize"
+                  onClick={() => injectPayloadMinimize()}
+                  title="Minimize the Controller"
+                >
+                  &lt;
                 </div>
               </div>
             </div>
@@ -112,14 +110,12 @@ function BuildController(data) {
                 <div className="controller__container--expand-bg">&gt;</div>
               </div>
               <div className="controller__container controller__container--minimized">
-                <div className="controller__container--expand">
-                  <a
-                    href="#"
-                    onClick={() => injectPayloadExpand()}
-                    title="Toggle Full Controller"
-                  >
-                    &nbsp;
-                  </a>
+                <div
+                  className="controller__container--expand"
+                  onClick={() => injectPayloadExpand()}
+                  title="Toggle Full Controller"
+                >
+                  &nbsp;
                 </div>
               </div>
             </div>

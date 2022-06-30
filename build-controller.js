@@ -40,14 +40,14 @@ function BuildController(data) {
   </div>
   */
 
-  function injectPayloadExpand() {
-    let payload = "(controller (expand))";
+  function injectPayloadMinimize() {
+    let payload = "(controller (minimize))";
     let payload_ast = lispLexer(payload);
     lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
   }
 
-  function injectPayloadMinimize() {
-    let payload = "(controller (minimize))";
+  function injectPayloadExpand() {
+    let payload = "(controller (expand))";
     let payload_ast = lispLexer(payload);
     lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
   } // can we wrap this in animation?
@@ -80,12 +80,10 @@ function BuildController(data) {
   }, controller_pane), /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--expanded"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "controller__container--expand"
-  }, /*#__PURE__*/React.createElement("a", {
-    href: "#",
+    className: "controller__container--minimize",
     onClick: () => injectPayloadMinimize(),
     title: "Minimize the Controller"
-  }, "<"))))), /*#__PURE__*/React.createElement("div", {
+  }, "<")))), /*#__PURE__*/React.createElement("div", {
     id: "controller-minimized"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller"
@@ -98,12 +96,10 @@ function BuildController(data) {
   }, ">")), /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--minimized"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "controller__container--expand"
-  }, /*#__PURE__*/React.createElement("a", {
-    href: "#",
+    className: "controller__container--expand",
     onClick: () => injectPayloadExpand(),
     title: "Toggle Full Controller"
-  }, "\xA0"))))))));
+  }, "\xA0")))))));
 }
 
 export { BuildController };

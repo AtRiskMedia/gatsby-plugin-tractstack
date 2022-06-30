@@ -63,7 +63,6 @@ const getScrollbarSize = () => {
 };
 
 const lispCallback = (payload, context = "", hookEndPoint) => {
-  console.log(payload, context, hookEndPoint);
   let icon;
   let lisp_data = payload[Object.keys(payload)[0]];
   let command = (lisp_data && lisp_data[0]) || false;
