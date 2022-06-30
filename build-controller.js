@@ -8,13 +8,13 @@ import { lispLexer } from "./lexer";
 
 function BuildController(data) {
   let next, prev, link, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
-  if (data?.state?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.state?.storyStep?.storyStepGraph?.next?.field_slug}`;
-  if (data?.state?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.state?.storyStep?.storyStepGraph?.previous?.field_slug}`;
+  if (data?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.storyStep?.storyStepGraph?.next?.field_slug}`;
+  if (data?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.storyStep?.storyStepGraph?.previous?.field_slug}`;
   controller_pane = SvgShape("controller", {
-    viewport: data?.state?.viewport?.viewport
+    viewport: data?.viewport?.viewport
   }).shape;
   controller_pane_minimized = SvgShape("mini", {
-    viewport: data?.state?.viewport?.viewport
+    viewport: data?.viewport?.viewport
   }).shape;
   let svgString = renderToStaticMarkup(controller_pane_minimized);
   let b64 = window.btoa(svgString);
@@ -53,7 +53,7 @@ function BuildController(data) {
   } // can we wrap this in animation?
 
 
-  if (data?.state?.prefersReducedMotion?.prefersReducedMotion === false) {
+  if (data?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
       in: ["fadeInRight", 2, 1]
     };
@@ -66,10 +66,8 @@ function BuildController(data) {
   }
 
   css = `${css} ${mask_css}`;
-  console.log("hit");
-  console.log(data.state);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("section", {
-    key: data?.state?.storyStep?.storyStepGraph?.current?.id,
+    key: data?.storyStep?.storyStepGraph?.current?.id,
     id: "controller"
   }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css
