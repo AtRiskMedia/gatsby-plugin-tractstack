@@ -356,7 +356,6 @@ const ComposedPane = (data) => {
         tablet: pane_fragment?.field_css_styles_parent_tablet || "",
         desktop: pane_fragment?.field_css_styles_parent_desktop || "",
       });
-
       // prepare structured data for this paneFragment
       tractStackFragment = {
         id: pane_fragment?.id,

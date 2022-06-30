@@ -58,6 +58,7 @@ const getScrollbarSize = () => {
 };
 
 const lispCallback = (payload, context = "", hookEndPoint) => {
+  console.log(payload, context, hookEndPoint);
   let icon;
   let lisp_data = payload[Object.keys(payload)[0]];
   let command = lisp_data && lisp_data[0] || false;
@@ -116,11 +117,6 @@ const lispCallback = (payload, context = "", hookEndPoint) => {
 
       if (parameter_one === "pane" && typeof parameter_two === "string") {
         hookEndPoint("hookSetCurrentPane", parameter_two);
-        /*
-        setTimeout(function () {
-          hookEndPoint( hookScrolled );
-        }, 100);
-        */
       }
 
       break;
