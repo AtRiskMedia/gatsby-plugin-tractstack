@@ -201,10 +201,13 @@ const ComposedPane = data => {
         break;
 
       case "paragraph__background_video":
-        this_payload.videoData = {
-          url: pane_fragment?.field_cdn_url,
-          alt_text: pane_fragment?.field_alt_text
-        };
+        if (prefersReducedMotion?.prefersReducedMotion === false) {
+          this_payload.videoData = {
+            url: pane_fragment?.field_cdn_url,
+            alt_text: pane_fragment?.field_alt_text
+          };
+        }
+
         break;
 
       case "paragraph__svg":

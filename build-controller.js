@@ -58,7 +58,7 @@ function BuildController(data) {
 
   if (data?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
-      in: ["fadeInRight", 2, 1]
+      in: ["fadeInRight", 0.65, 0]
     };
     let animateController = InjectCssAnimation(effects_payload, "controller");
     effects_payload = {
