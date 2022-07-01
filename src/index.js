@@ -1,3 +1,4 @@
+import { useInView } from "react-cool-inview";
 import { ComposePanes } from "./compose-panes";
 import { BuildController } from "./build-controller";
 import { PreParseMenuItems, ParseMenuItems } from "./build-menu";
@@ -20,4 +21,5 @@ export {
   getScrollbarSize,
   PreParseMenuItems,
   ParseMenuItems,
+  useInView,
 };
