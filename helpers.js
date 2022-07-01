@@ -320,11 +320,11 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
   if (paneFragmentId === "controller") {
     selector_in = "div#controller-minimized.visible,div#controller-expanded.visible";
   } else if (paneFragmentId === "controller-expand") {
-    selector_in = "div.controller__container--expand-bg";
+    selector_in = "div.controller__container--expand";
     opacity = "";
     looped = "animation-iteration-count: infinite;";
-  } else if (paneFragmentId === "controller-minimized") {
-    selector_in = "div.controller__container--minimized-bg";
+  } else if (paneFragmentId === "controller-minimize") {
+    selector_in = "div.controller__container--minimize";
     opacity = "";
     looped = "animation-iteration-count: infinite;";
   } else {

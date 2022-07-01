@@ -10,6 +10,11 @@ function BuildController(data) {
   let next,
     prev,
     link,
+    svgString,
+    b64,
+    dataUri,
+    css,
+    mask_css,
     react_fragment,
     effects_payload,
     controller_pane,
@@ -25,13 +30,19 @@ function BuildController(data) {
     viewport: data?.viewport?.viewport,
   }).shape;
 
-  let svgString = renderToStaticMarkup(controller_pane_minimized);
-  let b64 = window.btoa(svgString);
-  let dataUri = `data:image/svg+xml;base64,${b64}`;
-  let css,
-    mask_css =
-      `.controller__container--minimized {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
-      ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+  svgString = renderToStaticMarkup(controller_pane_minimized);
+  b64 = window.btoa(svgString);
+  dataUri = `data:image/svg+xml;base64,${b64}`;
+  mask_css =
+    `.controller__container--minimized {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+    ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+
+  svgString = renderToStaticMarkup(controller_pane);
+  b64 = window.btoa(svgString);
+  dataUri = `data:image/svg+xml;base64,${b64}`;
+  mask_css =
+    `${mask_css} .controller__container--expanded {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+    ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
 
   /*
   <div className="controller__graph">
@@ -62,6 +73,7 @@ function BuildController(data) {
     let payload_ast = lispLexer(payload);
     lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
   }
+
   // can we wrap this in animation?
   if (data?.prefersReducedMotion?.prefersReducedMotion === false) {
     effects_payload = {
@@ -75,7 +87,11 @@ function BuildController(data) {
       effects_payload,
       "controller-expand"
     );
-    css = `${animateController} ${animateControllerExpand}`;
+    let animateControllerMinimize = InjectCssAnimation(
+      effects_payload,
+      "controller-minimize"
+    );
+    css = `${animateController} ${animateControllerExpand} ${animateControllerMinimize}`;
   }
   css = `${css} ${mask_css}`;
   return (
@@ -96,7 +112,7 @@ function BuildController(data) {
                   onClick={() => injectPayloadMinimize()}
                   title="Minimize the Controller"
                 >
-                  &lt;
+                  <div>&lt;</div>
                 </div>
               </div>
             </div>
@@ -107,15 +123,12 @@ function BuildController(data) {
                 {controller_pane_minimized}
               </div>
               <div className="controller__container controller__container--minimized">
-                <div className="controller__container--expand-bg">&gt;</div>
-              </div>
-              <div className="controller__container controller__container--minimized">
                 <div
                   className="controller__container--expand"
                   onClick={() => injectPayloadExpand()}
                   title="Toggle Full Controller"
                 >
-                  &nbsp;
+                  <div>&gt;</div>
                 </div>
               </div>
             </div>
