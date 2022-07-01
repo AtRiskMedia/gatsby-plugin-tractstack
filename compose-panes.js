@@ -37,8 +37,6 @@ const ComposedPane = data => {
     observe,
     inView
   } = useInView({
-    rootMargin: "-100px 0px",
-    // threshold: 0.25,
     onEnter: ({}) => {
       hookEndPoint("hookPaneVisible", pane?.id);
     },
