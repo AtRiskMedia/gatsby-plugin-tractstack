@@ -94,6 +94,7 @@ function BuildController(data) {
     css = `${animateController} ${animateControllerExpand} ${animateControllerMinimize}`;
   }
   css = `${css} ${mask_css}`;
+  let icons = `controller__icons controller__icons--${data?.viewport?.viewport?.key}`; // to-do
   return (
     <>
       <section
@@ -105,6 +106,9 @@ function BuildController(data) {
             <div className="controller">
               <div className="controller__container controller__container--expanded">
                 {controller_pane}
+              </div>
+              <div className="controller__container controller__container--expanded">
+                <ul className={icons} id="controller-expanded-icons"></ul>
               </div>
               <div className="controller__container controller__container--expanded">
                 <div
@@ -121,6 +125,9 @@ function BuildController(data) {
             <div className="controller">
               <div className="controller__container controller__container--minimized">
                 {controller_pane_minimized}
+              </div>
+              <div className="controller__container controller__container--minimized">
+                <ul className={icons} id="controller-minimized-icons"></ul>
               </div>
               <div className="controller__container controller__container--minimized">
                 <div

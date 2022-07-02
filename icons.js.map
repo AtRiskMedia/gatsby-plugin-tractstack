@@ -1,0 +1,1 @@
+{"version":3,"file":"icons.js","names":["Icon","name"],"sources":["src/icons.js"],"sourcesContent":["const Icon = (name) => {\n  return name;\n};\n\nexport { Icon };\n"],"mappings":"AAAA,MAAMA,IAAI,GAAIC,IAAD,IAAU;EACrB,OAAOA,IAAP;AACD,CAFD;;AAIA,SAASD,IAAT"}

@@ -70,6 +70,8 @@ function BuildController(data) {
   }
 
   css = `${css} ${mask_css}`;
+  let icons = `controller__icons controller__icons--${data?.viewport?.viewport?.key}`; // to-do
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("section", {
     key: data?.storyStep?.storyStepGraph?.current?.id,
     id: "controller"
@@ -83,6 +85,11 @@ function BuildController(data) {
     className: "controller__container controller__container--expanded"
   }, controller_pane), /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--expanded"
+  }, /*#__PURE__*/React.createElement("ul", {
+    className: icons,
+    id: "controller-expanded-icons"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "controller__container controller__container--expanded"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--minimize",
     onClick: () => injectPayloadMinimize(),
@@ -94,6 +101,11 @@ function BuildController(data) {
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--minimized"
   }, controller_pane_minimized), /*#__PURE__*/React.createElement("div", {
+    className: "controller__container controller__container--minimized"
+  }, /*#__PURE__*/React.createElement("ul", {
+    className: icons,
+    id: "controller-minimized-icons"
+  })), /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--minimized"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--expand",

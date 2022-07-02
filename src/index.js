@@ -2,7 +2,12 @@ import { useInView } from "react-cool-inview";
 import { ComposePanes } from "./compose-panes";
 import { BuildController } from "./build-controller";
 import { PreParseMenuItems, ParseMenuItems } from "./build-menu";
-import { getStoryStepGraph, lispCallback, getScrollbarSize } from "./helpers";
+import {
+  getStoryStepGraph,
+  lispCallback,
+  getScrollbarSize,
+  controllerEndPoint,
+} from "./helpers";
 import { lispLexer } from "./lexer";
 
 const viewportWidths = {
@@ -22,4 +27,5 @@ export {
   PreParseMenuItems,
   ParseMenuItems,
   useInView,
+  controllerEndPoint,
 };
