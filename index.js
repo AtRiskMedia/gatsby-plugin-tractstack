@@ -1,4 +1,5 @@
 import { useInView } from "react-cool-inview";
+import { v4 as uuidv4 } from "uuid";
 import { ComposePanes } from "./compose-panes";
 import { BuildController } from "./build-controller";
 import { PreParseMenuItems, ParseMenuItems } from "./build-menu";
@@ -9,5 +10,5 @@ const viewportWidths = {
   tablet: 1080,
   desktop: 1920
 };
-export { ComposePanes, BuildController, getStoryStepGraph, viewportWidths, lispLexer, lispCallback, getScrollbarSize, PreParseMenuItems, ParseMenuItems, useInView, controllerEndPoint };
+export { ComposePanes, BuildController, getStoryStepGraph, viewportWidths, lispLexer, lispCallback, getScrollbarSize, PreParseMenuItems, ParseMenuItems, useInView, uuidv4, controllerEndPoint };
 //# sourceMappingURL=index.js.map

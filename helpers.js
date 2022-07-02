@@ -167,6 +167,7 @@ const HtmlAstToReact = (fragment, element = false) => {
       case "a":
         if (typeof e?.properties?.href === "string" && e?.children[0]?.type === "text" && typeof e?.children[0]?.value === "string") {
           // check for buttons action payload
+          // requires match on button's urlTarget === link's href
           let is_button;
 
           if (typeof fragment?.payload?.buttonData === "object" && Object.keys(fragment?.payload?.buttonData).length) {
