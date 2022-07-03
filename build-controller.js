@@ -19,11 +19,11 @@ function BuildController(data) {
   svgString = renderToStaticMarkup(controller_pane_minimized);
   b64 = window.btoa(svgString);
   dataUri = `data:image/svg+xml;base64,${b64}`;
-  mask_css = `.controller__container--minimized {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+  mask_css = `#controller-minimized {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
   svgString = renderToStaticMarkup(controller_pane);
   b64 = window.btoa(svgString);
   dataUri = `data:image/svg+xml;base64,${b64}`;
-  mask_css = `${mask_css} .controller__container--expanded {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
+  mask_css = `${mask_css} #controller-expanded {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
   /*
   <div className="controller__graph">
     {next ? (
@@ -79,16 +79,14 @@ function BuildController(data) {
     css: css
   }, /*#__PURE__*/React.createElement("div", {
     id: "controller-expanded"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("ul", {
+    className: icons,
+    id: "controller-expanded-icons"
+  }), /*#__PURE__*/React.createElement("div", {
     className: "controller"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--expanded"
   }, controller_pane), /*#__PURE__*/React.createElement("div", {
-    className: "controller__container controller__container--expanded"
-  }, /*#__PURE__*/React.createElement("ul", {
-    className: icons,
-    id: "controller-expanded-icons"
-  })), /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--expanded"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--minimize",
@@ -96,16 +94,14 @@ function BuildController(data) {
     title: "Minimize the Controller"
   }, /*#__PURE__*/React.createElement("div", null, "<"))))), /*#__PURE__*/React.createElement("div", {
     id: "controller-minimized"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("ul", {
+    className: icons,
+    id: "controller-minimized-icons"
+  }), /*#__PURE__*/React.createElement("div", {
     className: "controller"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--minimized"
   }, controller_pane_minimized), /*#__PURE__*/React.createElement("div", {
-    className: "controller__container controller__container--minimized"
-  }, /*#__PURE__*/React.createElement("ul", {
-    className: icons,
-    id: "controller-minimized-icons"
-  })), /*#__PURE__*/React.createElement("div", {
     className: "controller__container controller__container--minimized"
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--expand",

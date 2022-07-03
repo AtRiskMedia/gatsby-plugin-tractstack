@@ -34,14 +34,14 @@ function BuildController(data) {
   b64 = window.btoa(svgString);
   dataUri = `data:image/svg+xml;base64,${b64}`;
   mask_css =
-    `.controller__container--minimized {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+    `#controller-minimized {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
     ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
 
   svgString = renderToStaticMarkup(controller_pane);
   b64 = window.btoa(svgString);
   dataUri = `data:image/svg+xml;base64,${b64}`;
   mask_css =
-    `${mask_css} .controller__container--expanded {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
+    `${mask_css} #controller-expanded {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
     ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
 
   /*
@@ -103,12 +103,10 @@ function BuildController(data) {
       >
         <StyledWrapperDiv css={css}>
           <div id="controller-expanded">
+            <ul className={icons} id="controller-expanded-icons"></ul>
             <div className="controller">
               <div className="controller__container controller__container--expanded">
                 {controller_pane}
-              </div>
-              <div className="controller__container controller__container--expanded">
-                <ul className={icons} id="controller-expanded-icons"></ul>
               </div>
               <div className="controller__container controller__container--expanded">
                 <div
@@ -122,12 +120,10 @@ function BuildController(data) {
             </div>
           </div>
           <div id="controller-minimized">
+            <ul className={icons} id="controller-minimized-icons"></ul>
             <div className="controller">
               <div className="controller__container controller__container--minimized">
                 {controller_pane_minimized}
-              </div>
-              <div className="controller__container controller__container--minimized">
-                <ul className={icons} id="controller-minimized-icons"></ul>
               </div>
               <div className="controller__container controller__container--minimized">
                 <div

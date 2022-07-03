@@ -81,34 +81,6 @@ const lispCallback = (payload, context = "", hookEndPoint) => {
           hookEndPoint("hookController", parameter_one);
           break;
       }
-
-    case "icon":
-      // pre-process on context
-      switch (context) {
-        case "paneVisible":
-          // process as "icon" function
-          icon = parameter_one;
-          command = parameter_two[0];
-          parameter_one = parameter_two[1];
-          parameter_two = parameter_three;
-          parameter_three = false;
-          // TODO: do something with the icon
-          console.log(`todo: add ${icon} icon to controller`);
-          console.log(icon, command, parameter_one, parameter_two, context);
-          break;
-
-        case "paneHidden":
-          // process as "icon" function
-          icon = parameter_one;
-          command = parameter_two[0];
-          parameter_one = parameter_two[1];
-          parameter_two = parameter_three;
-          parameter_three = false;
-          // TODO: do something with the icon
-          console.log(`todo: remove ${icon} icon from controller`);
-          console.log(icon, command, parameter_one, parameter_two, context);
-          break;
-      }
       break;
 
     case "alert":
@@ -521,20 +493,6 @@ const HasPaneFragmentType = {
   paragraph__h5p: null,
 };
 
-const controllerEndPoint = (target, payload) => {
-  console.log(target, payload);
-  switch (target) {
-    case "controllerIconVisible":
-      break;
-    case "controllerIconHidden":
-      break;
-    case "controllerImpressionVisible":
-      break;
-    case "controllerImpressionHidden":
-      break;
-  }
-};
-
 export {
   InjectSvgModal,
   InjectCssAnimation,
@@ -549,5 +507,4 @@ export {
   getScrollbarSize,
   thisViewportValue,
   viewportWidth,
-  controllerEndPoint,
 };
