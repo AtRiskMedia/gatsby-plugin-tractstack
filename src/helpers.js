@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import { sanitize } from "hast-util-sanitize";
 import styled from "styled-components";
 import { graphql, useStaticQuery, Link } from "gatsby";
@@ -10,7 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SvgPane, SvgModal } from "./shapes";
 import { lispLexer } from "./lexer";
 import { tractStackFragmentSchema } from "./schema";
-
+import { icon } from "./icons";
 const viewportWidth = {
   mobile: 600,
   tablet: 1080,
@@ -488,6 +489,10 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
         "controller-minimized-icons"
       );
       let iconsExpanded = document.getElementById("controller-expanded-icons");
+      let icon_count_min = iconsMinimized.getElementsByTagName("li").length;
+      let icon_count_exp = iconsExpanded.getElementsByTagName("li").length;
+      if (icon_count_min === 9) return null;
+      if (icon_count_exp === 9) return null;
       for (const this_uuid in payload) {
         let payload_ast = lispLexer(payload[this_uuid]?.actionsLisp);
         if (payload_ast && payload_ast[0]) {
@@ -501,39 +506,53 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
           let this_icon_found =
             this_icon_expanded_found && this_icon_minimized_found;
           if (mode === "Visible" && !this_icon_found) {
+            // load icon shape
+            let this_icon_shape = icon(payload[this_uuid]?.icon);
             let this_li = document.createElement("li");
-            this_li.appendChild(document.createTextNode("x"));
             this_li.id = `m-${this_uuid}`;
+            this_li.title = payload[this_uuid]?.altTitle;
             this_li.addEventListener("click", function () {
               lispCallback(payload_ast[0], "", hookEndPoint);
             });
             this_li.classList.add("action");
+            this_li.classList.add("visible");
+            ReactDOM.render(this_icon_shape, this_li);
             iconsMinimized.appendChild(this_li);
             this_li = document.createElement("li");
-            this_li.appendChild(document.createTextNode("x"));
             this_li.id = `e-${this_uuid}`;
+            this_li.title = payload[this_uuid]?.altTitle;
             this_li.addEventListener("click", function () {
               lispCallback(payload_ast[0], "", hookEndPoint);
             });
             this_li.classList.add("action");
+            this_li.classList.add("visible");
+            ReactDOM.render(this_icon_shape, this_li);
             iconsExpanded.appendChild(this_li);
           } else if (mode === "Hidden" && this_icon_found) {
-            this_icon_minimized.parentNode.removeChild(this_icon_minimized);
-            this_icon_expanded.parentNode.removeChild(this_icon_expanded);
+            this_icon_minimized.classList.remove("visible");
+            this_icon_minimized.classList.add("hidden");
+            setTimeout(function () {
+              this_icon_minimized.parentNode.removeChild(this_icon_minimized);
+            }, 1000);
+            this_icon_expanded.classList.add("hidden");
+            this_icon_expanded.classList.remove("visible");
+            setTimeout(function () {
+              this_icon_expanded.parentNode.removeChild(this_icon_expanded);
+            }, 1000);
           }
         }
       }
       // toggle default <> full class on icons lists depending on number of icons
-      let icon_count_min = iconsMinimized.getElementsByTagName("li").length;
-      let icon_count_exp = iconsExpanded.getElementsByTagName("li").length;
-      if (icon_count_min <= 4) {
+      icon_count_min = iconsMinimized.getElementsByTagName("li").length;
+      icon_count_exp = iconsExpanded.getElementsByTagName("li").length;
+      if (icon_count_min > 4) {
         iconsMinimized.classList.remove("default");
         iconsMinimized.classList.add("full");
       } else {
         iconsMinimized.classList.remove("full");
         iconsMinimized.classList.add("default");
       }
-      if (icon_count_exp <= 4) {
+      if (icon_count_exp > 4) {
         iconsExpanded.classList.remove("default");
         iconsExpanded.classList.add("full");
       } else {
