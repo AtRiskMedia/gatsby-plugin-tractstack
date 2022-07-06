@@ -17,20 +17,21 @@
   "author": "Adon Irani <a@atriskmedia.com>",
   "license": "LGPL-3.0-or-later",
   "devDependencies": {
-    "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.18.5",
-    "@babel/preset-react": "^7.17.12",
-    "eslint": "^8.18.0"
+    "@babel/cli": "^7.18.6",
+    "@babel/core": "^7.18.6",
+    "@babel/preset-react": "^7.18.6",
+    "eslint": "^8.19.0"
   },
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.17.12",
     "ajv": "^8.11.0",
     "babel-plugin-styled-components": "^2.0.7",
     "gatsby-background-image": "^1.6.0",
-    "gatsby-plugin-image": "^2.17.0",
-    "gatsby-plugin-styled-components": "^5.17.0",
+    "gatsby-plugin-image": "^2.18.0",
+    "gatsby-plugin-styled-components": "^5.18.0",
     "gbimage-bridge": "^0.2.1",
     "hast-util-sanitize": "^4.0.0",
+    "keen-slider": "^6.7.0",
     "prettier": "^2.7.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
