@@ -488,11 +488,11 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
       let iconsMinimized = document.getElementById(
         "controller-minimized-icons"
       );
-      let iconsExpanded = document.getElementById("controller-expanded-icons");
+      //let iconsExpanded = document.getElementById("controller-expanded-icons");
       let icon_count_min = iconsMinimized.getElementsByTagName("li").length;
-      let icon_count_exp = iconsExpanded.getElementsByTagName("li").length;
+      //let icon_count_exp = iconsExpanded.getElementsByTagName("li").length;
       if (icon_count_min === 9) return null;
-      if (icon_count_exp === 9) return null;
+      //if (icon_count_exp === 9) return null;
       for (const this_uuid in payload) {
         let payload_ast = lispLexer(payload[this_uuid]?.actionsLisp);
         if (payload_ast && payload_ast[0]) {
@@ -500,11 +500,12 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
           let this_icon_minimized = document.getElementById(`m-${this_uuid}`);
           let this_icon_minimized_found =
             typeof this_icon_minimized === "object" && this_icon_minimized;
-          let this_icon_expanded = document.getElementById(`e-${this_uuid}`);
-          let this_icon_expanded_found =
-            typeof this_icon_expanded === "object" && this_icon_expanded;
-          let this_icon_found =
-            this_icon_expanded_found && this_icon_minimized_found;
+          //let this_icon_expanded = document.getElementById(`e-${this_uuid}`);
+          //let this_icon_expanded_found =
+          //  typeof this_icon_expanded === "object" && this_icon_expanded;
+          //let this_icon_found =
+          //  this_icon_expanded_found && this_icon_minimized_found;
+          let this_icon_found = this_icon_minimized_found;
           if (mode === "Visible" && !this_icon_found) {
             // load icon shape
             let this_icon_shape = icon(payload[this_uuid]?.icon);
@@ -527,24 +528,24 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
             this_li.classList.add("action");
             this_li.classList.add("visible");
             ReactDOM.render(this_icon_shape, this_li);
-            iconsExpanded.appendChild(this_li);
+            //iconsExpanded.appendChild(this_li);
           } else if (mode === "Hidden" && this_icon_found) {
             this_icon_minimized.classList.remove("visible");
             this_icon_minimized.classList.add("hidden");
             setTimeout(function () {
               this_icon_minimized.parentNode.removeChild(this_icon_minimized);
             }, 1000);
-            this_icon_expanded.classList.add("hidden");
-            this_icon_expanded.classList.remove("visible");
-            setTimeout(function () {
-              this_icon_expanded.parentNode.removeChild(this_icon_expanded);
-            }, 1000);
+            //this_icon_expanded.classList.add("hidden");
+            //this_icon_expanded.classList.remove("visible");
+            //setTimeout(function () {
+            //  this_icon_expanded.parentNode.removeChild(this_icon_expanded);
+            //}, 1000);
           }
         }
       }
       // toggle default <> full class on icons lists depending on number of icons
       icon_count_min = iconsMinimized.getElementsByTagName("li").length;
-      icon_count_exp = iconsExpanded.getElementsByTagName("li").length;
+      //icon_count_exp = iconsExpanded.getElementsByTagName("li").length;
       if (icon_count_min > 4) {
         iconsMinimized.classList.remove("default");
         iconsMinimized.classList.add("full");
@@ -552,13 +553,13 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
         iconsMinimized.classList.remove("full");
         iconsMinimized.classList.add("default");
       }
-      if (icon_count_exp > 4) {
-        iconsExpanded.classList.remove("default");
-        iconsExpanded.classList.add("full");
-      } else {
-        iconsExpanded.classList.remove("full");
-        iconsExpanded.classList.add("default");
-      }
+      //if (icon_count_exp > 4) {
+      //  iconsExpanded.classList.remove("default");
+      //  iconsExpanded.classList.add("full");
+      //} else {
+      //  iconsExpanded.classList.remove("full");
+      //  iconsExpanded.classList.add("default");
+      //}
       break;
     default:
       return null;
