@@ -8,10 +8,9 @@ import { convertToBgImage } from "gbimage-bridge";
 import BackgroundImage from "gatsby-background-image";
 import Ajv from "ajv";
 import { v4 as uuidv4 } from "uuid";
-import { SvgPane, SvgModal } from "./shapes";
+import { SvgPane, SvgModal, icon, wordmark } from "./shapes";
 import { lispLexer } from "./lexer";
 import { tractStackFragmentSchema } from "./schema";
-import { icon } from "./icons";
 const viewportWidth = {
   mobile: 600,
   tablet: 1080,
@@ -64,14 +63,13 @@ const getScrollbarSize = () => {
 };
 
 const lispCallback = (payload, context = "", hookEndPoint) => {
-  let icon;
-  let lisp_data = payload[Object.keys(payload)[0]];
-  let command = (lisp_data && lisp_data[0]) || false;
+  let lispData = payload[Object.keys(payload)[0]];
+  let command = (lispData && lispData[0]) || false;
   let parameter_one, parameter_two, parameter_three;
-  if (lisp_data && typeof lisp_data[1] === "object") {
-    parameter_one = lisp_data[1][0] || false;
-    parameter_two = lisp_data[1][1] || false;
-    parameter_three = lisp_data[1][2] || false;
+  if (lispData && typeof lispData[1] === "object") {
+    parameter_one = lispData[1][0] || false;
+    parameter_two = lispData[1][1] || false;
+    parameter_three = lispData[1][2] || false;
   }
   // now process the command
   switch (command) {
@@ -481,9 +479,9 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
   let mode;
   switch (target) {
     case "icons-Visible":
-      mode = "Visible";
+      mode = "Visible"; // set icons and impressions to Visible
     case "icons-Hidden":
-      if (!mode) mode = "Hidden";
+      if (!mode) mode = "Hidden"; // set icons and impressions to Hidden then None
       // first load ul from dom
       let iconsMinimized = document.getElementById(
         "controller-minimized-icons"
@@ -509,6 +507,8 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
           if (mode === "Visible" && !this_icon_found) {
             // load icon shape
             let this_icon_shape = icon(payload[this_uuid]?.icon);
+            let this_icon_wordmark = wordmark(payload[this_uuid]?.wordmark);
+            console.log("todo", this_icon_wordmark);
             let this_li = document.createElement("li");
             this_li.id = `m-${this_uuid}`;
             this_li.title = payload[this_uuid]?.altTitle;
