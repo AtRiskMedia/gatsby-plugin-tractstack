@@ -508,10 +508,10 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
       let iconsMinimized = document.getElementById(
         "controller-minimized-icons"
       );
-      let impressionsExpanded = document.getElementById("controller-carousel");
+      //let impressionsExpanded = document.getElementById("controller-carousel");
       let icon_count = iconsMinimized.getElementsByTagName("li").length;
-      let impression_count =
-        impressionsExpanded.getElementsByTagName("div").length;
+      //let impression_count =
+      //  impressionsExpanded.getElementsByTagName("div").length;
       if (icon_count === 9) return null;
       for (const this_uuid in payload) {
         let payload_ast = lispLexer(payload[this_uuid]?.actionsLisp);
@@ -519,23 +519,23 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
           // does this icon/impression exist already?
           let this_icon = document.getElementById(`m-${this_uuid}`);
           let this_icon_found = typeof this_icon === "object" && this_icon;
-          let this_impression = document.getElementById(`${this_uuid}`);
-          let this_impression_found =
-            typeof this_impression === "object" && this_impression;
-          console.log(mode, this_impression_found, this_impression);
+          //let this_impression = document.getElementById(`${this_uuid}`);
+          //let this_impression_found =
+          //  typeof this_impression === "object" && this_impression;
+          /*
           // add this impression to carousel
           if (mode === "Visible") {
-            this_impression.classList.add("visible");
-            this_impression.classList.remove("hidden");
-            this_impression.classList.remove("none");
+            this_impression?.classList.add("visible");
+            this_impression?.classList.remove("hidden");
+            this_impression?.classList.remove("none");
           } else if (mode === "Hidden" && this_impression_found) {
-            this_impression.classList.add("hidden");
-            this_impression.classList.remove("visible");
+            this_impression?.classList.add("hidden");
+            this_impression?.classList.remove("visible");
             setTimeout(function () {
-              this_impression.classList.add("none");
+              this_impression?.classList.add("none");
             }, 1000);
           }
-
+*/
           // add this icon to container
           if (mode === "Visible" && !this_icon_found) {
             let this_icon_shape = icon(payload[this_uuid]?.icon);

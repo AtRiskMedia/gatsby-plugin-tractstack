@@ -2,19 +2,13 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import styled from "styled-components";
 import { Link } from "gatsby";
-import "keen-slider/keen-slider.min.css";
-import { useKeenSlider } from "keen-slider/react";
-import {
-  SvgShape,
-  SvgPlay,
-  SvgRewind,
-  TractStackLogo,
-  wordmark,
-} from "./shapes";
+import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
+import { ImpressionsCarousel } from "./impressions";
 
-function BuildController(data) {
+const BuildController = (data) => {
+  console.log(1, data?.visible);
   let next,
     prev,
     link,
@@ -104,87 +98,6 @@ function BuildController(data) {
   css = `${css} ${mask_css}`;
   let icons = `controller__icons controller__icons--${data?.viewport?.viewport?.key}`; // to-do
 
-  const [refCallback, slider, sliderNode] = useKeenSlider(
-    {
-      loop: true,
-      mode: "free-snap",
-
-      breakpoints: {
-        "(min-width: 601px)": {
-          slides: { perView: 3, spacing: 4 },
-        },
-        "(min-width: 1367px)": {
-          slides: { perView: 5, spacing: 6 },
-        },
-      },
-      slides: { perView: 2 },
-    },
-    [
-      (slider) => {
-        let timeout;
-        let mouseOver = false;
-        function clearNextTimeout() {
-          clearTimeout(timeout);
-        }
-        function nextTimeout() {
-          clearTimeout(timeout);
-          if (mouseOver) return;
-          timeout = setTimeout(() => {
-            slider.next();
-          }, 22000);
-        }
-        slider.on("created", () => {
-          slider.container.addEventListener("mouseover", () => {
-            mouseOver = true;
-            clearNextTimeout();
-          });
-          slider.container.addEventListener("mouseout", () => {
-            mouseOver = false;
-            nextTimeout();
-          });
-          nextTimeout();
-        });
-        slider.on("dragStarted", clearNextTimeout);
-        slider.on("animationEnded", nextTimeout);
-        slider.on("updated", nextTimeout);
-      },
-    ]
-  );
-
-  let impressionsRaw = data?.controller?.payload?.impressions;
-  let impressions = [];
-  Object.keys(impressionsRaw).forEach((pane) => {
-    Object.keys(impressionsRaw[pane]).forEach((paneFragment) => {
-      Object.keys(impressionsRaw[pane][paneFragment]).forEach(
-        (impression, index) => {
-          let this_impression = impressionsRaw[pane][paneFragment][impression];
-          let title;
-          if (typeof this_impression?.wordmark === "string")
-            title = wordmark(this_impression?.wordmark);
-          impressions.push(
-            <div className="keen-slider__slide a" key={index} id={impression}>
-              {title}
-              <span>
-                {impressionsRaw[pane][paneFragment][impression]?.headline}
-              </span>
-            </div>
-          );
-        }
-      );
-    });
-  });
-
-  let title = wordmark("tractstack");
-  impressions.push(
-    <div className="keen-slider__slide b" key="tractstack">
-      <span className="title">{title}</span>
-      <span className="headline">
-        Learning science powered product-market-fit finder for start-ups, brand
-        evangelists and community builders.
-      </span>
-      <span className="more">Read &gt;</span>
-    </div>
-  );
   return (
     <>
       <StyledWrapperDiv
@@ -203,13 +116,10 @@ function BuildController(data) {
           >
             <div>&lt;</div>
           </div>
-          <div
-            id="controller-carousel"
-            className="controller__container--carousel keen-slider"
-            ref={refCallback}
-          >
-            {impressions}
-          </div>
+          <ImpressionsCarousel
+            payload={data?.controller?.payload?.impressions}
+            visible={data?.viewport?.visible || {}}
+          />
         </div>
         <div
           id="controller-container-minimized"
@@ -229,6 +139,6 @@ function BuildController(data) {
       </StyledWrapperDiv>
     </>
   );
-}
+};
 
 export { BuildController };
