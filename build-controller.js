@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Link } from "gatsby";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
-import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
+import { SvgShape, SvgPlay, SvgRewind, TractStackLogo, wordmark } from "./shapes";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
 
@@ -125,6 +125,31 @@ function BuildController(data) {
     slider.on("animationEnded", nextTimeout);
     slider.on("updated", nextTimeout);
   }]);
+  let impressionsRaw = data?.controller?.payload?.impressions;
+  let impressionSlider,
+      impressions = [];
+  Object.keys(impressionsRaw).forEach(pane => {
+    Object.keys(impressionsRaw[pane]).forEach(paneFragment => {
+      Object.keys(impressionsRaw[pane][paneFragment]).forEach((impression, index) => {
+        let this_impression = impressionsRaw[pane][paneFragment][impression];
+        let title;
+        if (typeof this_impression?.wordmark === "string") title = wordmark(this_impression?.wordmark);
+        impressions.push( /*#__PURE__*/React.createElement("div", {
+          className: "keen-slider__slide a",
+          key: index
+        }, title, /*#__PURE__*/React.createElement("span", null, impressionsRaw[pane][paneFragment][impression]?.headline)));
+      });
+    });
+  });
+  let title = wordmark("tractstack");
+  impressions.push( /*#__PURE__*/React.createElement("div", {
+    className: "keen-slider__slide b",
+    key: "tractstack"
+  }, title, /*#__PURE__*/React.createElement("span", {
+    className: "headline"
+  }, "Learning science powered product-market-fit finder for brand evangelists and community builders."), /*#__PURE__*/React.createElement("span", {
+    className: "more"
+  }, "Read >")));
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css,
     key: data?.storyStep?.storyStepGraph?.current?.id,
@@ -139,18 +164,7 @@ function BuildController(data) {
   }, /*#__PURE__*/React.createElement("div", null, "<")), /*#__PURE__*/React.createElement("div", {
     className: "controller__container--carousel keen-slider",
     ref: refCallback
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "keen-slider__slide a"
-  }, "1"), /*#__PURE__*/React.createElement("div", {
-    className: "keen-slider__slide b"
-  }, "2"), /*#__PURE__*/React.createElement("div", {
-    className: "keen-slider__slide c"
-  }, "3")), /*#__PURE__*/React.createElement("div", {
-    className: icons
-  }, /*#__PURE__*/React.createElement("ul", {
-    className: icons,
-    id: "controller-expanded-icons"
-  }))), /*#__PURE__*/React.createElement("div", {
+  }, impressions)), /*#__PURE__*/React.createElement("div", {
     id: "controller-container-minimized",
     className: `controller__container--${data?.viewport?.viewport?.key}`
   }, /*#__PURE__*/React.createElement("div", {

@@ -4,7 +4,13 @@ import styled from "styled-components";
 import { Link } from "gatsby";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
-import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
+import {
+  SvgShape,
+  SvgPlay,
+  SvgRewind,
+  TractStackLogo,
+  wordmark,
+} from "./shapes";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
 
@@ -145,6 +151,41 @@ function BuildController(data) {
     ]
   );
 
+  let impressionsRaw = data?.controller?.payload?.impressions;
+  let impressionSlider,
+    impressions = [];
+
+  Object.keys(impressionsRaw).forEach((pane) => {
+    Object.keys(impressionsRaw[pane]).forEach((paneFragment) => {
+      Object.keys(impressionsRaw[pane][paneFragment]).forEach(
+        (impression, index) => {
+          let this_impression = impressionsRaw[pane][paneFragment][impression];
+          let title;
+          if (typeof this_impression?.wordmark === "string")
+            title = wordmark(this_impression?.wordmark);
+          impressions.push(
+            <div className="keen-slider__slide a" key={index}>
+              {title}
+              <span>
+                {impressionsRaw[pane][paneFragment][impression]?.headline}
+              </span>
+            </div>
+          );
+        }
+      );
+    });
+  });
+  let title = wordmark("tractstack");
+  impressions.push(
+    <div className="keen-slider__slide b" key="tractstack">
+      {title}
+      <span className="headline">
+        Learning science powered product-market-fit finder for brand evangelists
+        and community builders.
+      </span>
+      <span className="more">Read &gt;</span>
+    </div>
+  );
   return (
     <>
       <StyledWrapperDiv
@@ -167,12 +208,7 @@ function BuildController(data) {
             className="controller__container--carousel keen-slider"
             ref={refCallback}
           >
-            <div className="keen-slider__slide a">1</div>
-            <div className="keen-slider__slide b">2</div>
-            <div className="keen-slider__slide c">3</div>
-          </div>
-          <div className={icons}>
-            <ul className={icons} id="controller-expanded-icons"></ul>
+            {impressions}
           </div>
         </div>
         <div

@@ -508,7 +508,6 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
             // load icon shape
             let this_icon_shape = icon(payload[this_uuid]?.icon);
             let this_icon_wordmark = wordmark(payload[this_uuid]?.wordmark);
-            console.log("todo", this_icon_wordmark);
             let this_li = document.createElement("li");
             this_li.id = `m-${this_uuid}`;
             this_li.title = payload[this_uuid]?.altTitle;
