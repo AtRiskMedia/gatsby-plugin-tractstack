@@ -557,9 +557,6 @@ const wordmark = name => {
         id: "path20"
       })), /*#__PURE__*/React.createElement("g", {
         className: "st0",
-        id: "g24"
-      }), /*#__PURE__*/React.createElement("g", {
-        className: "st0",
         id: "g36"
       }, /*#__PURE__*/React.createElement("path", {
         className: "st1",

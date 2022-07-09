@@ -152,9 +152,7 @@ function BuildController(data) {
   );
 
   let impressionsRaw = data?.controller?.payload?.impressions;
-  let impressionSlider,
-    impressions = [];
-
+  let impressions = [];
   Object.keys(impressionsRaw).forEach((pane) => {
     Object.keys(impressionsRaw[pane]).forEach((paneFragment) => {
       Object.keys(impressionsRaw[pane][paneFragment]).forEach(
@@ -164,7 +162,7 @@ function BuildController(data) {
           if (typeof this_impression?.wordmark === "string")
             title = wordmark(this_impression?.wordmark);
           impressions.push(
-            <div className="keen-slider__slide a" key={index}>
+            <div className="keen-slider__slide a" key={index} id={impression}>
               {title}
               <span>
                 {impressionsRaw[pane][paneFragment][impression]?.headline}
@@ -175,13 +173,14 @@ function BuildController(data) {
       );
     });
   });
+
   let title = wordmark("tractstack");
   impressions.push(
     <div className="keen-slider__slide b" key="tractstack">
-      {title}
+      <span className="title">{title}</span>
       <span className="headline">
-        Learning science powered product-market-fit finder for brand evangelists
-        and community builders.
+        Learning science powered product-market-fit finder for start-ups, brand
+        evangelists and community builders.
       </span>
       <span className="more">Read &gt;</span>
     </div>
@@ -205,6 +204,7 @@ function BuildController(data) {
             <div>&lt;</div>
           </div>
           <div
+            id="controller-carousel"
             className="controller__container--carousel keen-slider"
             ref={refCallback}
           >

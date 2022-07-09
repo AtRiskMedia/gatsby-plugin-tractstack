@@ -126,8 +126,7 @@ function BuildController(data) {
     slider.on("updated", nextTimeout);
   }]);
   let impressionsRaw = data?.controller?.payload?.impressions;
-  let impressionSlider,
-      impressions = [];
+  let impressions = [];
   Object.keys(impressionsRaw).forEach(pane => {
     Object.keys(impressionsRaw[pane]).forEach(paneFragment => {
       Object.keys(impressionsRaw[pane][paneFragment]).forEach((impression, index) => {
@@ -136,7 +135,8 @@ function BuildController(data) {
         if (typeof this_impression?.wordmark === "string") title = wordmark(this_impression?.wordmark);
         impressions.push( /*#__PURE__*/React.createElement("div", {
           className: "keen-slider__slide a",
-          key: index
+          key: index,
+          id: impression
         }, title, /*#__PURE__*/React.createElement("span", null, impressionsRaw[pane][paneFragment][impression]?.headline)));
       });
     });
@@ -145,9 +145,11 @@ function BuildController(data) {
   impressions.push( /*#__PURE__*/React.createElement("div", {
     className: "keen-slider__slide b",
     key: "tractstack"
-  }, title, /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "title"
+  }, title), /*#__PURE__*/React.createElement("span", {
     className: "headline"
-  }, "Learning science powered product-market-fit finder for brand evangelists and community builders."), /*#__PURE__*/React.createElement("span", {
+  }, "Learning science powered product-market-fit finder for start-ups, brand evangelists and community builders."), /*#__PURE__*/React.createElement("span", {
     className: "more"
   }, "Read >")));
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
@@ -162,6 +164,7 @@ function BuildController(data) {
     onClick: () => injectPayloadMinimize(),
     title: "Minimize the Controller"
   }, /*#__PURE__*/React.createElement("div", null, "<")), /*#__PURE__*/React.createElement("div", {
+    id: "controller-carousel",
     className: "controller__container--carousel keen-slider",
     ref: refCallback
   }, impressions)), /*#__PURE__*/React.createElement("div", {
