@@ -13,6 +13,8 @@ import {
 import { SvgModals, SvgShape } from "./shapes";
 
 const ComposePanes = (data) => {
+  console.log("ComposePanes", data);
+
   // if viewport is not yet defined, return empty fragment
   if (typeof data?.viewport?.viewport?.key === "undefined") return <></>;
 

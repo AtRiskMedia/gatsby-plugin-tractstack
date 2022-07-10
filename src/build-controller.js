@@ -8,6 +8,7 @@ import { lispLexer } from "./lexer";
 import { ImpressionsCarousel } from "./impressions";
 
 const BuildController = (data) => {
+  console.log("BuildController");
   if (
     typeof data?.viewport?.viewport === "object" &&
     !data?.viewport?.viewport?.key
@@ -25,10 +26,6 @@ const BuildController = (data) => {
     effects_payload,
     controller_pane,
     controller_pane_minimized;
-  if (data?.storyStep?.storyStepGraph?.next?.field_slug)
-    next = `/${data?.storyStep?.storyStepGraph?.next?.field_slug}`;
-  if (data?.storyStep?.storyStepGraph?.previous?.field_slug)
-    prev = `/${data?.storyStep?.storyStepGraph?.previous?.field_slug}`;
   controller_pane = SvgShape("controller", {
     viewport: data?.viewport?.viewport,
   }).shape;
@@ -104,11 +101,7 @@ const BuildController = (data) => {
 
   return (
     <>
-      <StyledWrapperDiv
-        css={css}
-        key={data?.storyStep?.storyStepGraph?.current?.id}
-        id="controller-container"
-      >
+      <StyledWrapperDiv css={css} id="controller-container">
         <div
           id="controller-container-expanded"
           className={`controller__container--${data?.viewport?.viewport?.key}`}

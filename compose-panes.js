@@ -5,7 +5,8 @@ import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimatio
 import { SvgModals, SvgShape } from "./shapes";
 
 const ComposePanes = data => {
-  // if viewport is not yet defined, return empty fragment
+  console.log("ComposePanes", data); // if viewport is not yet defined, return empty fragment
+
   if (typeof data?.viewport?.viewport?.key === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {

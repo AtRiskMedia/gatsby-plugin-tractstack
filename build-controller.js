@@ -8,10 +8,9 @@ import { lispLexer } from "./lexer";
 import { ImpressionsCarousel } from "./impressions";
 
 const BuildController = data => {
+  console.log("BuildController");
   if (typeof data?.viewport?.viewport === "object" && !data?.viewport?.viewport?.key) return /*#__PURE__*/React.createElement(React.Fragment, null);
   let next, prev, link, svgString, b64, dataUri, css, mask_css, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
-  if (data?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.storyStep?.storyStepGraph?.next?.field_slug}`;
-  if (data?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.storyStep?.storyStepGraph?.previous?.field_slug}`;
   controller_pane = SvgShape("controller", {
     viewport: data?.viewport?.viewport
   }).shape;
@@ -76,7 +75,6 @@ const BuildController = data => {
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css,
-    key: data?.storyStep?.storyStepGraph?.current?.id,
     id: "controller-container"
   }, /*#__PURE__*/React.createElement("div", {
     id: "controller-container-expanded",
