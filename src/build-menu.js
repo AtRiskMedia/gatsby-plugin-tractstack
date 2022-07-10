@@ -19,7 +19,7 @@ function CountChildrenOffset(items, index = 0, level = 0) {
   }
 }
 
-function PreParseMenuItems(items, hookEndPoint) {
+function PreParseMenuItems(items, useHookEndPoint) {
   // pre-parses menu items and injects hooks, if any
   let options;
   return items?.map((e) => {
@@ -32,10 +32,10 @@ function PreParseMenuItems(items, hookEndPoint) {
     }
     if (typeof options?.callbackPayload === "string") {
       e.callbackPayload = options.callbackPayload;
-      e.hookEndPoint = hookEndPoint;
+      e.useHookEndPoint = useHookEndPoint;
     } else {
       e.callbackPayload = false;
-      e.hookEndPoint = false;
+      e.useHookEndPoint = false;
     }
     return e;
   });
@@ -46,7 +46,7 @@ function ParseMenuItems(items, index = 0, level = 0) {
   let recurse;
   let payload_ast = lispLexer(items[index]?.callbackPayload);
   function injectPayload() {
-    lispCallback(payload_ast[0], "", items[index]?.hookEndPoint);
+    lispCallback(payload_ast[0], "", items[index]?.useHookEndPoint);
   }
   let this_menu_item = (
     <a key={index} href="#" onClick={() => injectPayload()}>

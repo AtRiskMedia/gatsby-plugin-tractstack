@@ -59,7 +59,7 @@ const tractStackFragmentSchema = {
         modalData: {
           type: "object"
         },
-        hookEndPoint: {},
+        useHookEndPoint: {},
         paneData: {
           type: "object"
         }

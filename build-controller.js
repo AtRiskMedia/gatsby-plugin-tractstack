@@ -8,7 +8,7 @@ import { lispLexer } from "./lexer";
 import { ImpressionsCarousel } from "./impressions";
 
 const BuildController = data => {
-  console.log(1, data?.visible);
+  if (typeof data?.viewport?.viewport === "object" && !data?.viewport?.viewport?.key) return /*#__PURE__*/React.createElement(React.Fragment, null);
   let next, prev, link, svgString, b64, dataUri, css, mask_css, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
   if (data?.storyStep?.storyStepGraph?.next?.field_slug) next = `/${data?.storyStep?.storyStepGraph?.next?.field_slug}`;
   if (data?.storyStep?.storyStepGraph?.previous?.field_slug) prev = `/${data?.storyStep?.storyStepGraph?.previous?.field_slug}`;
@@ -48,13 +48,13 @@ const BuildController = data => {
   function injectPayloadMinimize() {
     let payload = "(controller (minimize))";
     let payload_ast = lispLexer(payload);
-    lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
+    lispCallback(payload_ast[0], "controller", data?.useHookEndPoint);
   }
 
   function injectPayloadExpand() {
     let payload = "(controller (expand))";
     let payload_ast = lispLexer(payload);
-    lispCallback(payload_ast[0], "controller", data?.hookEndPoint);
+    lispCallback(payload_ast[0], "controller", data?.useHookEndPoint);
   } // can we wrap this in animation?
 
 

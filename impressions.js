@@ -4,7 +4,6 @@ import { useKeenSlider } from "keen-slider/react";
 import { wordmark } from "./shapes";
 
 const ImpressionsCarousel = (payload, visible) => {
-  console.log(4, payload, visible);
   const [refCallback, slider, sliderNode] = useKeenSlider({
     loop: true,
     mode: "free-snap",
@@ -58,7 +57,7 @@ const ImpressionsCarousel = (payload, visible) => {
   }]);
   let impressions = [];
   let impressionsRaw = payload?.payload;
-  Object.keys(impressionsRaw).forEach(pane => {
+  if (impressionsRaw) Object.keys(impressionsRaw).forEach(pane => {
     Object.keys(impressionsRaw[pane]).forEach(paneFragment => {
       Object.keys(impressionsRaw[pane][paneFragment]).forEach((impression, index) => {
         let this_impression = impressionsRaw[pane][paneFragment][impression];

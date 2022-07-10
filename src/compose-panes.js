@@ -27,7 +27,7 @@ const ComposePanes = (data) => {
             viewport: data?.viewport,
             prefersReducedMotion: data?.prefersReducedMotion,
             payload: data?.payload,
-            hookEndPoint: data?.hookEndPoint,
+            useHookEndPoint: data?.useHookEndPoint,
           }}
         />
       );
@@ -44,19 +44,19 @@ const ComposedPane = (data) => {
   const viewport = data?.data?.viewport;
   const prefersReducedMotion = data?.data?.prefersReducedMotion;
   const payload = data?.data?.payload?.payload;
-  const hookEndPoint = data?.data?.hookEndPoint;
+  const useHookEndPoint = data?.data?.useHookEndPoint;
   // useInView hook
   const { observe, inView } = useInView({
     onEnter: ({}) => {
-      hookEndPoint("hookPaneVisible", pane?.id);
+      useHookEndPoint("hookPaneVisible", pane?.id);
     },
     onLeave: ({}) => {
-      hookEndPoint("hookPaneHidden", pane?.id);
+      useHookEndPoint("hookPaneHidden", pane?.id);
     },
   });
 
   let pane_css = "",
-    effects = [];
+    effects = {};
   let background_colour = pane?.relationships?.field_pane_fragments.filter(
     (e) => e?.internal?.type === "paragraph__background_colour"
   );
@@ -169,6 +169,7 @@ const ComposedPane = (data) => {
           } else if (shape && pane_fragment?.field_modal) {
             // this is a modal
             let options =
+                payload?.modal &&
                 payload?.modal[pane?.id][pane_fragment?.id][
                   viewport?.viewport?.key
                 ],
@@ -177,7 +178,7 @@ const ComposedPane = (data) => {
               this_shape,
               this_css,
               this_viewport;
-            if (Object.keys(options).length !== 0) {
+            if (options && Object.keys(options).length !== 0) {
               this_modal_payload = {
                 id: pane_fragment?.id,
                 mode: "modal",
@@ -305,11 +306,11 @@ const ComposedPane = (data) => {
       if (tempValue && Object.keys(tempValue).length) {
         for (const key in tempValue) {
           // store animation
-          effects[`fragment-${pane_fragment?.id}`] = tempValue[key];
-          effects[`fragment-${pane_fragment?.id}`][
-            "paneFragment"
-          ] = `fragment-${pane_fragment?.id}`;
-          effects[`fragment-${pane_fragment?.id}`]["pane"] = pane?.id;
+          effects[`fragment-${pane_fragment?.id}`] = {
+            pane: pane?.id,
+            paneFragment: `fragment-${pane_fragment?.id}`,
+            ...tempValue[key],
+          };
           // clone and store animation for modal (if any)
           if (
             pane_fragment?.internal?.type === "paragraph__modal" ||
@@ -374,7 +375,7 @@ const ComposedPane = (data) => {
         payload: {
           imageData: this_payload?.imageData || [],
           maskData: this_payload?.maskData || {},
-          hookEndPoint: hookEndPoint || {},
+          useHookEndPoint: useHookEndPoint || {},
           videoData: this_payload?.videoData || {},
           shapeData: this_payload?.shapeData || {},
           modalData: this_payload?.modalData || {},

@@ -62,7 +62,7 @@ const getScrollbarSize = () => {
   return 12;
 };
 
-const lispCallback = (payload, context = "", hookEndPoint) => {
+const lispCallback = (payload, context = "", useHookEndPoint) => {
   let lispData = payload[Object.keys(payload)[0]];
   let command = (lispData && lispData[0]) || false;
   let parameter_one, parameter_two, parameter_three;
@@ -77,7 +77,7 @@ const lispCallback = (payload, context = "", hookEndPoint) => {
       switch (parameter_one) {
         case "expand":
         case "minimize":
-          hookEndPoint("hookController", parameter_one);
+          useHookEndPoint("hookController", parameter_one);
           break;
       }
       break;
@@ -91,9 +91,9 @@ const lispCallback = (payload, context = "", hookEndPoint) => {
         parameter_one === "storyFragment" &&
         typeof parameter_two === "string"
       )
-        hookEndPoint("hookGotoStoryFragment", `/${parameter_two}`);
+        useHookEndPoint("hookGotoStoryFragment", `/${parameter_two}`);
       if (parameter_one === "pane" && typeof parameter_two === "string") {
-        hookEndPoint("hookSetCurrentPane", parameter_two);
+        useHookEndPoint("hookSetCurrentPane", parameter_two);
       }
       break;
 
@@ -176,7 +176,7 @@ const HtmlAstToReact = (fragment, element = false) => {
               lispCallback(
                 payload_ast[0],
                 "button",
-                fragment?.payload?.hookEndPoint
+                fragment?.payload?.useHookEndPoint
               );
             }
             return (
@@ -194,7 +194,7 @@ const HtmlAstToReact = (fragment, element = false) => {
           return (
             <a
               onClick={() =>
-                fragment?.payload?.hookEndPoint(
+                fragment?.payload?.useHookEndPoint(
                   "hookGotoStoryFragment",
                   e?.properties?.href
                 )
@@ -475,7 +475,7 @@ const InjectPaneFragment = (fragment, mode) => {
   }
 };
 
-const hookControllerEndPoint = (target, payload, hookEndPoint) => {
+const hookControllerEndPoint = (target, payload, useHookEndPoint) => {
   let mode;
   switch (target) {
     case "impression-Visible":
@@ -543,7 +543,7 @@ const hookControllerEndPoint = (target, payload, hookEndPoint) => {
             this_li.id = `m-${this_uuid}`;
             this_li.title = payload[this_uuid]?.altTitle;
             this_li.addEventListener("click", function () {
-              lispCallback(payload_ast[0], "", hookEndPoint);
+              lispCallback(payload_ast[0], "", useHookEndPoint);
             });
             this_li.classList.add("action");
             this_li.classList.add("visible");
