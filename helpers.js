@@ -274,7 +274,8 @@ const PaneFragment = (id, child, css) => {
 const InjectSvgModal = (shape, options) => {
   // react fragment, not tractStackFragment
   let this_id = `${options?.id}-svg-modal`;
-  let css = `svg { width: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.width}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.padding_left}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${options?.viewport?.width} * ${options?.padding_top}); ` + `z-index: ${options?.z_index - 2}; ` + `}`;
+  let this_width = viewportWidth[options?.viewportKey];
+  let css = `svg { width: calc((100vw - (var(--offset) * 1px)) / ${this_width} * ${options?.width}); ` + `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_width} * ${options?.padding_left}); ` + `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_width} * ${options?.padding_top}); ` + `z-index: ${options?.z_index - 2}; ` + `}`;
   let fragment = PaneFragment(this_id, shape, css);
   return /*#__PURE__*/React.createElement("div", {
     className: "paneFragmentModal"

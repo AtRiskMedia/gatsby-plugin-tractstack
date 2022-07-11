@@ -8,12 +8,9 @@ import { lispLexer } from "./lexer";
 import { ImpressionsCarousel } from "./impressions";
 
 const BuildController = (data) => {
-  console.log("BuildController");
-  if (
-    typeof data?.viewport?.viewport === "object" &&
-    !data?.viewport?.viewport?.key
-  )
-    return <></>;
+  console.log("BuildController", data);
+  let viewportKey = data?.viewportKey;
+  if (viewportKey === "none") return <></>;
   let next,
     prev,
     link,
@@ -27,10 +24,10 @@ const BuildController = (data) => {
     controller_pane,
     controller_pane_minimized;
   controller_pane = SvgShape("controller", {
-    viewport: data?.viewport?.viewport,
+    viewportKey: viewportKey,
   }).shape;
   controller_pane_minimized = SvgShape("mini", {
-    viewport: data?.viewport?.viewport,
+    viewportKey: viewportKey,
   }).shape;
 
   svgString = renderToStaticMarkup(controller_pane_minimized);
@@ -97,14 +94,14 @@ const BuildController = (data) => {
     css = `${animateController} ${animateControllerExpand} ${animateControllerMinimize}`;
   }
   css = `${css} ${mask_css}`;
-  let icons = `controller__icons controller__icons--${data?.viewport?.viewport?.key}`; // to-do
+  let icons = `controller__icons controller__icons--${viewportKey}`; // to-do
 
   return (
     <>
       <StyledWrapperDiv css={css} id="controller-container">
         <div
           id="controller-container-expanded"
-          className={`controller__container--${data?.viewport?.viewport?.key}`}
+          className={`controller__container--${viewportKey}`}
         >
           <div
             className="controller__container--minimize"
@@ -115,12 +112,12 @@ const BuildController = (data) => {
           </div>
           <ImpressionsCarousel
             payload={data?.controller?.payload?.impressions}
-            visible={data?.viewport?.visible || {}}
+            activePanes={data?.viewport?.activePanes}
           />
         </div>
         <div
           id="controller-container-minimized"
-          className={`controller__container--${data?.viewport?.viewport?.key}`}
+          className={`controller__container--${viewportKey}`}
         >
           <div className={icons}>
             <ul id="controller-minimized-icons"></ul>

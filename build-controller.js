@@ -8,14 +8,15 @@ import { lispLexer } from "./lexer";
 import { ImpressionsCarousel } from "./impressions";
 
 const BuildController = data => {
-  console.log("BuildController");
-  if (typeof data?.viewport?.viewport === "object" && !data?.viewport?.viewport?.key) return /*#__PURE__*/React.createElement(React.Fragment, null);
+  console.log("BuildController", data);
+  let viewportKey = data?.viewportKey;
+  if (viewportKey === "none") return /*#__PURE__*/React.createElement(React.Fragment, null);
   let next, prev, link, svgString, b64, dataUri, css, mask_css, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
   controller_pane = SvgShape("controller", {
-    viewport: data?.viewport?.viewport
+    viewportKey: viewportKey
   }).shape;
   controller_pane_minimized = SvgShape("mini", {
-    viewport: data?.viewport?.viewport
+    viewportKey: viewportKey
   }).shape;
   svgString = renderToStaticMarkup(controller_pane_minimized);
   b64 = window.btoa(svgString);
@@ -71,24 +72,24 @@ const BuildController = data => {
   }
 
   css = `${css} ${mask_css}`;
-  let icons = `controller__icons controller__icons--${data?.viewport?.viewport?.key}`; // to-do
+  let icons = `controller__icons controller__icons--${viewportKey}`; // to-do
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css,
     id: "controller-container"
   }, /*#__PURE__*/React.createElement("div", {
     id: "controller-container-expanded",
-    className: `controller__container--${data?.viewport?.viewport?.key}`
+    className: `controller__container--${viewportKey}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "controller__container--minimize",
     onClick: () => injectPayloadMinimize(),
     title: "Minimize the Controller"
   }, /*#__PURE__*/React.createElement("div", null, "<")), /*#__PURE__*/React.createElement(ImpressionsCarousel, {
     payload: data?.controller?.payload?.impressions,
-    visible: data?.viewport?.visible || {}
+    activePanes: data?.viewport?.activePanes
   })), /*#__PURE__*/React.createElement("div", {
     id: "controller-container-minimized",
-    className: `controller__container--${data?.viewport?.viewport?.key}`
+    className: `controller__container--${viewportKey}`
   }, /*#__PURE__*/React.createElement("div", {
     className: icons
   }, /*#__PURE__*/React.createElement("ul", {

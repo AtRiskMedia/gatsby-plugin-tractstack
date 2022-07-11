@@ -281,14 +281,17 @@ function SvgShape(layout, options) {
   let mode = false,
     shapeData = {},
     viewport,
+    viewportKey,
+    this_width,
     textShapeOutside = false,
     shape;
   let this_id = uuidv4();
   if (options?.mode && typeof options?.mode === "string") {
     mode = options?.mode;
   }
-  if (options?.viewport && typeof options?.viewport === "object") {
-    viewport = options?.viewport;
+  if (options?.viewportKey && typeof options?.viewportKey === "string") {
+    viewportKey = options?.viewportKey;
+    this_width = viewportWidth[viewportKey];
   }
   if (
     options?.textShapeOutside &&
@@ -297,7 +300,7 @@ function SvgShape(layout, options) {
     textShapeOutside = true;
   }
   if (!mode) {
-    shape = SvgPanes[layout][viewport?.key];
+    shape = SvgPanes[layout][viewportKey];
   } else if (mode === "modal") {
     shape = SvgModals[layout];
   } else {
@@ -305,11 +308,11 @@ function SvgShape(layout, options) {
   }
   if (!shape) return null;
 
-  let this_className = `svg svg__${layout} svg__${layout}--${viewport?.key}`;
+  let this_className = `svg svg__${layout} svg__${layout}--${viewportKey}`;
   shapeData.shape = (
     <svg
       id={`svg__${this_id}`}
-      data-name={`svg__${layout}--${viewport?.key}`}
+      data-name={`svg__${layout}--${viewportKey}`}
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 ${shape["viewBox"][0]} ${shape["viewBox"][1]}`}
       className={this_className}
@@ -335,31 +338,31 @@ function SvgShape(layout, options) {
         cut + padding_left
       } ${pane_height}`;
       viewBox.right = `${cut} ${-padding_top} ${
-        viewport?.width - (width - cut + padding_left)
+        this_width - (width - cut + padding_left)
       } ${pane_height}`;
       viewBox.left_mask = `${-padding_left} ${-padding_top} ${
         cut + padding_left
       } ${pane_height}`;
       viewBox.right_mask = `${cut} ${-padding_top} ${
-        viewport?.width - (width - cut + padding_left)
+        this_width - (width - cut + padding_left)
       } ${pane_height}`;
-      viewBox.right_mask_width = viewport?.width - (width - cut + padding_left);
+      viewBox.right_mask_width = this_width - (width - cut + padding_left);
     } else {
       viewBox.left = `0 0 ${cut} ${width}`;
       viewBox.right = `${cut} 0 ${width - cut} ${height}`;
       viewBox.left_mask = `0 0 ${cut} ${height}`;
       viewBox.right_mask = `${cut} 0 ${width - cut} ${height}`;
-      viewBox.right_mask_width = viewport?.width - cut;
+      viewBox.right_mask_width = this_width - cut;
     }
     shapeData.left = (
       <svg
         id={`svg__${this_id}--shape-outside-left`}
-        data-name={`svg-shape-outside__${layout}--${viewport?.key}`}
+        data-name={`svg-shape-outside__${layout}--${viewportKey}`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox={viewBox.left}
         className={
           `svg svg-shape-outside svg-shape-outside-left svg-shape-outside__${layout}-left ` +
-          `svg-shape-outside__${layout}-left--${viewport?.key}`
+          `svg-shape-outside__${layout}-left--${viewportKey}`
         }
       >
         <desc id="desc">decorative background</desc>
@@ -371,12 +374,12 @@ function SvgShape(layout, options) {
     shapeData.right = (
       <svg
         id={`svg__${this_id}--shape-outside-right`}
-        data-name={`svg-shape-outside__${layout}--${viewport?.key}`}
+        data-name={`svg-shape-outside__${layout}--${viewportKey}`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox={viewBox.right}
         className={
           `svg svg-shape-outside svg-shape-outside-right svg-shape-outside__${layout}-right ` +
-          `svg-shape-outside__${layout}-right--${viewport?.key}`
+          `svg-shape-outside__${layout}-right--${viewportKey}`
         }
       >
         <desc id="desc">decorative background</desc>
@@ -388,10 +391,10 @@ function SvgShape(layout, options) {
     let left_mask = (
       <svg
         id={`svg__${this_id}--shape-outside-left-mask`}
-        data-name={`svg-shape-outside-mask__${layout}-left--${viewport?.key}`}
+        data-name={`svg-shape-outside-mask__${layout}-left--${viewportKey}`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox={viewBox.left_mask}
-        className={`svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewport?.key} svg-shape-outside__${layout}-left--${viewport?.key}`}
+        className={`svg svg-shape-outside svg-shape-outside__${layout}-left svg-shape-outside__${layout}--${viewportKey} svg-shape-outside__${layout}-left--${viewportKey}`}
       >
         <desc id="desc">decorative background</desc>
         <mask id={`svg__${this_id}--shape-outside-left-mask-cutout`}>
@@ -418,10 +421,10 @@ function SvgShape(layout, options) {
     let right_mask = (
       <svg
         id={`svg__${this_id}--shape-outside-right-mask`}
-        data-name={`svg-shape-outside-mask__${layout}-right--${viewport?.key}`}
+        data-name={`svg-shape-outside-mask__${layout}-right--${viewportKey}`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox={viewBox.right_mask}
-        className={`svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewport?.key} svg-shape-outside__${layout}-right--${viewport?.key}`}
+        className={`svg svg-shape-outside svg-shape-outside__${layout}-right svg-shape-outside__${layout}--${viewportKey} svg-shape-outside__${layout}-right--${viewportKey}`}
       >
         <desc id="desc">decorative background</desc>
         <mask id={`svg__${this_id}--shape-outside-right-mask-cutout`}>

@@ -3,7 +3,7 @@ import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import { wordmark } from "./shapes";
 
-const ImpressionsCarousel = (payload, visible) => {
+const ImpressionsCarousel = (props) => {
   const [refCallback, slider, sliderNode] = useKeenSlider(
     {
       loop: true,
@@ -50,30 +50,34 @@ const ImpressionsCarousel = (payload, visible) => {
       },
     ]
   );
-
   let impressions = [];
-  let impressionsRaw = payload?.payload;
+  let impressionsRaw = props?.payload;
   if (impressionsRaw)
     Object.keys(impressionsRaw).forEach((pane) => {
-      Object.keys(impressionsRaw[pane]).forEach((paneFragment) => {
-        Object.keys(impressionsRaw[pane][paneFragment]).forEach(
-          (impression, index) => {
-            let this_impression =
-              impressionsRaw[pane][paneFragment][impression];
-            let title;
-            if (typeof this_impression?.wordmark === "string")
-              title = wordmark(this_impression?.wordmark);
-            impressions.push(
-              <div className="keen-slider__slide a" key={index} id={impression}>
-                {title}
-                <span>
-                  {impressionsRaw[pane][paneFragment][impression]?.headline}
-                </span>
-              </div>
-            );
-          }
-        );
-      });
+      if (props?.activePanes?.includes(pane))
+        Object.keys(impressionsRaw[pane]).forEach((paneFragment) => {
+          Object.keys(impressionsRaw[pane][paneFragment]).forEach(
+            (impression, index) => {
+              let this_impression =
+                impressionsRaw[pane][paneFragment][impression];
+              let title;
+              if (typeof this_impression?.wordmark === "string")
+                title = wordmark(this_impression?.wordmark);
+              impressions.push(
+                <div
+                  className="keen-slider__slide a"
+                  key={index}
+                  id={impression}
+                >
+                  {title}
+                  <span>
+                    {impressionsRaw[pane][paneFragment][impression]?.headline}
+                  </span>
+                </div>
+              );
+            }
+          );
+        });
     });
 
   let title = wordmark("tractstack");
