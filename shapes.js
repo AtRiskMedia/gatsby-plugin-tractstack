@@ -1,6 +1,5 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { v4 as uuidv4 } from "uuid";
 import { viewportWidth } from "./helpers";
 const SvgPanes = {
   mini: {
@@ -283,7 +282,6 @@ function SvgShape(layout, options) {
       this_width,
       textShapeOutside = false,
       shape;
-  let this_id = uuidv4();
 
   if (options?.mode && typeof options?.mode === "string") {
     mode = options?.mode;
@@ -309,7 +307,7 @@ function SvgShape(layout, options) {
   if (!shape) return null;
   let this_className = `svg svg__${layout} svg__${layout}--${viewportKey}`;
   shapeData.shape = /*#__PURE__*/React.createElement("svg", {
-    id: `svg__${this_id}`,
+    id: `svg__${options?.id}`,
     "data-name": `svg__${layout}--${viewportKey}`,
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: `0 0 ${shape["viewBox"][0]} ${shape["viewBox"][1]}`,
@@ -319,7 +317,7 @@ function SvgShape(layout, options) {
   }, "decorative background"), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
     d: shape["path"]
   })));
-  shapeData.id = this_id;
+  shapeData.id = options?.id;
 
   if (textShapeOutside) {
     let width = parseInt(shape["viewBox"][0]);
@@ -345,7 +343,7 @@ function SvgShape(layout, options) {
     }
 
     shapeData.left = /*#__PURE__*/React.createElement("svg", {
-      id: `svg__${this_id}--shape-outside-left`,
+      id: `svg__${options?.id}--shape-outside-left`,
       "data-name": `svg-shape-outside__${layout}--${viewportKey}`,
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: viewBox.left,
@@ -356,7 +354,7 @@ function SvgShape(layout, options) {
       d: shape["path"]
     })));
     shapeData.right = /*#__PURE__*/React.createElement("svg", {
-      id: `svg__${this_id}--shape-outside-right`,
+      id: `svg__${options?.id}--shape-outside-right`,
       "data-name": `svg-shape-outside__${layout}--${viewportKey}`,
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: viewBox.right,
@@ -367,7 +365,7 @@ function SvgShape(layout, options) {
       d: shape["path"]
     })));
     let left_mask = /*#__PURE__*/React.createElement("svg", {
-      id: `svg__${this_id}--shape-outside-left-mask`,
+      id: `svg__${options?.id}--shape-outside-left-mask`,
       "data-name": `svg-shape-outside-mask__${layout}-left--${viewportKey}`,
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: viewBox.left_mask,
@@ -375,7 +373,7 @@ function SvgShape(layout, options) {
     }, /*#__PURE__*/React.createElement("desc", {
       id: "desc"
     }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
-      id: `svg__${this_id}--shape-outside-left-mask-cutout`
+      id: `svg__${options?.id}--shape-outside-left-mask-cutout`
     }, /*#__PURE__*/React.createElement("rect", {
       fill: "white",
       x: -padding_left,
@@ -385,14 +383,14 @@ function SvgShape(layout, options) {
     }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
       d: shape["path"]
     }))), /*#__PURE__*/React.createElement("rect", {
-      mask: `url(#svg__${this_id}--shape-outside-left-mask-cutout)`,
+      mask: `url(#svg__${options?.id}--shape-outside-left-mask-cutout)`,
       x: -padding_left,
       y: -padding_top,
       width: cut + padding_left,
       height: pane_height
     }));
     let right_mask = /*#__PURE__*/React.createElement("svg", {
-      id: `svg__${this_id}--shape-outside-right-mask`,
+      id: `svg__${options?.id}--shape-outside-right-mask`,
       "data-name": `svg-shape-outside-mask__${layout}-right--${viewportKey}`,
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: viewBox.right_mask,
@@ -400,7 +398,7 @@ function SvgShape(layout, options) {
     }, /*#__PURE__*/React.createElement("desc", {
       id: "desc"
     }, "decorative background"), /*#__PURE__*/React.createElement("mask", {
-      id: `svg__${this_id}--shape-outside-right-mask-cutout`
+      id: `svg__${options?.id}--shape-outside-right-mask-cutout`
     }, /*#__PURE__*/React.createElement("rect", {
       fill: "white",
       x: cut,
@@ -410,7 +408,7 @@ function SvgShape(layout, options) {
     }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
       d: shape["path"]
     }))), /*#__PURE__*/React.createElement("rect", {
-      mask: `url(#svg__${this_id}--shape-outside-right-mask-cutout)`,
+      mask: `url(#svg__${options?.id}--shape-outside-right-mask-cutout)`,
       x: cut,
       y: -padding_top,
       width: viewBox.right_mask_width,

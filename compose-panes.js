@@ -5,8 +5,7 @@ import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimatio
 import { SvgModals, SvgShape } from "./shapes";
 
 const ComposePanes = data => {
-  console.log("ComposePanes", data); // if viewport is not yet defined, return empty fragment
-
+  // if viewport is not yet defined, return empty fragment
   if (data?.viewportKey === "none") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
   const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
@@ -90,7 +89,8 @@ const ComposedPane = data => {
     if (typeof shape === "string" && shape !== "none") {
       let this_options = {
         viewportKey: viewportKey,
-        pane_height: pane_height
+        pane_height: pane_height,
+        id: `${pane_fragment?.id}-${viewportKey}`
       };
       let tempValue = SvgShape(shape, this_options);
       if (tempValue) shape = tempValue.shape;
@@ -125,7 +125,8 @@ const ComposedPane = data => {
             let this_options = {
               textShapeOutside: true,
               viewportKey: viewportKey,
-              pane_height: pane_height
+              pane_height: pane_height,
+              id: `${pane_fragment?.id}-${viewportKey}`
             };
             tempValue = SvgShape(shape, this_options);
             if (tempValue) this_payload.maskData = {
@@ -144,7 +145,7 @@ const ComposedPane = data => {
 
           if (options && Object.keys(options).length !== 0) {
             this_modal_payload = {
-              id: pane_fragment?.id,
+              id: `${pane_fragment?.id}-${viewportKey}`,
               mode: "modal",
               textShapeOutside: true,
               viewportKey: viewportKey,
@@ -194,7 +195,8 @@ const ComposedPane = data => {
         });
         let this_options = {
           viewportKey: viewportKey,
-          pane_height: pane_height
+          pane_height: pane_height,
+          id: `${pane_fragment?.id}-${viewportKey}`
         };
         tempValue = SvgShape(shape, this_options);
         if (tempValue) this_payload.shapeData = tempValue.shape;

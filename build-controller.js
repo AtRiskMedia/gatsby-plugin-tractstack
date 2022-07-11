@@ -8,14 +8,15 @@ import { lispLexer } from "./lexer";
 import { ImpressionsCarousel } from "./impressions";
 
 const BuildController = data => {
-  console.log("BuildController", data);
   let viewportKey = data?.viewportKey;
   if (viewportKey === "none") return /*#__PURE__*/React.createElement(React.Fragment, null);
   let next, prev, link, svgString, b64, dataUri, css, mask_css, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
   controller_pane = SvgShape("controller", {
+    id: `svg-controller-${viewportKey}`,
     viewportKey: viewportKey
   }).shape;
   controller_pane_minimized = SvgShape("mini", {
+    id: `svg-controller-mini-${viewportKey}`,
     viewportKey: viewportKey
   }).shape;
   svgString = renderToStaticMarkup(controller_pane_minimized);

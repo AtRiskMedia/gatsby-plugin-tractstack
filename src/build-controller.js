@@ -8,7 +8,6 @@ import { lispLexer } from "./lexer";
 import { ImpressionsCarousel } from "./impressions";
 
 const BuildController = (data) => {
-  console.log("BuildController", data);
   let viewportKey = data?.viewportKey;
   if (viewportKey === "none") return <></>;
   let next,
@@ -24,9 +23,11 @@ const BuildController = (data) => {
     controller_pane,
     controller_pane_minimized;
   controller_pane = SvgShape("controller", {
+    id: `svg-controller-${viewportKey}`,
     viewportKey: viewportKey,
   }).shape;
   controller_pane_minimized = SvgShape("mini", {
+    id: `svg-controller-mini-${viewportKey}`,
     viewportKey: viewportKey,
   }).shape;
 
