@@ -1,7 +1,41 @@
 import React from "react";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
-import { wordmark } from "./shapes";
+import { wordmark, icon } from "./shapes";
+import { lispLexer } from "./lexer";
+import { lispCallback } from "./helpers";
+
+const ImpressionsIcons = props => {
+  let iconsContainer = `controller__icons controller__icons--${props?.viewportKey}`,
+      iconsMode,
+      icons = [];
+  let impressionsRaw = props?.payload;
+  if (impressionsRaw) Object.keys(impressionsRaw).forEach(pane => {
+    if (props?.activePanes?.includes(pane)) Object.keys(impressionsRaw[pane]).forEach(paneFragment => {
+      Object.keys(impressionsRaw[pane][paneFragment]).forEach((impression, index) => {
+        let this_impression = impressionsRaw[pane][paneFragment][impression];
+        let this_icon = icon(this_impression?.icon);
+
+        function injectPayload() {
+          let payload_ast = lispLexer(this_impression?.actionsLisp);
+          lispCallback(payload_ast[0], "", props?.useHookEndPoint);
+        }
+
+        icons.push( /*#__PURE__*/React.createElement("li", {
+          key: index,
+          className: "action visible",
+          onClick: () => injectPayload()
+        }, this_icon));
+      });
+    });
+  });
+  if (icons.length <= 4) iconsMode = "default";else iconsMode = "full";
+  return /*#__PURE__*/React.createElement("div", {
+    className: iconsContainer
+  }, /*#__PURE__*/React.createElement("ul", {
+    className: iconsMode
+  }, icons));
+};
 
 const ImpressionsCarousel = props => {
   const [refCallback, slider, sliderNode] = useKeenSlider({
@@ -89,5 +123,5 @@ const ImpressionsCarousel = props => {
   }, impressions);
 };
 
-export { ImpressionsCarousel };
+export { ImpressionsCarousel, ImpressionsIcons };
 //# sourceMappingURL=impressions.js.map

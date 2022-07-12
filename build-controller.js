@@ -5,7 +5,7 @@ import { Link } from "gatsby";
 import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
-import { ImpressionsCarousel } from "./impressions";
+import { ImpressionsCarousel, ImpressionsIcons } from "./impressions";
 
 const BuildController = data => {
   let viewportKey = data?.viewportKey;
@@ -27,24 +27,6 @@ const BuildController = data => {
   b64 = window.btoa(svgString);
   dataUri = `data:image/svg+xml;base64,${b64}`;
   mask_css = `${mask_css} #controller-container-expanded {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` + ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
-  /*
-  <div className="controller__graph">
-    {next ? (
-      <a onClick={() => data?.hooks?.hookGotoStoryFragment(next)}>
-        <SvgPlay />
-      </a>
-    ) : (
-      ""
-    )}
-    {prev ? (
-      <a onClick={() => data?.hooks?.hookGotoStoryFragment(prev)}>
-        <SvgRewind />
-      </a>
-    ) : (
-      ""
-    )}
-  </div>
-  */
 
   function injectPayloadMinimize() {
     let payload = "(controller (minimize))";
@@ -73,8 +55,6 @@ const BuildController = data => {
   }
 
   css = `${css} ${mask_css}`;
-  let icons = `controller__icons controller__icons--${viewportKey}`; // to-do
-
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css,
     id: "controller-container"
@@ -87,15 +67,18 @@ const BuildController = data => {
     title: "Minimize the Controller"
   }, /*#__PURE__*/React.createElement("div", null, "<")), /*#__PURE__*/React.createElement(ImpressionsCarousel, {
     payload: data?.controller?.payload?.impressions,
-    activePanes: data?.viewport?.activePanes
+    activePanes: data?.controller?.activePanes,
+    useHookEndPoint: data?.useHookEndPoint,
+    viewportKey: viewportKey
   })), /*#__PURE__*/React.createElement("div", {
     id: "controller-container-minimized",
     className: `controller__container--${viewportKey}`
-  }, /*#__PURE__*/React.createElement("div", {
-    className: icons
-  }, /*#__PURE__*/React.createElement("ul", {
-    id: "controller-minimized-icons"
-  })), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(ImpressionsIcons, {
+    payload: data?.controller?.payload?.impressions,
+    activePanes: data?.controller?.activePanes,
+    useHookEndPoint: data?.useHookEndPoint,
+    viewportKey: viewportKey
+  }), /*#__PURE__*/React.createElement("div", {
     className: "controller__container--expand",
     onClick: () => injectPayloadExpand(),
     title: "Toggle Full Controller"

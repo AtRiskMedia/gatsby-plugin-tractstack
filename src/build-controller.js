@@ -5,7 +5,7 @@ import { Link } from "gatsby";
 import { SvgShape, SvgPlay, SvgRewind, TractStackLogo } from "./shapes";
 import { lispCallback, StyledWrapperDiv, InjectCssAnimation } from "./helpers";
 import { lispLexer } from "./lexer";
-import { ImpressionsCarousel } from "./impressions";
+import { ImpressionsCarousel, ImpressionsIcons } from "./impressions";
 
 const BuildController = (data) => {
   let viewportKey = data?.viewportKey;
@@ -45,30 +45,11 @@ const BuildController = (data) => {
     `${mask_css} #controller-container-expanded {-webkit-mask-image: url("${dataUri}"); mask-image: url("${dataUri}");` +
     ` mask-repeat: no-repeat; -webkit-mask-size: 100% AUTO; mask-size: 100% AUTO; }`;
 
-  /*
-  <div className="controller__graph">
-    {next ? (
-      <a onClick={() => data?.hooks?.hookGotoStoryFragment(next)}>
-        <SvgPlay />
-      </a>
-    ) : (
-      ""
-    )}
-    {prev ? (
-      <a onClick={() => data?.hooks?.hookGotoStoryFragment(prev)}>
-        <SvgRewind />
-      </a>
-    ) : (
-      ""
-    )}
-  </div>
-  */
   function injectPayloadMinimize() {
     let payload = "(controller (minimize))";
     let payload_ast = lispLexer(payload);
     lispCallback(payload_ast[0], "controller", data?.useHookEndPoint);
   }
-
   function injectPayloadExpand() {
     let payload = "(controller (expand))";
     let payload_ast = lispLexer(payload);
@@ -94,8 +75,8 @@ const BuildController = (data) => {
     );
     css = `${animateController} ${animateControllerExpand} ${animateControllerMinimize}`;
   }
+
   css = `${css} ${mask_css}`;
-  let icons = `controller__icons controller__icons--${viewportKey}`; // to-do
 
   return (
     <>
@@ -113,16 +94,21 @@ const BuildController = (data) => {
           </div>
           <ImpressionsCarousel
             payload={data?.controller?.payload?.impressions}
-            activePanes={data?.viewport?.activePanes}
+            activePanes={data?.controller?.activePanes}
+            useHookEndPoint={data?.useHookEndPoint}
+            viewportKey={viewportKey}
           />
         </div>
         <div
           id="controller-container-minimized"
           className={`controller__container--${viewportKey}`}
         >
-          <div className={icons}>
-            <ul id="controller-minimized-icons"></ul>
-          </div>
+          <ImpressionsIcons
+            payload={data?.controller?.payload?.impressions}
+            activePanes={data?.controller?.activePanes}
+            useHookEndPoint={data?.useHookEndPoint}
+            viewportKey={viewportKey}
+          />
           <div
             className="controller__container--expand"
             onClick={() => injectPayloadExpand()}

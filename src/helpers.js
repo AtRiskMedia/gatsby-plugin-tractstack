@@ -475,105 +475,6 @@ const InjectPaneFragment = (fragment, mode) => {
   }
 };
 
-const hookControllerEndPoint = (target, payload, useHookEndPoint) => {
-  let mode;
-  switch (target) {
-    case "impression-Visible":
-      mode = "Visible"; // set icons and impressions to Visible
-    case "impression-Hidden":
-      if (!mode) mode = "Hidden"; // set icons and impressions to Hidden then None
-      /*
-  Object.keys(impressionsRaw).forEach((pane) => {
-    Object.keys(impressionsRaw[pane]).forEach((paneFragment) => {
-      Object.keys(impressionsRaw[pane][paneFragment]).forEach(
-        (impression, index) => {
-          let this_impression = impressionsRaw[pane][paneFragment][impression];
-          let title;
-          if (typeof this_impression?.wordmark === "string")
-            title = wordmark(this_impression?.wordmark);
-          impressions.push(
-            <div className="keen-slider__slide a" key={index}>
-              {title}
-              <span>
-                {impressionsRaw[pane][paneFragment][impression]?.headline}
-              </span>
-            </div>
-          );
-        }
-      );
-    });
-  });
-  */
-      // first load ul from dom
-      let iconsMinimized = document.getElementById(
-        "controller-minimized-icons"
-      );
-      //let impressionsExpanded = document.getElementById("controller-carousel");
-      let icon_count = iconsMinimized.getElementsByTagName("li").length;
-      //let impression_count =
-      //  impressionsExpanded.getElementsByTagName("div").length;
-      if (icon_count === 9) return null;
-      for (const this_uuid in payload) {
-        let payload_ast = lispLexer(payload[this_uuid]?.actionsLisp);
-        if (payload_ast && payload_ast[0]) {
-          // does this icon/impression exist already?
-          let this_icon = document.getElementById(`m-${this_uuid}`);
-          let this_icon_found = typeof this_icon === "object" && this_icon;
-          //let this_impression = document.getElementById(`${this_uuid}`);
-          //let this_impression_found =
-          //  typeof this_impression === "object" && this_impression;
-          /*
-          // add this impression to carousel
-          if (mode === "Visible") {
-            this_impression?.classList.add("visible");
-            this_impression?.classList.remove("hidden");
-            this_impression?.classList.remove("none");
-          } else if (mode === "Hidden" && this_impression_found) {
-            this_impression?.classList.add("hidden");
-            this_impression?.classList.remove("visible");
-            setTimeout(function () {
-              this_impression?.classList.add("none");
-            }, 1000);
-          }
-*/
-          // add this icon to container
-          if (mode === "Visible" && !this_icon_found) {
-            let this_icon_shape = icon(payload[this_uuid]?.icon);
-            let this_li = document.createElement("li");
-            this_li.id = `m-${this_uuid}`;
-            this_li.title = payload[this_uuid]?.altTitle;
-            this_li.addEventListener("click", function () {
-              lispCallback(payload_ast[0], "", useHookEndPoint);
-            });
-            this_li.classList.add("action");
-            this_li.classList.add("visible");
-            ReactDOM.render(this_icon_shape, this_li);
-            iconsMinimized.appendChild(this_li);
-          } else if (mode === "Hidden" && this_icon_found) {
-            this_icon.classList.remove("visible");
-            this_icon.classList.add("hidden");
-            setTimeout(function () {
-              this_icon.parentNode.removeChild(this_icon);
-            }, 1000);
-          }
-        }
-      }
-      // toggle default <> full class on icons lists depending on number of icons
-      icon_count = iconsMinimized.getElementsByTagName("li").length;
-      if (icon_count > 4) {
-        iconsMinimized.classList.remove("default");
-        iconsMinimized.classList.add("full");
-      } else {
-        iconsMinimized.classList.remove("full");
-        iconsMinimized.classList.add("default");
-      }
-      break;
-
-    default:
-      return null;
-  }
-};
-
 const HasImageMask = {
   paragraph__background_video: ".paneFragmentVideo",
   paragraph__background_image: ".paneFragmentImage",
@@ -602,7 +503,6 @@ export {
   InjectPaneFragment,
   getStoryStepGraph,
   lispCallback,
-  hookControllerEndPoint,
   getScrollbarSize,
   thisViewportValue,
   viewportWidth,
