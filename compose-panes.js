@@ -78,7 +78,13 @@ const ComposedPane = data => {
         this_payload = {},
         tempValue,
         shape;
-    this_payload.imageData = []; // check for imageMasks
+    this_payload.imageData = []; // check for textShapeOutside
+
+    shape = thisViewportValue(viewportKey, {
+      mobile: pane_fragment?.field_text_shape_outside_mobile,
+      tablet: pane_fragment?.field_text_shape_outside_tablet,
+      desktop: pane_fragment?.field_text_shape_outside_desktop
+    }); // check for imageMasks
 
     shape = thisViewportValue(viewportKey, {
       mobile: pane_fragment?.field_image_mask_shape_mobile,
