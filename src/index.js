@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ComposePanes } from "./compose-panes";
 import { BuildController } from "./build-controller";
 import { PreParseMenuItems, ParseMenuItems } from "./build-menu";
-import { getStoryStepGraph, lispCallback, getScrollbarSize } from "./helpers";
+import { lispCallback, getScrollbarSize } from "./helpers";
 import { lispLexer } from "./lexer";
 
 const viewportWidths = {
@@ -15,7 +15,6 @@ const viewportWidths = {
 export {
   ComposePanes,
   BuildController,
-  getStoryStepGraph,
   viewportWidths,
   lispLexer,
   lispCallback,

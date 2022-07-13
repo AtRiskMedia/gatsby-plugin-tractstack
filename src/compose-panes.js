@@ -201,10 +201,11 @@ const ComposedPane = (data) => {
               };
               this_shape = SvgShape(shape, this_modal_payload);
               // generate react fragment
-              this_fragment = InjectSvgModal(
-                this_shape?.shape,
-                this_modal_payload
-              );
+              tempValue = InjectSvgModal(this_shape?.shape, this_modal_payload);
+              this_fragment = tempValue?.modal;
+              if (tempValue?.css && typeof tempValue?.css === "string") {
+                pane_css = `${pane_css} #c-${tempValue?.id}-container { ${tempValue?.css} }`;
+              }
               this_modal_payload.shape = this_shape;
               this_css = thisViewportValue(viewportKey, {
                 mobile: pane_fragment?.field_css_styles_parent_mobile,
@@ -391,12 +392,17 @@ const ComposedPane = (data) => {
 
       let this_pane_fragment_type =
         HasPaneFragmentType[tractStackFragment?.mode];
-      if (this_pane_fragment_type)
-        react_fragment = InjectPaneFragment(
+      if (this_pane_fragment_type) {
+        tempValue = InjectPaneFragment(
           tractStackFragment,
           this_pane_fragment_type
         );
-      else
+        if (tempValue?.css && typeof tempValue?.css === "string") {
+          pane_css = `${pane_css} #c-${tempValue?.id}-container { ${tempValue?.css} }`;
+          pane_css = `${pane_css} #c-${tempValue?.id}-container-section { height:100%; }`;
+        }
+        react_fragment = tempValue?.fragment;
+      } else
         console.log("ERROR in compose-panes.js: pane fragment type not found.");
 
       let thisClass = `paneFragment paneFragment__view paneFragment__view--${viewportKey}`;

@@ -289,31 +289,24 @@ const StyledWrapperSection = styled.section`
   ${(props) => props.css};
 `;
 
-const PaneFragment = (id, child, css) => {
-  let this_css = `height:100%; ${css}`;
-  return (
-    <StyledWrapperDiv key={id} css={this_css}>
-      {child}
-    </StyledWrapperDiv>
-  );
-};
-
 const InjectSvgModal = (shape, options) => {
   // react fragment, not tractStackFragment
   let this_id = `${options?.id}-svg-modal`;
   let this_width = viewportWidth[options?.viewportKey];
   let css =
-    `svg { width: calc((100vw - (var(--offset) * 1px)) / ${this_width} * ${options?.width}); ` +
+    `height: 100%; svg { width: calc((100vw - (var(--offset) * 1px)) / ${this_width} * ${options?.width}); ` +
     `margin-left: calc((100vw - (var(--offset) * 1px)) / ${this_width} * ${options?.padding_left}); ` +
     `margin-top: calc((100vw - (var(--offset) * 1px)) / ${this_width} * ${options?.padding_top}); ` +
     `z-index: ${options?.z_index - 2}; ` +
     `}`;
-  let fragment = PaneFragment(this_id, shape, css);
-  return <div className="paneFragmentModal">{fragment}</div>;
-};
-
-const getStoryStepGraph = (graph, targetId) => {
-  return graph?.edges?.filter((e) => e?.node?.id === targetId)[0];
+  let this_fragment = (
+    <div className="paneFragmentModal">
+      <div key={this_id} css={css} id={`c-${this_id}-container`}>
+        {shape}
+      </div>
+    </div>
+  );
+  return { modal: this_fragment, id: this_id, css: css };
 };
 
 const InjectCssAnimation = (payload, paneFragmentId) => {
@@ -363,18 +356,22 @@ const InjectCssAnimation = (payload, paneFragmentId) => {
 
 const InjectPaneFragment = (fragment, mode) => {
   if (!validateSchema(fragment)) return <></>;
-  let this_id, css, child;
+  let this_id, this_fragment, css, child;
 
   switch (mode) {
     case "MarkdownParagraph":
       this_id = `${fragment?.id}-paragraph`;
       const paragraph = HtmlAstToReact(fragment);
-      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      css = `height:100%; z-index: ${parseInt(fragment?.z_index)};`;
       if (typeof fragment?.css?.parent === "string")
         css = `${css} ${fragment?.css?.parent}`;
       if (typeof fragment?.css?.child === "string")
         css = `${css} ${fragment?.css?.child}`;
-      let composed = PaneFragment(this_id, paragraph, css);
+      let composed = (
+        <div key={this_id} id={`c-${this_id}-container`}>
+          {paragraph}
+        </div>
+      );
       // inject textShapeOutside(s) (if available)
       if (
         fragment?.payload?.maskData &&
@@ -384,32 +381,37 @@ const InjectPaneFragment = (fragment, mode) => {
         typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask ===
           "string"
       ) {
-        return (
+        this_fragment = (
           <div className="paneFragmentParagraph">
             {fragment?.payload?.maskData?.textShapeOutside?.left}
             {fragment?.payload?.maskData?.textShapeOutside?.right}
             {composed}
           </div>
         );
+        break;
       }
       // else render paragraph with shapeOutside
-      return <div className="paneFragmentParagraph">{composed}</div>;
+      this_fragment = <div className="paneFragmentParagraph">{composed}</div>;
+      break;
 
     case "Shape":
       this_id = `${fragment?.id}-svg-shape`;
-      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      css = `height:100%; z-index: ${parseInt(fragment?.z_index)};`;
       if (typeof fragment?.css?.parent === "string")
         css = `${css} ${fragment?.css?.parent}`;
-      return PaneFragment(this_id, fragment?.payload?.shapeData, css);
+      this_fragment = (
+        <div key={this_id} id={`c-${this_id}-container`}>
+          {fragment?.payload?.shapeData}
+        </div>
+      );
+      break;
 
     case "BackgroundImage":
       // always uses the first image only
       this_id = `${fragment?.id}-background-image`;
       const this_imageData = getImage(fragment?.payload?.imageData[0]?.data);
       const bgImage = convertToBgImage(this_imageData);
-      css = `z-index: ${parseInt(
-        fragment?.z_index
-      )}; section { height:100%; } `;
+      css = `height:100%; z-index: ${parseInt(fragment?.z_index)}; `;
       if (typeof parent_css === "string")
         css = `${css} img {${fragment?.css?.parent}; }`;
       let this_object_fit = "cover";
@@ -419,6 +421,7 @@ const InjectPaneFragment = (fragment, mode) => {
       let child = (
         <div className="paneFragmentImage">
           <BackgroundImage
+            id={`c-${this_id}-container-section`}
             Tag="section"
             style={{ backgroundPosition: this_background_position }}
             {...bgImage}
@@ -436,11 +439,16 @@ const InjectPaneFragment = (fragment, mode) => {
           </BackgroundImage>
         </div>
       );
-      return PaneFragment(this_id, child, css);
+      this_fragment = (
+        <div key={this_id} id={`c-${this_id}-container`}>
+          {child}
+        </div>
+      );
+      break;
 
     case "BackgroundVideo":
       this_id = `${fragment?.id}-background-video`;
-      css = `z-index: ${parseInt(
+      css = `height:100%; z-index: ${parseInt(
         fragment?.z_index
       )}; video{ object-fit: cover; } `;
       if (typeof parent_css === "string")
@@ -457,11 +465,16 @@ const InjectPaneFragment = (fragment, mode) => {
           <source src={fragment?.payload?.videoData?.url} type="video/mp4" />
         </video>
       );
-      return PaneFragment(this_id, child, css);
+      this_fragment = (
+        <div key={this_id} id={`c-${this_id}-container`}>
+          {child}
+        </div>
+      );
+      break;
 
     case "SvgSource":
       this_id = `${fragment?.id}-svg`;
-      css = `z-index: ${parseInt(fragment?.z_index)};`;
+      css = `height:100%; z-index: ${parseInt(fragment?.z_index)};`;
       if (typeof fragment?.css?.parent === "string")
         css = `${css} ${fragment?.css?.parent}`;
       child = (
@@ -471,8 +484,14 @@ const InjectPaneFragment = (fragment, mode) => {
           className="paneFragmentSvg"
         />
       );
-      return PaneFragment(this_id, child, css);
+      this_fragment = (
+        <div key={this_id} id={`c-${this_id}-container`}>
+          {child}
+        </div>
+      );
+      break;
   }
+  return { fragment: this_fragment, id: this_id, css: css };
 };
 
 const HasImageMask = {
@@ -497,11 +516,9 @@ export {
   InjectCssAnimation,
   StyledWrapperDiv,
   StyledWrapperSection,
-  PaneFragment,
   HasImageMask,
   HasPaneFragmentType,
   InjectPaneFragment,
-  getStoryStepGraph,
   lispCallback,
   getScrollbarSize,
   thisViewportValue,
