@@ -46,21 +46,33 @@ const ImpressionsIcons = (props) => {
   );
 };
 
+const Slide = (props) => {
+  return (
+    <div className="keen-slider__slide" key={props?.this_id}>
+      <div className="keen-slider__slide--hud">
+        <div className="title">{props?.title}</div>
+        {props?.hook && (
+          <div className="more" onClick={() => props?.hook()}>
+            Read&nbsp;&gt;
+          </div>
+        )}
+      </div>
+      <div className="headline">{props?.headline}</div>
+    </div>
+  );
+};
+
 const ImpressionsCarousel = (props) => {
+  const slots = {
+    mobile: 2,
+    tablet: 4,
+    desktop: 5,
+  };
   const [refCallback, slider, sliderNode] = useKeenSlider(
     {
       loop: true,
       mode: "free-snap",
-
-      breakpoints: {
-        "(min-width: 601px)": {
-          slides: { perView: 3, spacing: 4 },
-        },
-        "(min-width: 1367px)": {
-          slides: { perView: 5, spacing: 6 },
-        },
-      },
-      slides: { perView: 2 },
+      slides: { perView: `${slots[props?.viewportKey]}` },
     },
     [
       (slider) => {
@@ -74,7 +86,7 @@ const ImpressionsCarousel = (props) => {
           if (mouseOver) return;
           timeout = setTimeout(() => {
             slider.next();
-          }, 22000);
+          }, 2200);
         }
         slider.on("created", () => {
           slider.container.addEventListener("mouseover", () => {
@@ -93,6 +105,7 @@ const ImpressionsCarousel = (props) => {
       },
     ]
   );
+
   let impressions = [];
   let impressionsRaw = props?.payload;
   if (impressionsRaw)
@@ -110,24 +123,20 @@ const ImpressionsCarousel = (props) => {
               let title;
               if (typeof this_impression?.wordmark === "string")
                 title = wordmark(this_impression?.wordmark);
-              else
-                title = impressionsRaw[pane][paneFragment][impression]?.title;
+              else title = this_impression?.title;
+              console.log(`*${this_impression?.headline}$`);
               impressions.push(
-                <div className="keen-slider__slide" key={index} id={impression}>
-                  <div className="title">{title}</div>
-                  <div className="headline">
-                    {impressionsRaw[pane][paneFragment][impression]?.headline}
-                    <span className="more" onClick={() => injectPayload()}>
-                      Read&nbsp;&gt;
-                    </span>
-                  </div>
-                </div>
+                Slide({
+                  this_id: this_impression?.icon,
+                  title: title,
+                  headline: this_impression?.headline,
+                  hook: injectPayload,
+                })
               );
             }
           );
         });
     });
-
   let title = wordmark("tractstack");
   impressions.push(
     <div className="keen-slider__slide" key="tractstack">
@@ -139,6 +148,19 @@ const ImpressionsCarousel = (props) => {
     </div>
   );
 
+  // add fillers
+  if (impressions.length < slots[props?.viewportKey]) {
+    let emptySlots = slots[props?.viewportKey] - impressions.length;
+    while (emptySlots) {
+      impressions.push(
+        <div className="keen-slider__slide" key={`blank-${emptySlots}`}>
+          <div className="blank">{emptySlots}</div>
+        </div>
+      );
+      emptySlots = emptySlots - 1;
+    }
+  }
+  console.log("*", impressions);
   return (
     <div
       id="controller-carousel"
