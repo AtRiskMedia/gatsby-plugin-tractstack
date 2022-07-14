@@ -101,21 +101,26 @@ const ImpressionsCarousel = (props) => {
         Object.keys(impressionsRaw[pane]).forEach((paneFragment) => {
           Object.keys(impressionsRaw[pane][paneFragment]).forEach(
             (impression, index) => {
+              function injectPayload() {
+                let payload_ast = lispLexer(this_impression?.actionsLisp);
+                lispCallback(payload_ast[0], "", props?.useHookEndPoint);
+              }
               let this_impression =
                 impressionsRaw[pane][paneFragment][impression];
               let title;
               if (typeof this_impression?.wordmark === "string")
                 title = wordmark(this_impression?.wordmark);
+              else
+                title = impressionsRaw[pane][paneFragment][impression]?.title;
               impressions.push(
-                <div
-                  className="keen-slider__slide a"
-                  key={index}
-                  id={impression}
-                >
-                  {title}
-                  <span>
+                <div className="keen-slider__slide" key={index} id={impression}>
+                  <div className="title">{title}</div>
+                  <div className="headline">
                     {impressionsRaw[pane][paneFragment][impression]?.headline}
-                  </span>
+                    <span className="more" onClick={() => injectPayload()}>
+                      Read&nbsp;&gt;
+                    </span>
+                  </div>
                 </div>
               );
             }
@@ -125,20 +130,19 @@ const ImpressionsCarousel = (props) => {
 
   let title = wordmark("tractstack");
   impressions.push(
-    <div className="keen-slider__slide b" key="tractstack">
-      <span className="title">{title}</span>
-      <span className="headline">
+    <div className="keen-slider__slide" key="tractstack">
+      <div className="title">{title}</div>
+      <div className="headline">
         Learning science powered product-market-fit finder for start-ups, brand
         evangelists and community builders.
-      </span>
-      <span className="more">Read &gt;</span>
+      </div>
     </div>
   );
 
   return (
     <div
       id="controller-carousel"
-      className="controller__container--carousel keen-slider"
+      className={`controller__container--carousel controller__container--carousel-${props?.viewportKey} keen-slider`}
       ref={refCallback}
     >
       {impressions}

@@ -94,31 +94,41 @@ const ImpressionsCarousel = props => {
   if (impressionsRaw) Object.keys(impressionsRaw).forEach(pane => {
     if (props?.activePanes?.includes(pane)) Object.keys(impressionsRaw[pane]).forEach(paneFragment => {
       Object.keys(impressionsRaw[pane][paneFragment]).forEach((impression, index) => {
+        function injectPayload() {
+          let payload_ast = lispLexer(this_impression?.actionsLisp);
+          lispCallback(payload_ast[0], "", props?.useHookEndPoint);
+        }
+
         let this_impression = impressionsRaw[pane][paneFragment][impression];
         let title;
-        if (typeof this_impression?.wordmark === "string") title = wordmark(this_impression?.wordmark);
+        if (typeof this_impression?.wordmark === "string") title = wordmark(this_impression?.wordmark);else title = impressionsRaw[pane][paneFragment][impression]?.title;
         impressions.push( /*#__PURE__*/React.createElement("div", {
-          className: "keen-slider__slide a",
+          className: "keen-slider__slide",
           key: index,
           id: impression
-        }, title, /*#__PURE__*/React.createElement("span", null, impressionsRaw[pane][paneFragment][impression]?.headline)));
+        }, /*#__PURE__*/React.createElement("div", {
+          className: "title"
+        }, title), /*#__PURE__*/React.createElement("div", {
+          className: "headline"
+        }, impressionsRaw[pane][paneFragment][impression]?.headline, /*#__PURE__*/React.createElement("span", {
+          className: "more",
+          onClick: () => injectPayload()
+        }, "Read\xA0>"))));
       });
     });
   });
   let title = wordmark("tractstack");
   impressions.push( /*#__PURE__*/React.createElement("div", {
-    className: "keen-slider__slide b",
+    className: "keen-slider__slide",
     key: "tractstack"
-  }, /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("div", {
     className: "title"
-  }, title), /*#__PURE__*/React.createElement("span", {
+  }, title), /*#__PURE__*/React.createElement("div", {
     className: "headline"
-  }, "Learning science powered product-market-fit finder for start-ups, brand evangelists and community builders."), /*#__PURE__*/React.createElement("span", {
-    className: "more"
-  }, "Read >")));
+  }, "Learning science powered product-market-fit finder for start-ups, brand evangelists and community builders.")));
   return /*#__PURE__*/React.createElement("div", {
     id: "controller-carousel",
-    className: "controller__container--carousel keen-slider",
+    className: `controller__container--carousel controller__container--carousel-${props?.viewportKey} keen-slider`,
     ref: refCallback
   }, impressions);
 };
