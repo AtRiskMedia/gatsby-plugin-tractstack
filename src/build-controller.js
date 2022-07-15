@@ -92,14 +92,12 @@ const BuildController = (data) => {
           >
             <div>&lt;</div>
           </div>
-          <div id="controller-carousel">
-            <ImpressionsCarousel
-              payload={data?.controller?.payload?.impressions}
-              activePanes={data?.controller?.activePanes}
-              useHookEndPoint={data?.useHookEndPoint}
-              viewportKey={viewportKey}
-            />
-          </div>
+          <ImpressionsCarousel
+            payload={data?.controller?.payload?.impressions}
+            activePanes={data?.controller?.activePanes}
+            useHookEndPoint={data?.useHookEndPoint}
+            viewportKey={viewportKey}
+          />
         </div>
         <div
           id="controller-container-minimized"

@@ -1,6 +1,5 @@
-import React from "react";
-import "keen-slider/keen-slider.min.css";
-import { useKeenSlider } from "keen-slider/react";
+import React, { Component } from "react";
+import Slider from "react-slick";
 import { wordmark, icon } from "./shapes";
 import { lispLexer } from "./lexer";
 import { lispCallback } from "./helpers";
@@ -39,7 +38,6 @@ const ImpressionsIcons = props => {
 
 const Slide = props => {
   return /*#__PURE__*/React.createElement("div", {
-    className: "keen-slider__slide",
     key: props?.this_id
   }, /*#__PURE__*/React.createElement("div", {
     className: "title"
@@ -51,101 +49,71 @@ const Slide = props => {
   }, "Read\xA0>")));
 };
 
-const ImpressionsCarousel = props => {
-  const slots = {
-    mobile: 2,
-    tablet: 3,
-    desktop: 4
-  };
-  const [refCallback, slider, sliderNode] = useKeenSlider({
-    loop: true,
-    mode: "free-snap",
-    slides: {
-      perView: `${slots[props?.viewportKey]}`
-    }
-  }, [slider => {
-    let timeout;
-    let mouseOver = false;
+export default class ImpressionsCarousel extends Component {
+  render() {
+    let props = this?.props;
+    var settings = {
+      dots: false,
+      //true,
+      infinite: true,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: true,
+      fade: true,
+      arrows: false,
+      autoplaySpeed: 22000
+    };
+    let impressions = [];
+    let impressionsRaw = props?.payload;
+    if (impressionsRaw) Object.keys(impressionsRaw).forEach(pane => {
+      if (props?.activePanes?.includes(pane)) Object.keys(impressionsRaw[pane]).forEach(paneFragment => {
+        Object.keys(impressionsRaw[pane][paneFragment]).forEach((impression, index) => {
+          function injectPayload() {
+            let payload_ast = lispLexer(this_impression?.actionsLisp);
+            lispCallback(payload_ast[0], "", props?.useHookEndPoint);
+          }
 
-    function clearNextTimeout() {
-      clearTimeout(timeout);
-    }
-
-    function nextTimeout() {
-      clearTimeout(timeout);
-      if (mouseOver) return;
-      timeout = setTimeout(() => {
-        slider.next();
-      }, 2200);
-    }
-
-    slider.on("created", () => {
-      slider.container.addEventListener("mouseover", () => {
-        mouseOver = true;
-        clearNextTimeout();
-      });
-      slider.container.addEventListener("mouseout", () => {
-        mouseOver = false;
-        nextTimeout();
-      });
-      nextTimeout();
-    });
-    slider.on("dragStarted", clearNextTimeout);
-    slider.on("animationEnded", nextTimeout);
-    slider.on("updated", nextTimeout);
-  }]);
-  let impressions = [];
-  let impressionsRaw = props?.payload;
-  if (impressionsRaw) Object.keys(impressionsRaw).forEach(pane => {
-    if (props?.activePanes?.includes(pane)) Object.keys(impressionsRaw[pane]).forEach(paneFragment => {
-      Object.keys(impressionsRaw[pane][paneFragment]).forEach((impression, index) => {
-        function injectPayload() {
-          let payload_ast = lispLexer(this_impression?.actionsLisp);
-          lispCallback(payload_ast[0], "", props?.useHookEndPoint);
-        }
-
-        let this_impression = impressionsRaw[pane][paneFragment][impression];
-        let title;
-        if (typeof this_impression?.wordmark === "string") title = wordmark(this_impression?.wordmark);else title = this_impression?.title;
-        impressions.push(Slide({
-          this_id: this_impression?.icon,
-          title: title,
-          headline: this_impression?.headline,
-          hook: injectPayload
-        }));
+          let this_impression = impressionsRaw[pane][paneFragment][impression];
+          let title;
+          if (typeof this_impression?.wordmark === "string") title = wordmark(this_impression?.wordmark);else title = this_impression?.title;
+          impressions.push(Slide({
+            this_id: this_impression?.icon,
+            title: title,
+            headline: this_impression?.headline,
+            hook: injectPayload
+          }));
+        });
       });
     });
-  });
-  let title = wordmark("tractstack");
-  impressions.push( /*#__PURE__*/React.createElement("div", {
-    className: "keen-slider__slide",
-    key: "tractstack-${props?.viewportKey}"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "title"
-  }, title), /*#__PURE__*/React.createElement("div", {
-    className: "headline"
-  }, "Learning science powered product-market-fit finder for start-ups, brand evangelists and community builders."))); // add fillers
-
-  if (impressions.length < slots[props?.viewportKey]) {
-    let emptySlots = slots[props?.viewportKey] - impressions.length;
-
+    let title = wordmark("tractstack");
+    impressions.push( /*#__PURE__*/React.createElement("div", {
+      key: "powered-by-tractstack"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "title"
+    }, title), /*#__PURE__*/React.createElement("div", {
+      className: "headline"
+    }, "Learning science powered product-market-fit finder for start-ups, brand evangelists and community builders.")));
+    /*
+    // add fillers
+    let emptySlots = 0;
+    if (impressions.length <= slots[props?.viewportKey])
+      emptySlots = slots[props?.viewportKey] - impressions.length + 1;
     while (emptySlots) {
-      impressions.push( /*#__PURE__*/React.createElement("div", {
-        className: "keen-slider__slide",
-        key: `blank-${emptySlots}-${props?.viewportKey}`
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "blank"
-      }, emptySlots)));
+      impressions.push(
+        <div key={`blank-${emptySlots}-${props?.viewportKey}`}>
+          <div className="blank">**{emptySlots}</div>
+        </div>
+      );
       emptySlots = emptySlots - 1;
     }
+    */
+
+    return /*#__PURE__*/React.createElement("div", {
+      id: `controller-carousel-${props?.viewportKey}`,
+      className: `controller-carousel controller-carousel-${props?.viewportKey} controller__container--carousel`
+    }, /*#__PURE__*/React.createElement(Slider, settings, impressions));
   }
 
-  return /*#__PURE__*/React.createElement("div", {
-    id: `controller-carousel-${props?.viewportKey}`,
-    className: `keen-slider controller__container--carousel-${props?.viewportKey}`,
-    ref: refCallback
-  }, impressions);
-};
-
+}
 export { ImpressionsCarousel, ImpressionsIcons };
 //# sourceMappingURL=impressions.js.map

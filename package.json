@@ -32,12 +32,12 @@
     "gatsby-plugin-styled-components": "^5.18.0",
     "gbimage-bridge": "^0.2.1",
     "hast-util-sanitize": "^4.0.0",
-    "keen-slider": "^6.7.0",
     "prettier": "^2.7.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-cool-inview": "^3.0.1",
     "react-is-visible": "^1.2.0",
+    "react-slick": "^0.29.0",
     "react-waypoint": "^10.3.0",
     "styled-components": "^5.3.5",
     "uuid": "^8.3.2"
