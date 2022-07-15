@@ -49,15 +49,13 @@ const ImpressionsIcons = (props) => {
 const Slide = (props) => {
   return (
     <div className="keen-slider__slide" key={props?.this_id}>
-      <div className="keen-slider__slide--hud">
-        <div className="title">{props?.title}</div>
-        {props?.hook && (
-          <div className="more" onClick={() => props?.hook()}>
-            Read&nbsp;&gt;
-          </div>
-        )}
+      <div className="title">{props?.title}</div>
+      <div className="headline">
+        {props?.headline}{" "}
+        <a className="more" onClick={() => props?.hook()}>
+          Read&nbsp;&gt;
+        </a>
       </div>
-      <div className="headline">{props?.headline}</div>
     </div>
   );
 };
@@ -65,14 +63,16 @@ const Slide = (props) => {
 const ImpressionsCarousel = (props) => {
   const slots = {
     mobile: 2,
-    tablet: 4,
-    desktop: 5,
+    tablet: 3,
+    desktop: 4,
   };
   const [refCallback, slider, sliderNode] = useKeenSlider(
     {
       loop: true,
       mode: "free-snap",
-      slides: { perView: `${slots[props?.viewportKey]}` },
+      slides: {
+        perView: `${slots[props?.viewportKey]}`,
+      },
     },
     [
       (slider) => {
@@ -124,7 +124,6 @@ const ImpressionsCarousel = (props) => {
               if (typeof this_impression?.wordmark === "string")
                 title = wordmark(this_impression?.wordmark);
               else title = this_impression?.title;
-              console.log(`*${this_impression?.headline}$`);
               impressions.push(
                 Slide({
                   this_id: this_impression?.icon,
@@ -139,7 +138,7 @@ const ImpressionsCarousel = (props) => {
     });
   let title = wordmark("tractstack");
   impressions.push(
-    <div className="keen-slider__slide" key="tractstack">
+    <div className="keen-slider__slide" key="tractstack-${props?.viewportKey}">
       <div className="title">{title}</div>
       <div className="headline">
         Learning science powered product-market-fit finder for start-ups, brand
@@ -153,18 +152,20 @@ const ImpressionsCarousel = (props) => {
     let emptySlots = slots[props?.viewportKey] - impressions.length;
     while (emptySlots) {
       impressions.push(
-        <div className="keen-slider__slide" key={`blank-${emptySlots}`}>
+        <div
+          className="keen-slider__slide"
+          key={`blank-${emptySlots}-${props?.viewportKey}`}
+        >
           <div className="blank">{emptySlots}</div>
         </div>
       );
       emptySlots = emptySlots - 1;
     }
   }
-  console.log("*", impressions);
   return (
     <div
-      id="controller-carousel"
-      className={`controller__container--carousel controller__container--carousel-${props?.viewportKey} keen-slider`}
+      id={`controller-carousel-${props?.viewportKey}`}
+      className={`keen-slider controller__container--carousel-${props?.viewportKey}`}
       ref={refCallback}
     >
       {impressions}

@@ -65,12 +65,14 @@ const BuildController = data => {
     className: "controller__container--minimize",
     onClick: () => injectPayloadMinimize(),
     title: "Minimize the Controller"
-  }, /*#__PURE__*/React.createElement("div", null, "<")), /*#__PURE__*/React.createElement(ImpressionsCarousel, {
+  }, /*#__PURE__*/React.createElement("div", null, "<")), /*#__PURE__*/React.createElement("div", {
+    id: "controller-carousel"
+  }, /*#__PURE__*/React.createElement(ImpressionsCarousel, {
     payload: data?.controller?.payload?.impressions,
     activePanes: data?.controller?.activePanes,
     useHookEndPoint: data?.useHookEndPoint,
     viewportKey: viewportKey
-  })), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
     id: "controller-container-minimized",
     className: `controller__container--${viewportKey}`
   }, /*#__PURE__*/React.createElement(ImpressionsIcons, {

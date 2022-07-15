@@ -42,22 +42,20 @@ const Slide = props => {
     className: "keen-slider__slide",
     key: props?.this_id
   }, /*#__PURE__*/React.createElement("div", {
-    className: "keen-slider__slide--hud"
-  }, /*#__PURE__*/React.createElement("div", {
     className: "title"
-  }, props?.title), props?.hook && /*#__PURE__*/React.createElement("div", {
+  }, props?.title), /*#__PURE__*/React.createElement("div", {
+    className: "headline"
+  }, props?.headline, " ", /*#__PURE__*/React.createElement("a", {
     className: "more",
     onClick: () => props?.hook()
-  }, "Read\xA0>")), /*#__PURE__*/React.createElement("div", {
-    className: "headline"
-  }, props?.headline));
+  }, "Read\xA0>")));
 };
 
 const ImpressionsCarousel = props => {
   const slots = {
     mobile: 2,
-    tablet: 4,
-    desktop: 5
+    tablet: 3,
+    desktop: 4
   };
   const [refCallback, slider, sliderNode] = useKeenSlider({
     loop: true,
@@ -109,7 +107,6 @@ const ImpressionsCarousel = props => {
         let this_impression = impressionsRaw[pane][paneFragment][impression];
         let title;
         if (typeof this_impression?.wordmark === "string") title = wordmark(this_impression?.wordmark);else title = this_impression?.title;
-        console.log(`*${this_impression?.headline}$`);
         impressions.push(Slide({
           this_id: this_impression?.icon,
           title: title,
@@ -122,7 +119,7 @@ const ImpressionsCarousel = props => {
   let title = wordmark("tractstack");
   impressions.push( /*#__PURE__*/React.createElement("div", {
     className: "keen-slider__slide",
-    key: "tractstack"
+    key: "tractstack-${props?.viewportKey}"
   }, /*#__PURE__*/React.createElement("div", {
     className: "title"
   }, title), /*#__PURE__*/React.createElement("div", {
@@ -135,7 +132,7 @@ const ImpressionsCarousel = props => {
     while (emptySlots) {
       impressions.push( /*#__PURE__*/React.createElement("div", {
         className: "keen-slider__slide",
-        key: `blank-${emptySlots}`
+        key: `blank-${emptySlots}-${props?.viewportKey}`
       }, /*#__PURE__*/React.createElement("div", {
         className: "blank"
       }, emptySlots)));
@@ -143,10 +140,9 @@ const ImpressionsCarousel = props => {
     }
   }
 
-  console.log("*", impressions);
   return /*#__PURE__*/React.createElement("div", {
-    id: "controller-carousel",
-    className: `controller__container--carousel controller__container--carousel-${props?.viewportKey} keen-slider`,
+    id: `controller-carousel-${props?.viewportKey}`,
+    className: `keen-slider controller__container--carousel-${props?.viewportKey}`,
     ref: refCallback
   }, impressions);
 };
