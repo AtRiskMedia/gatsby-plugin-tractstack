@@ -18,7 +18,7 @@ const ComposePanes = (data) => {
   if (data?.viewportKey === "none") return <></>;
 
   // loop through the panes in view and render each pane fragment
-  const composedPanes = data?.fragments?.relationships?.field_panes.map(
+  const composedPanes = data?.fragments?.relationships?.field_panes?.map(
     (pane, i) => {
       return (
         <ComposedPane

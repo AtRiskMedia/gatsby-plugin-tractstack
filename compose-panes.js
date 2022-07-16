@@ -8,7 +8,7 @@ const ComposePanes = data => {
   // if viewport is not yet defined, return empty fragment
   if (data?.viewportKey === "none") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
-  const composedPanes = data?.fragments?.relationships?.field_panes.map((pane, i) => {
+  const composedPanes = data?.fragments?.relationships?.field_panes?.map((pane, i) => {
     return /*#__PURE__*/React.createElement(ComposedPane, {
       key: i,
       data: {
