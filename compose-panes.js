@@ -247,7 +247,7 @@ const ComposedPane = data => {
         }; // clone and store animation for modal (if any)
 
         if (pane_fragment?.internal?.type === "paragraph__modal" || pane_fragment?.field_modal) {
-          effects[`modal-${pane_fragment?.id}`] = structuredClone(tempValue[key]);
+          effects[`modal-${pane_fragment?.id}`] = tempValue[key];
           effects[`modal-${pane_fragment?.id}`]["paneFragment"] = `modal-${pane_fragment?.id}`;
         }
       }
