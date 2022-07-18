@@ -5,8 +5,7 @@ import { lispLexer } from "./lexer";
 import { lispCallback } from "./helpers";
 
 const ImpressionsIcons = props => {
-  let iconsContainer = `controller__icons controller__icons--${props?.viewportKey}`,
-      iconsMode,
+  let iconsMode,
       icons = [];
   let impressionsRaw = props?.payload;
   if (impressionsRaw) Object.keys(impressionsRaw).forEach(pane => {
@@ -29,11 +28,9 @@ const ImpressionsIcons = props => {
     });
   });
   if (icons.length <= 4) iconsMode = "default";else iconsMode = "full";
-  return /*#__PURE__*/React.createElement("div", {
-    className: iconsContainer
-  }, /*#__PURE__*/React.createElement("ul", {
+  return /*#__PURE__*/React.createElement("ul", {
     className: iconsMode
-  }, icons));
+  }, icons);
 };
 
 const Slide = props => {

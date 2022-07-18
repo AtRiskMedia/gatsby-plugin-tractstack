@@ -11,11 +11,11 @@ const BuildController = data => {
   let viewportKey = data?.viewportKey;
   if (viewportKey === "none") return /*#__PURE__*/React.createElement(React.Fragment, null);
   let next, prev, link, svgString, b64, dataUri, css, mask_css, react_fragment, effects_payload, controller_pane, controller_pane_minimized;
-  controller_pane = SvgShape("controller", {
+  controller_pane = SvgShape("controllerExpanded", {
     id: `svg-controller-${viewportKey}`,
     viewportKey: viewportKey
   }).shape;
-  controller_pane_minimized = SvgShape("mini", {
+  controller_pane_minimized = SvgShape("controllerMinimized", {
     id: `svg-controller-mini-${viewportKey}`,
     viewportKey: viewportKey
   }).shape;
@@ -55,6 +55,44 @@ const BuildController = data => {
   }
 
   css = `${css} ${mask_css}`;
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    id: "controller__minimized",
+    className: "controller__minimized hidden none"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "controller__minimized--icons"
+  }, /*#__PURE__*/React.createElement(ImpressionsIcons, {
+    payload: data?.controller?.payload?.impressions,
+    activePanes: data?.controller?.activePanes,
+    useHookEndPoint: data?.useHookEndPoint,
+    viewportKey: viewportKey
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "controller__minimized--toggle",
+    onClick: () => injectPayloadExpand(),
+    title: "Activate Controller"
+  }, /*#__PURE__*/React.createElement("div", null, ">"))), /*#__PURE__*/React.createElement("div", {
+    id: "controller__expanded",
+    className: "controller__expanded hidden none"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "controller__expanded--toggle",
+    onClick: () => injectPayloadMinimize(),
+    title: "Minimize the Controller"
+  }, /*#__PURE__*/React.createElement("div", null, "<")), /*#__PURE__*/React.createElement("div", {
+    className: "controller__expanded--carousel"
+  }, /*#__PURE__*/React.createElement(ImpressionsCarousel, {
+    payload: data?.controller?.payload?.impressions,
+    activePanes: data?.controller?.activePanes,
+    useHookEndPoint: data?.useHookEndPoint,
+    viewportKey: viewportKey
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "controller__expanded--carousel-dots"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "controller__expanded--icons"
+  }, /*#__PURE__*/React.createElement(ImpressionsIcons, {
+    payload: data?.controller?.payload?.impressions,
+    activePanes: data?.controller?.activePanes,
+    useHookEndPoint: data?.useHookEndPoint,
+    viewportKey: viewportKey
+  }))));
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     css: css,
     id: "controller-container"

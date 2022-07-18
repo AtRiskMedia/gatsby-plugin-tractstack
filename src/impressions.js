@@ -5,8 +5,7 @@ import { lispLexer } from "./lexer";
 import { lispCallback } from "./helpers";
 
 const ImpressionsIcons = (props) => {
-  let iconsContainer = `controller__icons controller__icons--${props?.viewportKey}`,
-    iconsMode,
+  let iconsMode,
     icons = [];
   let impressionsRaw = props?.payload;
   if (impressionsRaw)
@@ -38,11 +37,7 @@ const ImpressionsIcons = (props) => {
   if (icons.length <= 4) iconsMode = "default";
   else iconsMode = "full";
 
-  return (
-    <div className={iconsContainer}>
-      <ul className={iconsMode}>{icons}</ul>
-    </div>
-  );
+  return <ul className={iconsMode}>{icons}</ul>;
 };
 
 const Slide = (props) => {
