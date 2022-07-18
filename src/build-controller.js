@@ -78,6 +78,28 @@ const BuildController = (data) => {
 
   css = `${css} ${mask_css}`;
 
+/*
+  return (
+    <div className="controller__minimized">
+      <div className="controller__minimized--icons">
+      </div>
+      <div className="controller__minimized--toggle">
+      </div>
+    </div>
+    <div className="controller__expanded">
+      <div className="controller__expanded--toggle">
+      </div>
+      <div className="controller__expanded--carousel">
+      </div>
+      <div className="controller__expanded--carousel-dots">
+      </div>
+      <div className="controller__expanded--icons">
+      </div>
+    </div>
+  );
+*/
+
+
   return (
     <>
       <StyledWrapperDiv css={css} id="controller-container">
