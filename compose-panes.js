@@ -142,7 +142,7 @@ const ComposedPane = data => {
           }
         } else if (shape && pane_fragment?.field_modal) {
           // this is a modal
-          let options = payload?.modal && payload?.modal[pane?.id][pane_fragment?.id][viewportKey],
+          let options = payload?.modal && payload?.modal[pane?.id] && payload?.modal[pane?.id][pane_fragment?.id] && payload?.modal[pane?.id][pane_fragment?.id][viewportKey],
               this_modal_payload = {},
               this_fragment,
               this_shape,
@@ -200,17 +200,33 @@ const ComposedPane = data => {
         break;
 
       case "paragraph__background_pane":
+        let mask = false;
+
+        if (payload?.codeHooks?.hasOwnProperty(pane?.id) && payload?.codeHooks[pane?.id]?.hasOwnProperty(pane_fragment?.id)) {
+          this_payload.codeHooks = payload.codeHooks[pane.id][pane_fragment.id];
+          mask = true;
+        }
+
         shape = thisViewportValue(viewportKey, {
           mobile: pane_fragment?.field_shape_mobile,
           tablet: pane_fragment?.field_shape_tablet,
           desktop: pane_fragment?.field_shape_desktop
         });
         let this_options = {
+          textShapeOutside: mask,
           viewportKey: viewportKey,
           pane_height: pane_height,
           id: `${pane_fragment?.id}-${viewportKey}`
         };
         tempValue = SvgShape(shape, this_options);
+
+        if (tempValue && mask) {
+          this_payload.maskData = {
+            textShapeOutside: tempValue
+          };
+          pane_css = `${pane_css} #svg__${tempValue?.id}--shape-outside-left {float:left;shape-outside:url(${tempValue?.left_mask})} ` + `#svg__${tempValue?.id}--shape-outside-right {float:right;shape-outside:url(${tempValue?.right_mask})}`;
+        }
+
         if (tempValue) this_payload.shapeData = tempValue.shape;
         break;
 
@@ -306,13 +322,14 @@ const ComposedPane = data => {
         videoData: this_payload?.videoData || {},
         shapeData: this_payload?.shapeData || {},
         modalData: this_payload?.modalData || {},
-        buttonData: this_payload?.buttonData || {}
+        buttonData: this_payload?.buttonData || {},
+        codeHooks: this_payload?.codeHooks || {}
       }
     };
     let this_pane_fragment_type = HasPaneFragmentType[tractStackFragment?.mode];
 
     if (this_pane_fragment_type) {
-      tempValue = InjectPaneFragment(tractStackFragment, this_pane_fragment_type);
+      tempValue = InjectPaneFragment(tractStackFragment, this_payload?.codeHooks && "CodeHook" || this_pane_fragment_type);
 
       if (tempValue?.css && typeof tempValue?.css === "string") {
         pane_css = `${pane_css} #c-${tempValue?.id}-container { ${tempValue?.css} }`;

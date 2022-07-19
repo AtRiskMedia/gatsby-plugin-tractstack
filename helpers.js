@@ -331,6 +331,12 @@ const InjectPaneFragment = (fragment, mode) => {
   let this_id, this_fragment, css, child;
 
   switch (mode) {
+    case "CodeHook":
+      // todo -  what is the payload?
+      this_fragment = fragment?.payload?.useHookEndPoint("codeHook", "todo");
+      console.log(2, fragment?.payload?.maskData);
+      break;
+
     case "MarkdownParagraph":
       this_id = `${fragment?.id}-paragraph`;
       const paragraph = HtmlAstToReact(fragment);
