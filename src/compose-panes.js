@@ -318,12 +318,12 @@ const ComposedPane = (data) => {
             paneFragment: `fragment-${pane_fragment?.id}`,
             ...tempValue[key],
           };
-          // clone and store animation for modal (if any)
+          // store copy of the animation for modal (if any)
           if (
             pane_fragment?.internal?.type === "paragraph__modal" ||
             pane_fragment?.field_modal
           ) {
-            effects[`modal-${pane_fragment?.id}`] = tempValue[key];
+            effects[`modal-${pane_fragment?.id}`] = { ...tempValue[key] };
             effects[`modal-${pane_fragment?.id}`][
               "paneFragment"
             ] = `modal-${pane_fragment?.id}`;
