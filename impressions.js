@@ -27,10 +27,7 @@ const ImpressionsIcons = props => {
       });
     });
   });
-  if (icons.length <= 4) iconsMode = "default";else iconsMode = "full";
-  return /*#__PURE__*/React.createElement("ul", {
-    className: iconsMode
-  }, icons);
+  return /*#__PURE__*/React.createElement("ul", null, icons);
 };
 
 const Slide = props => {
@@ -51,7 +48,6 @@ export default class ImpressionsCarousel extends Component {
     let props = this?.props;
     var settings = {
       dots: false,
-      //true,
       infinite: true,
       slidesToShow: 1,
       slidesToScroll: 1,
@@ -90,21 +86,6 @@ export default class ImpressionsCarousel extends Component {
     }, title), /*#__PURE__*/React.createElement("div", {
       className: "headline"
     }, "Learning science powered product-market-fit finder for start-ups, brand evangelists and community builders.")));
-    /*
-    // add fillers
-    let emptySlots = 0;
-    if (impressions.length <= slots[props?.viewportKey])
-      emptySlots = slots[props?.viewportKey] - impressions.length + 1;
-    while (emptySlots) {
-      impressions.push(
-        <div key={`blank-${emptySlots}-${props?.viewportKey}`}>
-          <div className="blank">**{emptySlots}</div>
-        </div>
-      );
-      emptySlots = emptySlots - 1;
-    }
-    */
-
     return /*#__PURE__*/React.createElement("div", {
       id: `controller-carousel-${props?.viewportKey}`,
       className: `controller-carousel controller-carousel-${props?.viewportKey} controller__container--carousel`

@@ -34,10 +34,7 @@ const ImpressionsIcons = (props) => {
           );
         });
     });
-  if (icons.length <= 4) iconsMode = "default";
-  else iconsMode = "full";
-
-  return <ul className={iconsMode}>{icons}</ul>;
+  return <ul>{icons}</ul>;
 };
 
 const Slide = (props) => {
@@ -58,7 +55,7 @@ export default class ImpressionsCarousel extends Component {
   render() {
     let props = this?.props;
     var settings = {
-      dots: false, //true,
+      dots: false,
       infinite: true,
       slidesToShow: 1,
       slidesToScroll: 1,
@@ -107,20 +104,7 @@ export default class ImpressionsCarousel extends Component {
         </div>
       </div>
     );
-    /*
-    // add fillers
-    let emptySlots = 0;
-    if (impressions.length <= slots[props?.viewportKey])
-      emptySlots = slots[props?.viewportKey] - impressions.length + 1;
-    while (emptySlots) {
-      impressions.push(
-        <div key={`blank-${emptySlots}-${props?.viewportKey}`}>
-          <div className="blank">**{emptySlots}</div>
-        </div>
-      );
-      emptySlots = emptySlots - 1;
-    }
-*/
+
     return (
       <div
         id={`controller-carousel-${props?.viewportKey}`}

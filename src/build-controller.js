@@ -63,7 +63,6 @@ const BuildController = (data) => {
             viewportKey={viewportKey}
           />
         </div>
-        <div className="controller__expanded--carousel-dots"></div>
         <div className="controller__expanded--icons">
           <ImpressionsIcons
             payload={data?.controller?.payload?.impressions}
