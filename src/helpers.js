@@ -494,6 +494,44 @@ const InjectPaneFragment = (fragment, mode) => {
   return { fragment: this_fragment, id: this_id, css: css };
 };
 
+const getLogo = (field_svg_logo, field_image_logo) => {
+  // svg or image logo?
+  if (typeof field_svg_logo?.localFile?.publicURL === "string") {
+    // svg logo
+    let this_image_id = field_svg_logo?.id;
+    let this_image = field_svg_logo?.localFile?.publicURL;
+    return (
+      <img
+        key={this_image_id}
+        src={this_image}
+        className={`menu__logo`}
+        alt="Logo"
+      />
+    );
+  } else if (
+    typeof field_image_logo?.localFile?.childImageSharp[viewportKey] !==
+    "undefined"
+  ) {
+    let this_image_id = field_image_logo?.id;
+    let this_image = field_image_logo?.localFile?.childImageSharp[viewportKey];
+    // image logo
+    return (
+      <GatsbyImage
+        key={this_image_id}
+        className={`menu__logo`}
+        alt="Logo"
+        image={this_image}
+        objectFit="contain"
+      />
+    );
+  }
+  return logo;
+};
+
+const getIdHash = () => {
+  return uuidv4();
+};
+
 const HasImageMask = {
   paragraph__background_video: ".paneFragmentVideo",
   paragraph__background_image: ".paneFragmentImage",
@@ -523,4 +561,6 @@ export {
   getScrollbarSize,
   thisViewportValue,
   viewportWidth,
+  getLogo,
+  getIdHash,
 };

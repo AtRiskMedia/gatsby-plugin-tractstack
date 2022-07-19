@@ -31,8 +31,7 @@ const BuildController = data => {
   }, /*#__PURE__*/React.createElement(ImpressionsIcons, {
     payload: data?.controller?.payload?.impressions,
     activePanes: data?.controller?.activePanes,
-    useHookEndPoint: data?.useHookEndPoint,
-    viewportKey: viewportKey
+    useHookEndPoint: data?.useHookEndPoint
   })), /*#__PURE__*/React.createElement("div", {
     className: "controller__minimized--toggle",
     onClick: () => injectPayloadExpand(),

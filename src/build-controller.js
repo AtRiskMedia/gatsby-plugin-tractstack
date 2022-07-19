@@ -33,7 +33,6 @@ const BuildController = (data) => {
             payload={data?.controller?.payload?.impressions}
             activePanes={data?.controller?.activePanes}
             useHookEndPoint={data?.useHookEndPoint}
-            viewportKey={viewportKey}
           />
         </div>
         <div
