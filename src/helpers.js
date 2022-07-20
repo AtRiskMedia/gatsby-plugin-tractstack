@@ -359,9 +359,28 @@ const InjectPaneFragment = (fragment, mode) => {
   let this_id, this_fragment, css, child;
   switch (mode) {
     case "CodeHook":
-      // todo -  what is the payload?
-      this_fragment = fragment?.payload?.useHookEndPoint("codeHook", "todo");
-      console.log(2, fragment?.payload?.maskData);
+      let code = fragment?.payload?.useHookEndPoint(
+        "codeHook",
+        fragment?.payload?.codeHooks
+      );
+      // inject textShapeOutside(s) (if available)
+      if (
+        fragment?.payload?.maskData &&
+        Object.keys(fragment?.payload?.maskData).length &&
+        typeof fragment?.payload?.maskData?.textShapeOutside?.left_mask ===
+          "string" &&
+        typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask ===
+          "string"
+      ) {
+        this_fragment = (
+          <div className="paneFragmentCode">
+            {fragment?.payload?.maskData?.textShapeOutside?.left}
+            {fragment?.payload?.maskData?.textShapeOutside?.right}
+            {code}
+          </div>
+        );
+        break;
+      } else this_fragment = code;
       break;
 
     case "MarkdownParagraph":

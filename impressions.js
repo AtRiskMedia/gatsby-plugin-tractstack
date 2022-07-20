@@ -5,7 +5,7 @@ import { lispLexer } from "./lexer";
 import { lispCallback } from "./helpers";
 
 const ImpressionsIcons = props => {
-  let iconsMode,
+  let iconsMode = "default",
       icons = [];
   let impressionsRaw = props?.payload;
   if (impressionsRaw) Object.keys(impressionsRaw).forEach(pane => {
@@ -19,7 +19,7 @@ const ImpressionsIcons = props => {
           lispCallback(payload_ast[0], "", props?.useHookEndPoint);
         }
 
-        icons.push( /*#__PURE__*/React.createElement("li", {
+        if (icons.length < 8) icons.push( /*#__PURE__*/React.createElement("li", {
           key: index,
           className: "action visible",
           onClick: () => injectPayload()
@@ -27,7 +27,10 @@ const ImpressionsIcons = props => {
       });
     });
   });
-  return /*#__PURE__*/React.createElement("ul", null, icons);
+  if (icons.length > 4) iconsMode = "full";
+  return /*#__PURE__*/React.createElement("ul", {
+    className: iconsMode
+  }, icons);
 };
 
 const Slide = props => {
