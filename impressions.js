@@ -34,7 +34,6 @@ const ImpressionsIcons = props => {
 };
 
 const Slide = props => {
-  console.log(props);
   return /*#__PURE__*/React.createElement("div", {
     key: props?.this_id
   }, /*#__PURE__*/React.createElement("div", {

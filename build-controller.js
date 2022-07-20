@@ -60,7 +60,7 @@ const BuildController = data => {
     useHookEndPoint: data?.useHookEndPoint,
     viewportKey: viewportKey
   }))));
-  return /*#__PURE__*/React.createElement("p", null, "ul");
+  return /*#__PURE__*/React.createElement("p", null, "THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER. THIS IS THE prefersReducedMotion CONTROLLER.", " ");
 };
 
 export { BuildController };
