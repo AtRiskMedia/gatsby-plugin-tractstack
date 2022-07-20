@@ -28,7 +28,10 @@ const BuildController = (data) => {
           id="controller__minimized"
           className="controller__minimized hidden none"
         >
-          <div className="controller__minimized--icons">
+          <div
+            id="controller__minimized--icons"
+            className="controller__minimized--icons"
+          >
             <ImpressionsIcons
               payload={data?.controller?.payload?.impressions}
               activePanes={data?.controller?.activePanes}
@@ -62,7 +65,10 @@ const BuildController = (data) => {
               viewportKey={viewportKey}
             />
           </div>
-          <div className="controller__expanded--icons">
+          <div
+            id="controller__expanded--icons"
+            className="controller__expanded--icons"
+          >
             <ImpressionsIcons
               payload={data?.controller?.payload?.impressions}
               activePanes={data?.controller?.activePanes}

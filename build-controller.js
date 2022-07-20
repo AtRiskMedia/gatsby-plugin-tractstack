@@ -27,6 +27,7 @@ const BuildController = data => {
     id: "controller__minimized",
     className: "controller__minimized hidden none"
   }, /*#__PURE__*/React.createElement("div", {
+    id: "controller__minimized--icons",
     className: "controller__minimized--icons"
   }, /*#__PURE__*/React.createElement(ImpressionsIcons, {
     payload: data?.controller?.payload?.impressions,
@@ -51,6 +52,7 @@ const BuildController = data => {
     useHookEndPoint: data?.useHookEndPoint,
     viewportKey: viewportKey
   })), /*#__PURE__*/React.createElement("div", {
+    id: "controller__expanded--icons",
     className: "controller__expanded--icons"
   }, /*#__PURE__*/React.createElement(ImpressionsIcons, {
     payload: data?.controller?.payload?.impressions,
