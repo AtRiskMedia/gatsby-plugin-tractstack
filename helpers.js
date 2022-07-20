@@ -480,7 +480,7 @@ const getLogo = (field_svg_logo, field_image_logo) => {
     });
   }
 
-  return logo;
+  return /*#__PURE__*/React.createElement(React.Fragment, null);
 };
 
 const getIdHash = () => {

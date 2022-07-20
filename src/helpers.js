@@ -537,7 +537,7 @@ const getLogo = (field_svg_logo, field_image_logo) => {
       />
     );
   }
-  return logo;
+  return <></>;
 };
 
 const getIdHash = () => {
