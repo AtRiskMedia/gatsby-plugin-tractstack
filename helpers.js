@@ -332,15 +332,13 @@ const InjectPaneFragment = (fragment, mode) => {
 
   switch (mode) {
     case "CodeHook":
-      let code = fragment?.payload?.useHookEndPoint("codeHook", fragment?.payload?.codeHooks); // inject textShapeOutside(s) (if available)
-
-      if (fragment?.payload?.maskData && Object.keys(fragment?.payload?.maskData).length && typeof fragment?.payload?.maskData?.textShapeOutside?.left_mask === "string" && typeof fragment?.payload?.maskData?.textShapeOutside?.right_mask === "string") {
-        this_fragment = /*#__PURE__*/React.createElement("div", {
-          className: "paneFragmentCode"
-        }, fragment?.payload?.maskData?.textShapeOutside?.left, fragment?.payload?.maskData?.textShapeOutside?.right, code);
-        break;
-      } else this_fragment = code;
-
+      this_id = `${fragment?.id}-code-hook`;
+      let code = fragment?.payload?.useHookEndPoint("codeHook", fragment?.payload?.codeHooks);
+      css = `${fragment?.css?.parent}`;
+      this_fragment = /*#__PURE__*/React.createElement("div", {
+        key: this_id,
+        id: `c-${this_id}-container`
+      }, code);
       break;
 
     case "MarkdownParagraph":
@@ -385,9 +383,8 @@ const InjectPaneFragment = (fragment, mode) => {
       css = `height:100%; z-index: ${parseInt(fragment?.z_index)}; `;
       if (typeof parent_css === "string") css = `${css} img {${fragment?.css?.parent}; }`;
       let this_object_fit = "cover";
-      let this_background_position = fragment?.payload?.imageData[0]?.backgroundPosition || "center"; // TODO: background position isn't actually working
-
-      let child = /*#__PURE__*/React.createElement("div", {
+      let this_background_position = fragment?.payload?.imageData[0]?.backgroundPosition || "center";
+      child = /*#__PURE__*/React.createElement("div", {
         className: "paneFragmentImage"
       }, /*#__PURE__*/React.createElement(BackgroundImage, _extends({
         id: `c-${this_id}-container-section`,

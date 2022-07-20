@@ -160,7 +160,7 @@ const ComposedPane = (data) => {
           });
           if (shape && !pane_fragment?.field_modal) {
             // regular markdown paragraph; add shape outside if any
-            if (shape && shape !== "none") {
+            if (typeof shape === "string" && shape !== "none") {
               let this_options = {
                 textShapeOutside: true,
                 viewportKey: viewportKey,
@@ -263,35 +263,24 @@ const ComposedPane = (data) => {
           break;
 
         case "paragraph__background_pane":
-          let mask = false;
           if (
             payload?.codeHooks?.hasOwnProperty(pane?.id) &&
             payload?.codeHooks[pane?.id]?.hasOwnProperty(pane_fragment?.id)
-          ) {
+          )
             this_payload.codeHooks =
               payload.codeHooks[pane.id][pane_fragment.id];
-            mask = true;
-          }
           shape = thisViewportValue(viewportKey, {
             mobile: pane_fragment?.field_shape_mobile,
             tablet: pane_fragment?.field_shape_tablet,
             desktop: pane_fragment?.field_shape_desktop,
           });
           let this_options = {
-            textShapeOutside: mask,
             viewportKey: viewportKey,
             pane_height: pane_height,
             id: `${pane_fragment?.id}-${viewportKey}`,
           };
-          tempValue = SvgShape(shape, this_options);
-          if (tempValue && mask) {
-            this_payload.maskData = {
-              textShapeOutside: tempValue,
-            };
-            pane_css =
-              `${pane_css} #svg__${tempValue?.id}--shape-outside-left {float:left;shape-outside:url(${tempValue?.left_mask})} ` +
-              `#svg__${tempValue?.id}--shape-outside-right {float:right;shape-outside:url(${tempValue?.right_mask})}`;
-          }
+          if (typeof shape === "string" && shape !== "none")
+            tempValue = SvgShape(shape, this_options);
           if (tempValue) this_payload.shapeData = tempValue.shape;
           break;
 

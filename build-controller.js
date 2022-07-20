@@ -23,7 +23,7 @@ const BuildController = data => {
     lispCallback(payload_ast[0], "controller", data?.useHookEndPoint);
   }
 
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  if (data?.prefersReducedMotion?.prefersReducedMotion === false) return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     id: "controller__minimized",
     className: "controller__minimized hidden none"
   }, /*#__PURE__*/React.createElement("div", {
@@ -58,6 +58,7 @@ const BuildController = data => {
     useHookEndPoint: data?.useHookEndPoint,
     viewportKey: viewportKey
   }))));
+  return /*#__PURE__*/React.createElement("p", null, "ul");
 };
 
 export { BuildController };
