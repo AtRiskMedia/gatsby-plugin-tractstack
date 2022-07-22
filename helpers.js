@@ -271,7 +271,7 @@ const InjectSvgModal = (shape, options) => {
   let this_fragment = /*#__PURE__*/React.createElement("div", {
     className: "paneFragmentModal"
   }, /*#__PURE__*/React.createElement("div", {
-    key: this_id,
+    key: `modal-svg-${this_id}`,
     css: css,
     id: `c-${this_id}-container`
   }, shape));
@@ -336,7 +336,7 @@ const InjectPaneFragment = (fragment, mode) => {
       let code = fragment?.payload?.useHookEndPoint("codeHook", fragment?.payload?.codeHooks);
       css = `${fragment?.css?.parent}`;
       this_fragment = /*#__PURE__*/React.createElement("div", {
-        key: this_id,
+        key: `fragment-code-${this_id}`,
         id: `c-${this_id}-container`
       }, code);
       break;
@@ -348,7 +348,7 @@ const InjectPaneFragment = (fragment, mode) => {
       if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
       if (typeof fragment?.css?.child === "string") css = `${css} ${fragment?.css?.child}`;
       let composed = /*#__PURE__*/React.createElement("div", {
-        key: this_id,
+        key: `fragment-paragraph-${this_id}`,
         id: `c-${this_id}-container`
       }, paragraph); // inject textShapeOutside(s) (if available)
 
@@ -370,7 +370,7 @@ const InjectPaneFragment = (fragment, mode) => {
       css = `height:100%; z-index: ${parseInt(fragment?.z_index)};`;
       if (typeof fragment?.css?.parent === "string") css = `${css} ${fragment?.css?.parent}`;
       this_fragment = /*#__PURE__*/React.createElement("div", {
-        key: this_id,
+        key: `fragment-svg-${this_id}`,
         id: `c-${this_id}-container`
       }, fragment?.payload?.shapeData);
       break;
@@ -406,7 +406,7 @@ const InjectPaneFragment = (fragment, mode) => {
         objectFit: this_object_fit
       }))));
       this_fragment = /*#__PURE__*/React.createElement("div", {
-        key: this_id,
+        key: `fragment-image-${this_id}`,
         id: `c-${this_id}-container`
       }, child);
       break;
@@ -427,7 +427,7 @@ const InjectPaneFragment = (fragment, mode) => {
         type: "video/mp4"
       }));
       this_fragment = /*#__PURE__*/React.createElement("div", {
-        key: this_id,
+        key: `fragment-video-${this_id}`,
         id: `c-${this_id}-container`
       }, child);
       break;
@@ -442,7 +442,7 @@ const InjectPaneFragment = (fragment, mode) => {
         className: "paneFragmentSvg"
       });
       this_fragment = /*#__PURE__*/React.createElement("div", {
-        key: this_id,
+        key: `fragment-svgsource-${this_id}`,
         id: `c-${this_id}-container`
       }, child);
       break;

@@ -10,7 +10,9 @@ import {
   HasPaneFragmentType,
   thisViewportValue,
   viewportWidth,
+  lispCallback,
 } from "./helpers";
+import { lispLexer } from "./lexer";
 import { SvgModals, SvgShape } from "./shapes";
 
 const ComposePanes = (data) => {
@@ -20,17 +22,53 @@ const ComposePanes = (data) => {
   // loop through the panes in view and render each pane fragment
   const composedPanes = data?.fragments?.relationships?.field_panes?.map(
     (pane, i) => {
+      let hasAccessibleController =
+        data?.prefersReducedMotion?.prefersReducedMotion === true &&
+        data?.payload?.payload?.accessibleController?.hasOwnProperty(pane?.id);
+      if (!hasAccessibleController)
+        return (
+          <ComposedPane
+            key={i}
+            data={{
+              pane: pane,
+              viewportKey: data?.viewportKey,
+              prefersReducedMotion: data?.prefersReducedMotion,
+              payload: data?.payload,
+              useHookEndPoint: data?.useHookEndPoint,
+            }}
+          />
+        );
+
+      let accessibleController = [],
+        impressionsData = data?.payload?.payload?.accessibleController[pane.id];
+      for (const impression in impressionsData) {
+        let this_id = `accessible-controller-li-${pane.id}-${impressionsData[impression].icon}`;
+        let headline = impressionsData[impression].headline;
+        let payload_ast = lispLexer(impressionsData[impression].actionsLisp);
+        function injectPayload() {
+          lispCallback(payload_ast[0], "button", data?.useHookEndPoint);
+        }
+        accessibleController.push(
+          <li key={this_id}>
+            {headline} <button onClick={() => injectPayload()}>Read</button>
+          </li>
+        );
+      }
       return (
-        <ComposedPane
-          key={i}
-          data={{
-            pane: pane,
-            viewportKey: data?.viewportKey,
-            prefersReducedMotion: data?.prefersReducedMotion,
-            payload: data?.payload,
-            useHookEndPoint: data?.useHookEndPoint,
-          }}
-        />
+        <React.Fragment key={i}>
+          <ComposedPane
+            data={{
+              pane: pane,
+              viewportKey: data?.viewportKey,
+              prefersReducedMotion: data?.prefersReducedMotion,
+              payload: data?.payload,
+              useHookEndPoint: data?.useHookEndPoint,
+            }}
+          />
+          <div className="accessible-controller">
+            <ul>{accessibleController}</ul>
+          </div>
+        </React.Fragment>
       );
     }
   );
@@ -247,7 +285,10 @@ const ComposedPane = (data) => {
 
             // add modal shape to stack
             composedPaneFragments.push(
-              <div className={thisClass} key={`modal-${pane_fragment?.id}`}>
+              <div
+                className={thisClass}
+                key={`modal-outer-${pane_fragment?.id}`}
+              >
                 <div
                   id={`modal-${pane_fragment?.id}`}
                   className={
@@ -418,7 +459,7 @@ const ComposedPane = (data) => {
 
       // add the composed pane fragment
       composedPaneFragments.push(
-        <div className={thisClass} key={pane_fragment?.id}>
+        <div className={thisClass} key={`fragment-outer-${pane_fragment?.id}`}>
           <div
             id={`fragment-${pane_fragment?.id}`}
             className={inView ? "paneFragment visible" : "paneFragment hidden"}
@@ -447,7 +488,7 @@ const ComposedPane = (data) => {
   }
 
   return (
-    <section key={pane?.id}>
+    <section key={`pane-${pane?.id}`}>
       <StyledWrapperDiv
         ref={observe}
         className={`pane pane__view pane__view--${viewportKey}`}

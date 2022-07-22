@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useInView } from "react-cool-inview";
-import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimation, HasImageMask, HasPaneFragmentType, thisViewportValue, viewportWidth } from "./helpers";
+import { InjectPaneFragment, InjectSvgModal, StyledWrapperDiv, InjectCssAnimation, HasImageMask, HasPaneFragmentType, thisViewportValue, viewportWidth, lispCallback } from "./helpers";
+import { lispLexer } from "./lexer";
 import { SvgModals, SvgShape } from "./shapes";
 
 const ComposePanes = data => {
@@ -9,7 +10,8 @@ const ComposePanes = data => {
   if (data?.viewportKey === "none") return /*#__PURE__*/React.createElement(React.Fragment, null); // loop through the panes in view and render each pane fragment
 
   const composedPanes = data?.fragments?.relationships?.field_panes?.map((pane, i) => {
-    return /*#__PURE__*/React.createElement(ComposedPane, {
+    let hasAccessibleController = data?.prefersReducedMotion?.prefersReducedMotion === true && data?.payload?.payload?.accessibleController?.hasOwnProperty(pane?.id);
+    if (!hasAccessibleController) return /*#__PURE__*/React.createElement(ComposedPane, {
       key: i,
       data: {
         pane: pane,
@@ -19,6 +21,38 @@ const ComposePanes = data => {
         useHookEndPoint: data?.useHookEndPoint
       }
     });
+    let accessibleController = [],
+        impressionsData = data?.payload?.payload?.accessibleController[pane.id];
+
+    for (const impression in impressionsData) {
+      let this_id = `accessible-controller-li-${pane.id}-${impressionsData[impression].icon}`;
+      let headline = impressionsData[impression].headline;
+      let payload_ast = lispLexer(impressionsData[impression].actionsLisp);
+
+      function injectPayload() {
+        lispCallback(payload_ast[0], "button", data?.useHookEndPoint);
+      }
+
+      accessibleController.push( /*#__PURE__*/React.createElement("li", {
+        key: this_id
+      }, headline, " ", /*#__PURE__*/React.createElement("button", {
+        onClick: () => injectPayload()
+      }, "Read")));
+    }
+
+    return /*#__PURE__*/React.createElement(React.Fragment, {
+      key: i
+    }, /*#__PURE__*/React.createElement(ComposedPane, {
+      data: {
+        pane: pane,
+        viewportKey: data?.viewportKey,
+        prefersReducedMotion: data?.prefersReducedMotion,
+        payload: data?.payload,
+        useHookEndPoint: data?.useHookEndPoint
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "accessible-controller"
+    }, /*#__PURE__*/React.createElement("ul", null, accessibleController)));
   }); // this is the storyFragment
 
   if (typeof composedPanes === "undefined") return /*#__PURE__*/React.createElement(React.Fragment, null);
@@ -189,7 +223,7 @@ const ComposedPane = data => {
 
           composedPaneFragments.push( /*#__PURE__*/React.createElement("div", {
             className: thisClass,
-            key: `modal-${pane_fragment?.id}`
+            key: `modal-outer-${pane_fragment?.id}`
           }, /*#__PURE__*/React.createElement("div", {
             id: `modal-${pane_fragment?.id}`,
             className: inView ? "paneFragment visible" : "paneFragment hidden",
@@ -329,7 +363,7 @@ const ComposedPane = data => {
 
     composedPaneFragments.push( /*#__PURE__*/React.createElement("div", {
       className: thisClass,
-      key: pane_fragment?.id
+      key: `fragment-outer-${pane_fragment?.id}`
     }, /*#__PURE__*/React.createElement("div", {
       id: `fragment-${pane_fragment?.id}`,
       className: inView ? "paneFragment visible" : "paneFragment hidden",
@@ -350,7 +384,7 @@ const ComposedPane = data => {
   }
 
   return /*#__PURE__*/React.createElement("section", {
-    key: pane?.id
+    key: `pane-${pane?.id}`
   }, /*#__PURE__*/React.createElement(StyledWrapperDiv, {
     ref: observe,
     className: `pane pane__view pane__view--${viewportKey}`,

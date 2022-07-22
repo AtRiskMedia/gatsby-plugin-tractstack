@@ -301,7 +301,7 @@ const InjectSvgModal = (shape, options) => {
     `}`;
   let this_fragment = (
     <div className="paneFragmentModal">
-      <div key={this_id} css={css} id={`c-${this_id}-container`}>
+      <div key={`modal-svg-${this_id}`} css={css} id={`c-${this_id}-container`}>
         {shape}
       </div>
     </div>
@@ -366,7 +366,7 @@ const InjectPaneFragment = (fragment, mode) => {
       );
       css = `${fragment?.css?.parent}`;
       this_fragment = (
-        <div key={this_id} id={`c-${this_id}-container`}>
+        <div key={`fragment-code-${this_id}`} id={`c-${this_id}-container`}>
           {code}
         </div>
       );
@@ -381,7 +381,10 @@ const InjectPaneFragment = (fragment, mode) => {
       if (typeof fragment?.css?.child === "string")
         css = `${css} ${fragment?.css?.child}`;
       let composed = (
-        <div key={this_id} id={`c-${this_id}-container`}>
+        <div
+          key={`fragment-paragraph-${this_id}`}
+          id={`c-${this_id}-container`}
+        >
           {paragraph}
         </div>
       );
@@ -413,7 +416,7 @@ const InjectPaneFragment = (fragment, mode) => {
       if (typeof fragment?.css?.parent === "string")
         css = `${css} ${fragment?.css?.parent}`;
       this_fragment = (
-        <div key={this_id} id={`c-${this_id}-container`}>
+        <div key={`fragment-svg-${this_id}`} id={`c-${this_id}-container`}>
           {fragment?.payload?.shapeData}
         </div>
       );
@@ -452,7 +455,7 @@ const InjectPaneFragment = (fragment, mode) => {
         </div>
       );
       this_fragment = (
-        <div key={this_id} id={`c-${this_id}-container`}>
+        <div key={`fragment-image-${this_id}`} id={`c-${this_id}-container`}>
           {child}
         </div>
       );
@@ -478,7 +481,7 @@ const InjectPaneFragment = (fragment, mode) => {
         </video>
       );
       this_fragment = (
-        <div key={this_id} id={`c-${this_id}-container`}>
+        <div key={`fragment-video-${this_id}`} id={`c-${this_id}-container`}>
           {child}
         </div>
       );
@@ -497,7 +500,10 @@ const InjectPaneFragment = (fragment, mode) => {
         />
       );
       this_fragment = (
-        <div key={this_id} id={`c-${this_id}-container`}>
+        <div
+          key={`fragment-svgsource-${this_id}`}
+          id={`c-${this_id}-container`}
+        >
           {child}
         </div>
       );
